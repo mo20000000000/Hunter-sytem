@@ -13,15 +13,15 @@
     }
     .neon-cyan {
       border: 1px solid #00e5ff;
-      box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.25);
     }
     .neon-green {
       border: 1px solid #10b981;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
     }
     .neon-red {
       border: 1px solid #ff3333;
-      box-shadow: 0 0 14px rgba(255, 51, 51, 0.35);
+      box-shadow: 0 0 12px rgba(255, 51, 51, 0.35);
     }
     .card-bg {
       background-color: #12151f;
@@ -32,92 +32,122 @@
     .glow-red {
       text-shadow: 0 0 8px rgba(255, 51, 51, 0.7);
     }
-    .wheel {
-      transition: transform 3.5s cubic-bezier(0.15, 0.9, 0.25, 1);
+    .wheel-container {
+      position: relative;
+      width: 260px;
+      height: 260px;
+      margin: 0 auto;
+    }
+    .wheel-pointer {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+      border-top: 20px solid #ef4444;
+      z-index: 10;
     }
   </style>
 </head>
-<body class="p-3 pb-20 min-h-screen flex flex-col items-center select-none">
+<body class="p-3 pb-20 min-h-screen flex flex-col items-center select-none text-right">
 
-  <!-- Header & Navigation Bar -->
+  <!-- Top Hub Bar -->
   <header class="w-full max-w-md flex justify-between items-center p-3 mb-3 card-bg rounded-xl neon-cyan">
     <div class="flex items-center gap-2 cursor-pointer" onclick="showView('home')">
       <span class="text-xl">⚡</span>
       <div>
-        <h1 class="text-sm font-bold text-cyan-400 glow-cyan">HUNTER LIFE SYSTEM</h1>
-        <p class="text-[10px] text-gray-400">Mostafa Abdelrahman</p>
+        <h1 class="text-sm font-bold text-cyan-400 glow-cyan font-mono">HUNTER LIFE SYSTEM</h1>
+        <p class="text-[10px] text-gray-400" id="top-user-name">Mostafa Abdelrahman</p>
       </div>
     </div>
-    <button onclick="showView('home')" class="px-2.5 py-1 text-xs bg-gray-900 border border-cyan-500/50 hover:bg-cyan-950 rounded text-cyan-400">
+    <button onclick="showView('home')" class="px-3 py-1 text-xs bg-gray-900 border border-cyan-500/50 hover:bg-cyan-950 rounded text-cyan-400 font-bold transition">
       🏠 الرئيسية
     </button>
   </header>
 
   <main class="w-full max-w-md">
 
-    <!-- ================= VIEW 1: HOME DASHBOARD (الواجهة الرئيسية) ================= -->
+    <!-- ================= VIEW 1: HOME HUB (الواجهة الرئيسية) ================= -->
     <section id="view-home" class="space-y-3">
       <div class="card-bg p-4 rounded-xl border border-gray-800 text-center">
-        <h2 class="text-base font-bold text-gray-100 mb-1">لوحة تحكم البطل ⚔️</h2>
-        <p class="text-xs text-gray-400">اختر البوابة التي تريد الدخول إليها الآن:</p>
+        <h2 class="text-base font-bold text-gray-100 mb-1">لوحة قيادة البطل ⚔️</h2>
+        <p class="text-xs text-gray-400">اختر البوابة المطلوبة لمواصلة التطوير والتعافي:</p>
       </div>
 
       <div class="grid grid-cols-1 gap-2.5">
         <!-- Gate 1: Workouts -->
         <button onclick="showView('workouts')" class="p-4 rounded-xl card-bg border border-cyan-500/40 hover:border-cyan-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
           <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/50">⚔️️</span>
+            <span class="text-2xl p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/50">⚔️</span>
             <div>
               <h3 class="text-sm font-bold text-cyan-400">نظام تمارين Hunter</h3>
-              <p class="text-xs text-gray-400">Day 1 / Day 2، الرتب، السجل الشهري والستريك</p>
+              <p class="text-xs text-gray-400">Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي</p>
             </div>
           </div>
           <span class="text-cyan-400 text-sm">◀</span>
         </button>
 
-        <!-- Gate 2: Evening Adhkar -->
+        <!-- Gate 2: Recovery Days Counter -->
+        <div class="p-4 rounded-xl card-bg border border-emerald-500/40 flex justify-between items-center">
+          <div>
+            <h3 class="text-sm font-bold text-emerald-400">🛡️ عداد التعافي والصمود</h3>
+            <div class="flex items-center gap-2 mt-1">
+              <label class="text-[11px] text-gray-400">البداية:</label>
+              <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded px-1.5 py-0.5 text-gray-200">
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-2xl font-bold text-emerald-400 font-mono" id="recovery-days-count">0</div>
+            <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-1.5 py-0.5 rounded mt-0.5 hover:bg-red-950">سجلت زلة (-1)</button>
+          </div>
+        </div>
+
+        <!-- Gate 3: Evening Adhkar -->
         <button onclick="showView('adhkar')" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
           <div class="flex items-center gap-3">
             <span class="text-2xl p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50">📿</span>
             <div>
-              <h3 class="text-sm font-bold text-emerald-400">أذكار المساء</h3>
-              <p class="text-xs text-gray-400">حصنك اليومي مع عدّاد تسبيح تفاعلي</p>
+              <h3 class="text-sm font-bold text-emerald-400">أذكار المساء والتحصين</h3>
+              <p class="text-xs text-gray-400">تعديل، إضافة، ترتيب، وتتبع بعدّاد تفاعلي</p>
             </div>
           </div>
           <span class="text-emerald-400 text-sm">◀</span>
         </button>
 
-        <!-- Gate 3: Duaa -->
+        <!-- Gate 4: Duaa -->
         <button onclick="showView('duaa')" class="p-4 rounded-xl card-bg border border-blue-500/40 hover:border-blue-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
           <div class="flex items-center gap-3">
             <span class="text-2xl p-2 rounded-lg bg-blue-950/60 border border-blue-500/50">🤲</span>
             <div>
-              <h3 class="text-sm font-bold text-blue-400">أدعية الثبات والتحصين</h3>
-              <p class="text-xs text-gray-400">أدعية الشفاء، الهداية، ومقاومة الزلات</p>
+              <h3 class="text-sm font-bold text-blue-400">أدعية الثبات والاستعاذة</h3>
+              <p class="text-xs text-gray-400">تحصين النفس مع تفعيل علامة الصح والإدارة الكاملة</p>
             </div>
           </div>
           <span class="text-blue-400 text-sm">◀</span>
         </button>
 
-        <!-- Gate 4: Journal & Audio -->
+        <!-- Gate 5: Journal Telegram -->
         <button onclick="showView('journal')" class="p-4 rounded-xl card-bg border border-purple-500/40 hover:border-purple-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
           <div class="flex items-center gap-3">
             <span class="text-2xl p-2 rounded-lg bg-purple-950/60 border border-purple-500/50">🎙️</span>
             <div>
-              <h3 class="text-sm font-bold text-purple-400">يوميات الصياد</h3>
-              <p class="text-xs text-gray-400">تسجيلات صوتية، صور، وتفريغ ذهني يومي</p>
+              <h3 class="text-sm font-bold text-purple-400">اليوميات المربوطة بتليجرام</h3>
+              <p class="text-xs text-gray-400">تسجيلات صوتية + توثيق بالصور مباشرة لمحادثتك</p>
             </div>
           </div>
           <span class="text-purple-400 text-sm">◀</span>
         </button>
 
-        <!-- Gate 5: Emergency Wheel -->
+        <!-- Gate 6: Emergency Wheel -->
         <button onclick="showView('wheel')" class="p-4 rounded-xl card-bg border border-red-500/50 hover:border-red-400 text-right flex items-center justify-between transition hover:scale-[1.01] bg-red-950/20">
           <div class="flex items-center gap-3">
             <span class="text-2xl p-2 rounded-lg bg-red-950/80 border border-red-500/70">🎡</span>
             <div>
-              <h3 class="text-sm font-bold text-red-400 glow-red">عجلة الطوارئ (SOS)</h3>
-              <p class="text-xs text-gray-400">مهام كسر الرغبة الفورية وتشتيت المحفزات</p>
+              <h3 class="text-sm font-bold text-red-400 glow-red">عجلة الطوارئ (وقت الخطر)</h3>
+              <p class="text-xs text-gray-400">تعديل المهام، إضافة خطط هروب، وكسر الرغبة فوراً</p>
             </div>
           </div>
           <span class="text-red-400 text-sm">◀</span>
@@ -149,7 +179,6 @@
         </div>
       </div>
 
-      <!-- Workout Actions -->
       <div class="flex justify-between items-center text-xs px-1">
         <div class="flex gap-1.5">
           <button onclick="exportData()" class="px-2 py-1 bg-gray-900 border border-gray-700 hover:border-cyan-500 rounded">💾 Export</button>
@@ -173,12 +202,10 @@
         <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center"></div>
       </div>
 
-      <!-- Rest Day Banner -->
       <div id="rest-day-banner" class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/50 hidden">
         <p class="text-xs text-emerald-300 font-bold">🌿 يوم استشفاء مفعل: أنت معفي اليوم من التمارين والعقوبات.</p>
       </div>
 
-      <!-- Penalty Card -->
       <div id="penalty-card" class="p-3 rounded-xl bg-red-950/30 border border-red-500 hidden space-y-2">
         <div class="flex justify-between items-center">
           <h4 class="text-xs font-bold text-red-400">⚠️ PENALTY QUEST ACTIVE</h4>
@@ -194,10 +221,10 @@
           <button id="tab-day1" onclick="switchRoutine('day1')" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-cyan-400 bg-cyan-950 text-cyan-400">⚡ DAY 1</button>
           <button id="tab-day2" onclick="switchRoutine('day2')" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400">🔥 DAY 2</button>
         </div>
-        <button onclick="openAddQuestModal()" class="text-xs border border-cyan-500 text-cyan-400 px-2 py-1.5 rounded hover:bg-cyan-950">+ إضافة تمرين</button>
+        <button onclick="openAddQuestModal()" class="text-xs border border-cyan-500 text-cyan-400 px-2.5 py-1.5 rounded hover:bg-cyan-950">+ إضافة تمرين</button>
       </div>
 
-      <!-- Quests Container -->
+      <!-- Quests Container with Weekly Average -->
       <div id="quest-list" class="space-y-2.5"></div>
 
       <!-- Complete Button -->
@@ -211,92 +238,103 @@
       <div class="card-bg p-3 rounded-xl border border-emerald-500/40 flex justify-between items-center">
         <div>
           <h2 class="text-sm font-bold text-emerald-400">📿 أذكار المساء والتحصين</h2>
-          <p class="text-[11px] text-gray-400">اضغط على بطاقة الذكر لتسجيل التكرار</p>
+          <p class="text-[11px] text-gray-400">تعديل، ترتيب، وحفظ أذكارك الخاصة</p>
         </div>
-        <button onclick="resetAdhkar()" class="text-[10px] border border-emerald-500/50 px-2 py-1 rounded text-emerald-400">إعادة التصفير</button>
+        <div class="flex gap-1.5">
+          <button onclick="resetAzkarCounters()" class="text-[10px] bg-gray-900 border border-emerald-500/50 px-2 py-1 rounded text-emerald-400">🔄 تصفير</button>
+          <button onclick="openAddZekrPrompt()" class="text-[10px] bg-emerald-950 border border-emerald-500 px-2 py-1 rounded text-emerald-300 font-bold">+ ذكر جديد</button>
+        </div>
       </div>
 
-      <div id="adhkar-container" class="space-y-2.5"></div>
+      <div id="azkarList" class="space-y-2.5"></div>
     </section>
 
-    <!-- ================= VIEW 4: DUAA (أدعية الثبات) ================= -->
+    <!-- ================= VIEW 4: DUAA (أدعية الثبات مع إشارة صح) ================= -->
     <section id="view-duaa" class="hidden space-y-3">
       <div class="card-bg p-3 rounded-xl border border-blue-500/40 flex justify-between items-center">
         <div>
-          <h2 class="text-sm font-bold text-blue-400">🤲 أدعية الثبات والانكسار لله</h2>
-          <p class="text-[11px] text-gray-400">حصنك عند الخلوة والضعف</p>
+          <h2 class="text-sm font-bold text-blue-400">🤲 أدعية الثبات والاستعاذة</h2>
+          <p class="text-[11px] text-gray-400">اضغط ✔ لتسجيل قراءة الدعاء، أو رتب وعدل</p>
         </div>
-        <button onclick="addNewDuaa()" class="text-xs border border-blue-500/50 px-2 py-1 rounded text-blue-400">+ إضافة دعاء</button>
+        <div class="flex gap-1.5">
+          <button onclick="resetDuaaChecks()" class="text-[10px] bg-gray-900 border border-blue-500/50 px-2 py-1 rounded text-blue-400">🔄 تصفير الصح</button>
+          <button onclick="openAddDuaaPrompt()" class="text-[10px] bg-blue-950 border border-blue-500 px-2 py-1 rounded text-blue-300 font-bold">+ دعاء جديد</button>
+        </div>
       </div>
 
-      <div id="duaa-container" class="space-y-2.5"></div>
+      <div id="duaaList" class="space-y-2.5"></div>
     </section>
 
-    <!-- ================= VIEW 5: JOURNAL & AUDIO (اليوميات) ================= -->
+    <!-- ================= VIEW 5: JOURNAL & TELEGRAM ================= -->
     <section id="view-journal" class="hidden space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-purple-500/40">
-        <h2 class="text-sm font-bold text-purple-400 mb-1">🎙️ تفريغ المشاعر واليوميات</h2>
-        <p class="text-[11px] text-gray-400 mb-2">سجل أفكارك صوتياً، اكتب ما يقلقك، أو أرفق صورة لتوثيق يومك</p>
+      <div class="card-bg p-4 rounded-xl border border-purple-500/40 space-y-3">
+        <div>
+          <h2 class="text-sm font-bold text-purple-400">🎙️ ركن اليوميات الصوتية والتوثيق</h2>
+          <p class="text-[11px] text-gray-400">يتم إرسال الفويس والصور فوراً لمحادثتك على تليجرام</p>
+        </div>
 
-        <!-- Audio Recorder -->
-        <div class="p-2.5 bg-black/40 rounded-lg border border-gray-800 flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <button id="record-btn" onclick="toggleAudioRecord()" class="w-8 h-8 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center font-bold text-xs">
-              ⏺
+        <!-- Audio Recorder Telegram -->
+        <div class="p-3 bg-black/40 rounded-xl border border-gray-800 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <button id="recBtn" onclick="toggleRecord()" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">
+              بدء التسجيل ⏺
             </button>
-            <span id="record-status" class="text-xs text-gray-300">تسجيل صوتي جديد</span>
+            <span id="rec-status" class="text-xs text-gray-400">جاهز للتسجيل</span>
           </div>
-          <span id="record-timer" class="text-xs font-mono text-purple-400">00:00</span>
         </div>
+        <div id="audioList" class="space-y-1.5"></div>
 
-        <textarea id="journal-input" rows="3" placeholder="اكتب ما يدور في بالك الآن بصراحة..." class="w-full p-2.5 text-xs bg-gray-900 border border-gray-800 rounded-lg text-gray-200 focus:outline-none focus:border-purple-500"></textarea>
-
-        <div class="flex justify-between items-center mt-2">
-          <label class="text-xs border border-gray-700 px-2.5 py-1.5 rounded cursor-pointer hover:border-purple-400 text-gray-300">
-            📷 إرفاق صورة
-            <input type="file" id="journal-img-input" accept="image/*" class="hidden" onchange="previewJournalImg(event)">
+        <!-- Photo Telegram -->
+        <div class="pt-2 border-t border-gray-800">
+          <p class="text-xs text-gray-300 mb-2">📸 توثيق بالصور (إرسال لتليجرام):</p>
+          <label class="w-full block text-center py-2.5 px-3 rounded-lg bg-gray-900 border border-purple-500/60 text-purple-300 hover:bg-purple-950/40 text-xs font-bold cursor-pointer transition">
+            📷 اختيار أو التقاط صورة
+            <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="sendPhotoToTelegram(this)">
           </label>
-          <button onclick="saveJournalEntry()" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded text-xs font-bold">
-            حفظ التدوينة
-          </button>
-        </div>
-        <div id="journal-img-preview" class="mt-2 hidden">
-          <img id="preview-img" src="" class="h-20 rounded border border-purple-500/50 object-cover">
+          <div id="photoStatus" class="text-[11px] text-cyan-400 text-center mt-2"></div>
         </div>
       </div>
-
-      <div id="journal-entries" class="space-y-2"></div>
     </section>
 
-    <!-- ================= VIEW 6: EMERGENCY WHEEL (عجلة الطوارئ) ================= -->
+    <!-- ================= VIEW 6: EMERGENCY WHEEL ================= -->
     <section id="view-wheel" class="hidden space-y-4 text-center">
-      <div class="card-bg p-4 rounded-xl neon-red">
-        <h2 class="text-base font-bold text-red-400 glow-red mb-1">🚨 بروتوكول الطوارئ (SOS)</h2>
-        <p class="text-xs text-gray-300">عند الشعور برغبة ملحة أو ضغط، دور العجلة ونفذ الأمر فوراً دون تفكير!</p>
+      <div class="card-bg p-3.5 rounded-xl neon-red">
+        <h2 class="text-sm font-bold text-red-400 glow-red mb-0.5">🚨 عجلة الطوارئ وكسر الرغبة</h2>
+        <p class="text-xs text-gray-300">لف العجلة واهرب فوراً لتنفيذ المهمة!</p>
       </div>
 
-      <div class="relative w-64 h-64 mx-auto flex items-center justify-center">
-        <!-- Pointer -->
-        <div class="absolute -top-3 z-10 text-2xl text-red-500">▼</div>
-        <!-- Wheel Canvas -->
-        <canvas id="wheel-canvas" width="250" height="250" class="wheel rounded-full border-2 border-red-500 shadow-[0_0_15px_rgba(255,51,51,0.4)]"></canvas>
+      <div class="wheel-container">
+        <div class="wheel-pointer"></div>
+        <canvas id="wheelCanvas" width="500" height="500" class="w-full h-full rounded-full shadow-[0_0_15px_rgba(255,51,51,0.4)]"></canvas>
       </div>
 
-      <button id="spin-btn" onclick="spinWheel()" class="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm tracking-wider uppercase shadow-[0_0_15px_rgba(255,51,51,0.5)] transition">
-        🎯 تدوير العجلة الآن
+      <div id="spinResult" class="text-xs font-bold text-yellow-300 min-h-[24px]">اضغط على الزر واهرب فوراً</div>
+
+      <button id="spinBtn" onclick="spinWheel()" class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase shadow-[0_0_12px_rgba(255,51,51,0.5)] transition">
+        🎯 لف العجلة الآن
       </button>
 
-      <div id="wheel-result" class="p-3 rounded-xl card-bg border border-red-500/60 hidden">
-        <p class="text-xs text-gray-400 mb-1">المهمة المطلوبة فوراً:</p>
-        <h3 id="wheel-task-title" class="text-sm font-bold text-cyan-400"></h3>
+      <!-- Task Manager Accordion -->
+      <div class="text-right">
+        <button onclick="toggleTaskManager()" class="text-xs text-gray-400 hover:text-cyan-400 flex items-center gap-1 border border-gray-800 px-2.5 py-1 rounded bg-gray-900">
+          ⚙️ تعديل وإضافة مهام العجلة
+        </button>
+        <div id="taskManager" class="mt-2 card-bg p-3 rounded-xl border border-gray-800 hidden space-y-2">
+          <div id="taskList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
+          <div class="flex gap-1.5 pt-2 border-t border-gray-800">
+            <input type="text" id="newTaskInput" placeholder="مهمة هروب جديدة..." class="flex-1 text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200">
+            <button onclick="addTask()" class="text-xs px-3 py-1 bg-cyan-600 text-white rounded font-bold">إضافة</button>
+          </div>
+        </div>
       </div>
     </section>
 
   </main>
 
   <script>
-    // ================= GLOBAL STATE & STORAGE =================
     const RANKS = ["E-Rank", "D-Rank", "C-Rank", "B-Rank", "A-Rank", "S-Rank"];
+    const TELEGRAM_BOT_TOKEN = "8238961725:AAEnYk98W5GumFyIYNb7ZDnE6H_ZM7H5ZDw";
+    const TELEGRAM_CHAT_ID = "6783357158";
 
     function getFormattedDate(d) {
       const year = d.getFullYear();
@@ -316,6 +354,36 @@
     }
     requestPersistentStorage();
 
+    // ================= INITIAL STATE =================
+    const defaultAzkar = [
+      { id: 1, text: "آية الكرسي: ﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...﴾", total: 1, current: 1 },
+      { id: 2, text: "سورة الإخلاص + المعوذتين (الفلق والناس)", total: 3, current: 3 },
+      { id: 3, text: "بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ", total: 3, current: 3 },
+      { id: 4, text: "أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ", total: 3, current: 3 },
+      { id: 5, text: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أُشْرِكَ بِكَ وَأَنَا أَعْلَمُ، وَأَسْتَغْفِرُكَ لِمَا لَا أَعْلَمُ", total: 3, current: 3 },
+      { id: 6, text: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ أَصْلِحْ لِي شَأْنِي كُلَّهُ وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ", total: 1, current: 1 },
+      { id: 7, text: "سيد الاستغفار: اللَّهُمَّ أَنْتَ رَبِّي لا إِلَهَ إِلا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ...", total: 1, current: 1 },
+      { id: 8, text: "حَسْبِـيَ اللّهُ لا إلهَ إلّا هُوَ عَلَـيهِ تَوَكَّـلتُ وَهُوَ رَبُّ العَرْشِ العَظـيم", total: 7, current: 7 },
+      { id: 9, text: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنْ الْعَجْزِ وَالْكَسَلِ...", total: 3, current: 3 }
+    ];
+
+    const defaultDuas = [
+      { id: 1, text: "«اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ شَرِّ سَمْعِي، وَمِنْ شَرِّ بَصَرِي، وَمِنْ شَرِّ لِسَانِي، وَمِنْ شَرِّ قَلْبِي، وَمِنْ شَرِّ مَنِيِّي»", done: false },
+      { id: 2, text: "«اللهم إنك تعلم بحالي، وتعلم ما يصلح حالي، اللهم إنك تعلم من ضرني وتعلم ما يصلح ويذهب ضري، اللهم إني أكل إليك أمري»", done: false },
+      { id: 3, text: "«اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى»", done: false },
+      { id: 4, text: "«اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ وَرَحْمَتِكَ فَإِنَّهُ لا يَمْلِكُهَا إِلا أَنْتَ»", done: false },
+      { id: 5, text: "«لَا إِلَهَ إِلَّا أَنْتَ سُبْحَانَكَ إِنِّي كُنْتُ مِنَ الظَّالِمِينَ»", done: false }
+    ];
+
+    const defaultWheelPlans = [
+      "اغسل وشك بماية مثلجة فوراً 🧊",
+      "انزل اتمشى ربع ساعة 🚶‍♂️",
+      "اتصل بصديق ثقة احكيله 📞",
+      "اعمل 15 عدة ضغط حالاً 💪",
+      "اتوضى وصلّي ركعتين 🤲",
+      "تمارين تنفس 3 دقائق 🧘"
+    ];
+
     let state = {
       name: "Mostafa Abdelrahman",
       level: 1,
@@ -325,6 +393,9 @@
       lastActiveDate: getTodayKey(),
       activeRoutine: "day1",
       history: {},
+      questHistory: {}, // { 'YYYY-MM-DD': { questId: reps } }
+      recoveryStart: getTodayKey(),
+      recoveryPenaltyDays: 0,
       routines: {
         day1: [
           { id: 101, name: "Push-ups", current: 0, target: 100 },
@@ -337,31 +408,18 @@
           { id: 203, name: "Lunges", current: 0, target: 60 }
         ]
       },
-      adhkar: [
-        { id: 1, text: "أمسينا وأمسى الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له", count: 0, target: 1 },
-        { id: 2, text: "اللهم بك أمسينا، وبك أصبحنا، وبك نحيا، وبك نموت، وإليك المصير", count: 0, target: 1 },
-        { id: 3, text: "سيد الاستغفار: اللهم أنت ربي لا إله إلا أنت، خلقتني وأنا عبدك...", count: 0, target: 1 },
-        { id: 4, text: "اللهم إني أسألك العافية في الدنيا والآخرة...", count: 0, target: 1 },
-        { id: 5, text: "بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء", count: 0, target: 3 },
-        { id: 6, text: "أعوذ بكلمات الله التامات من شر ما خلق", count: 0, target: 3 },
-        { id: 7, text: "سبحان الله وبحمده", count: 0, target: 100 }
-      ],
-      duaaList: [
-        "اللهم يا مقلب القلوب ثبت قلبي على دينك وطاعتك.",
-        "اللهم إني أعوذ بك من شر سمعي، ومن شر بصري، ومن شر لساني، ومن شر قلبي، ومن شر منيِي.",
-        "اللهم حصّن فرجي، وطهّر قلبي، واغفر ذنبي، ووفقني لمرضاتك.",
-        "اللهم باعد بيني وبين خطاياي كما باعدت بين المشرق والمغرب."
-      ],
-      journals: []
+      azkar: defaultAzkar,
+      duas: defaultDuas,
+      wheelPlans: defaultWheelPlans
     };
 
     function loadData() {
-      const saved = localStorage.getItem("hunter_hub_data_v3");
+      const saved = localStorage.getItem("hunter_ultimate_v4");
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           state = Object.assign(state, parsed);
-        } catch (e) {}
+        } catch(e) {}
       } else {
         const v2 = localStorage.getItem("hunter_system_data_v2");
         if (v2) {
@@ -373,31 +431,87 @@
       }
       checkDayTransition();
       recalculateStreakAndLevel();
+      calculateRecoveryDays();
       renderAll();
     }
 
     function saveData() {
-      localStorage.setItem("hunter_hub_data_v3", JSON.stringify(state));
+      localStorage.setItem("hunter_ultimate_v4", JSON.stringify(state));
+    }
+
+    function renderAll() {
+      renderWorkouts();
+      renderAzkar();
+      renderDuas();
+      renderTasks();
+      drawWheel();
+      calculateRecoveryDays();
     }
 
     // ================= NAVIGATION =================
-    function showView(viewName) {
-      const views = ['home', 'workouts', 'adhkar', 'duaa', 'journal', 'wheel'];
-      views.forEach(v => {
+    function showView(view) {
+      ['home', 'workouts', 'adhkar', 'duaa', 'journal', 'wheel'].forEach(v => {
         const el = document.getElementById(`view-${v}`);
         if (el) el.classList.add('hidden');
       });
-      const activeEl = document.getElementById(`view-${viewName}`);
-      if (activeEl) activeEl.classList.remove('hidden');
+      const target = document.getElementById(`view-${view}`);
+      if (target) target.classList.remove('hidden');
 
-      if (viewName === 'wheel') drawWheel();
-      if (viewName === 'adhkar') renderAdhkar();
-      if (viewName === 'duaa') renderDuaa();
-      if (viewName === 'journal') renderJournals();
-      if (viewName === 'workouts') renderWorkouts();
+      if (view === 'wheel') drawWheel();
+      if (view === 'adhkar') renderAzkar();
+      if (view === 'duaa') renderDuas();
+      if (view === 'workouts') renderWorkouts();
     }
 
-    // ================= WORKOUT LOGIC =================
+    // ================= RECOVERY DAYS COUNTER =================
+    function calculateRecoveryDays() {
+      if (!state.recoveryStart) state.recoveryStart = getTodayKey();
+      document.getElementById("recovery-start-input").value = state.recoveryStart;
+
+      const start = new Date(state.recoveryStart);
+      const today = new Date();
+      const diffTime = today - start;
+      let days = Math.floor(diffTime / (1000 * 60 * 60 * 24)) - (state.recoveryPenaltyDays || 0);
+      document.getElementById("recovery-days-count").innerText = days < 0 ? 0 : days;
+    }
+
+    function updateRecoveryStart() {
+      state.recoveryStart = document.getElementById("recovery-start-input").value;
+      state.recoveryPenaltyDays = 0;
+      saveData();
+      calculateRecoveryDays();
+    }
+
+    function reportRecoverySlip() {
+      if (confirm("الزلة مش نهاية المطاف، كمل بكل قوتك! نخصم يوم؟")) {
+        state.recoveryPenaltyDays = (state.recoveryPenaltyDays || 0) + 1;
+        saveData();
+        calculateRecoveryDays();
+      }
+    }
+
+    // ================= WORKOUT LOGIC + 5-DAY AVERAGE =================
+    function calculateWeeklyAverage(questId) {
+      let totalReps = 0;
+      let trainingDays = 0;
+      const today = new Date();
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(today.getDate() - i);
+        const dayOfWeek = d.getDay();
+        // أيام التمارين العادية (ليس خميس 4 أو جمعة 5)
+        if (dayOfWeek !== 4 && dayOfWeek !== 5) {
+          const key = getFormattedDate(d);
+          trainingDays++;
+          if (state.questHistory && state.questHistory[key] && state.questHistory[key][questId]) {
+            totalReps += state.questHistory[key][questId];
+          }
+        }
+      }
+      return (totalReps / Math.max(1, trainingDays)).toFixed(1);
+    }
+
     function checkDayTransition() {
       const today = getTodayKey();
       if (!state.lastActiveDate) {
@@ -463,7 +577,8 @@
     }
 
     function renderWorkouts() {
-      document.getElementById("hunter-name").innerText = state.name + " ✏️";
+      document.getElementById("hunter-name").innerText = state.name + " ✏️️";
+      document.getElementById("top-user-name").innerText = state.name;
       const rankIndex = Math.min(Math.floor((state.level - 1) / 2), RANKS.length - 1);
       document.getElementById("hunter-rank-level").innerText = `${RANKS[rankIndex].toUpperCase()} HUNTER | LEVEL ${state.level}`;
       document.getElementById("streak-count").innerText = state.streak;
@@ -475,15 +590,17 @@
       const restActive = isTodayRest();
       const statusText = document.getElementById("weekly-status-text");
       if (restActive) statusText.innerHTML = `<span class="text-green-400 font-bold">RECOVERY DAY 🌿</span>`;
-      else statusText.innerText = `Day ${dayInWeek} of 7`;
+      else statusText.innerText = `Day ${dayInWeek} of 7 (Level Progress)`;
 
       const restBanner = document.getElementById("rest-day-banner");
       const restBtn = document.getElementById("rest-toggle-btn");
       if (restActive) {
         restBanner.classList.remove("hidden");
+        restBtn.className = "px-2.5 py-1 bg-green-950 border border-green-400 text-green-300 rounded font-semibold text-xs";
         restBtn.innerText = "🌿 Rest Active";
       } else {
         restBanner.classList.add("hidden");
+        restBtn.className = "px-2.5 py-1 bg-gray-900 border border-green-700 hover:border-green-400 text-green-400 rounded transition font-semibold text-xs";
         restBtn.innerText = "🌿 Rest Day";
       }
 
@@ -512,26 +629,40 @@
 
       quests.forEach((q, index) => {
         const pct = Math.min(100, Math.floor((q.current / q.target) * 100));
+        const avg = calculateWeeklyAverage(q.id);
+
         const card = document.createElement("div");
         card.className = `card-bg p-3 rounded-lg border transition ${pct >= 100 ? "border-cyan-500/70" : "border-gray-800"}`;
         card.innerHTML = `
           <div class="flex justify-between items-center mb-1">
-            <span class="font-bold text-xs text-gray-200">${q.name}</span>
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-xs text-gray-200">${q.name}</span>
+              <button onclick="editQuestName(${q.id})" class="text-[10px] text-gray-400 hover:text-cyan-400">✏️</button>
+            </div>
             <div class="flex items-center gap-1">
-              <button onclick="editTarget(${q.id})" class="text-[10px] text-cyan-400 border border-cyan-500/40 px-1 rounded">🎯 ${q.target}</button>
+              <button onclick="moveQuest(${index}, -1)" class="text-xs px-1 bg-gray-800 text-gray-400 rounded">▲</button>
+              <button onclick="moveQuest(${index}, 1)" class="text-xs px-1 bg-gray-800 text-gray-400 rounded">▼</button>
               <button onclick="deleteQuest(${q.id})" class="text-xs text-gray-500 hover:text-red-400 px-1">✕</button>
             </div>
           </div>
+
+          <div class="flex justify-between items-center text-xs text-gray-400 mb-1">
+            <span>Progress: ${q.current} / <strong onclick="editTarget(${q.id})" class="text-cyan-400 underline cursor-pointer">${q.target}</strong></span>
+            <span class="text-cyan-400 font-semibold">${pct}%</span>
+          </div>
+
+          <div class="text-[10px] text-gray-400 mb-1.5 flex justify-between">
+            <span class="text-cyan-300 font-mono">📈 متوسط أسبوعي: <strong>${avg}</strong> عَدّة/يوم</span>
+          </div>
+
           <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-2">
             <div class="bg-cyan-400 h-1.5 transition-all duration-200" style="width: ${pct}%"></div>
           </div>
-          <div class="flex justify-between items-center text-xs">
-            <span class="text-gray-400">${q.current} / ${q.target} (${pct}%)</span>
-            <div class="flex gap-1">
-              <button onclick="updateQuest(${q.id}, -1)" ${state.penaltyActive || isDayCompletedToday || restActive ? 'disabled' : ''} class="px-2 py-0.5 bg-gray-800 rounded">-1</button>
-              <button onclick="updateQuest(${q.id}, 1)" ${state.penaltyActive || isDayCompletedToday || restActive ? 'disabled' : ''} class="px-2 py-0.5 bg-gray-800 text-cyan-400 rounded">+1</button>
-              <button onclick="completeSingleQuest(${q.id})" ${state.penaltyActive || isDayCompletedToday || restActive ? 'disabled' : ''} class="px-2 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-400 rounded font-semibold">✔</button>
-            </div>
+
+          <div class="flex justify-end gap-1.5 text-xs">
+            <button onclick="updateQuest(${q.id}, -1)" ${state.penaltyActive || isDayCompletedToday || restActive ? 'disabled' : ''} class="px-2 py-0.5 bg-gray-800 rounded hover:bg-gray-700 text-gray-300 disabled:opacity-30">-1</button>
+            <button onclick="updateQuest(${q.id}, 1)" ${state.penaltyActive || isDayCompletedToday || restActive ? 'disabled' : ''} class="px-2.5 py-0.5 bg-gray-800 rounded hover:bg-cyan-900 text-cyan-400 disabled:opacity-30">+1</button>
+            <button onclick="completeSingleQuest(${q.id})" ${state.penaltyActive || isDayCompletedToday || restActive ? 'disabled' : ''} class="px-2.5 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-400 hover:bg-cyan-900 rounded font-semibold disabled:opacity-30">✔ Done</button>
           </div>
         `;
         listEl.appendChild(card);
@@ -539,14 +670,17 @@
 
       const completeBtn = document.getElementById("complete-day-btn");
       if (restActive) {
-        completeBtn.innerText = "🌿 REST DAY (PROTECTED)";
-        completeBtn.disabled = true;
+        completeBtn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-green-500 bg-green-950/40 text-green-400 cursor-not-allowed";
+        completeBtn.innerText = "🌿 REST DAY ACTIVE (PROTECTED)";
       } else if (isDayCompletedToday) {
+        completeBtn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-cyan-700 bg-cyan-950/40 text-cyan-400 cursor-not-allowed opacity-80";
         completeBtn.innerText = "✅ TODAY ALREADY COMPLETED";
-        completeBtn.disabled = true;
+      } else if (state.penaltyActive) {
+        completeBtn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-red-900 bg-red-950/30 text-red-400 cursor-not-allowed";
+        completeBtn.innerText = "LOCKED (PENALTY ACTIVE)";
       } else {
+        completeBtn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition shadow-[0_0_12px_rgba(0,229,255,0.3)] cursor-pointer";
         completeBtn.innerText = "COMPLETE DAY";
-        completeBtn.disabled = false;
       }
     }
 
@@ -567,14 +701,24 @@
         const d = new Date(year, month, day);
         const key = getFormattedDate(d);
         const status = state.history[key];
+        const isToday = key === getTodayKey();
+
         const box = document.createElement("div");
         box.onclick = () => toggleDayStatus(key);
-        let cls = "p-1 rounded cursor-pointer border text-center text-[10px] ";
-        if (status === 'rest') cls += "border-green-600 bg-green-950/40 text-green-400";
-        else if (status === 'completed' || status === true) cls += "border-cyan-500 bg-cyan-950 text-cyan-400";
-        else cls += "border-gray-800 bg-gray-900/40 text-gray-500";
-        box.className = cls;
-        box.innerText = day;
+        let borderClass = "border-gray-800 bg-gray-900/40 text-gray-500";
+        let icon = "✖";
+
+        if (status === 'rest') {
+          borderClass = "border-green-600/70 bg-green-950/40 text-green-400";
+          icon = "🌿";
+        } else if (status === 'completed' || status === true) {
+          borderClass = "border-cyan-500 bg-cyan-950/50 text-cyan-400";
+          icon = "✔";
+        }
+        if (isToday) borderClass += " ring-1 ring-cyan-400";
+
+        box.className = `p-1.5 rounded cursor-pointer border transition flex flex-col items-center justify-center ${borderClass}`;
+        box.innerHTML = `<span class="text-[10px] font-bold">${day}</span><span class="text-[9px]">${icon}</span>`;
         calEl.appendChild(box);
       }
     }
@@ -589,6 +733,7 @@
     }
 
     function updateQuest(id, amt) {
+      if (state.penaltyActive || isTodayRest()) return;
       const q = state.routines[state.activeRoutine].find(x => x.id === id);
       if (!q) return;
       q.current = Math.max(0, q.current + amt);
@@ -597,6 +742,7 @@
     }
 
     function completeSingleQuest(id) {
+      if (state.penaltyActive || isTodayRest()) return;
       const q = state.routines[state.activeRoutine].find(x => x.id === id);
       if (!q) return;
       q.current = q.target;
@@ -615,290 +761,481 @@
       }
     }
 
+    function editQuestName(id) {
+      const q = state.routines[state.activeRoutine].find(x => x.id === id);
+      if (!q) return;
+      const n = prompt("Quest Name:", q.name);
+      if (n && n.trim()) {
+        q.name = n.trim();
+        saveData();
+        renderWorkouts();
+      }
+    }
+
+    function moveQuest(index, dir) {
+      const list = state.routines[state.activeRoutine];
+      const target = index + dir;
+      if (target < 0 || target >= list.length) return;
+      const temp = list[index];
+      list[index] = list[target];
+      list[target] = temp;
+      saveData();
+      renderWorkouts();
+    }
+
     function openAddQuestModal() {
-      const n = prompt("Quest Name:");
+      const n = prompt(`Enter Quest Name for ${state.activeRoutine.toUpperCase()}:`);
       if (!n) return;
-      const t = parseInt(prompt("Target:", "100"), 10) || 100;
-      state.routines[state.activeRoutine].push({ id: Date.now(), name: n, current: 0, target: t });
+      const t = parseInt(prompt("Enter Target Count:", "100"), 10) || 100;
+      state.routines[state.activeRoutine].push({ id: Date.now(), name: n.trim(), current: 0, target: t });
       saveData();
       renderWorkouts();
     }
 
     function deleteQuest(id) {
-      state.routines[state.activeRoutine] = state.routines[state.activeRoutine].filter(x => x.id !== id);
-      saveData();
-      renderWorkouts();
+      if (confirm("Delete this quest?")) {
+        state.routines[state.activeRoutine] = state.routines[state.activeRoutine].filter(x => x.id !== id);
+        saveData();
+        renderWorkouts();
+      }
     }
 
     function completeDay() {
       const todayKey = getTodayKey();
-      const unfinished = state.routines[state.activeRoutine].filter(q => q.current < q.target);
-      if (unfinished.length > 0) {
-        alert("⚠️ لم تنهِ كل تمارين اليوم بعد!");
+      if (state.history[todayKey] === 'completed') {
+        alert("You already completed your quests for today!");
         return;
       }
+      if (isTodayRest()) {
+        alert("Today is a Rest Day!");
+        return;
+      }
+      const unfinished = state.routines[state.activeRoutine].filter(q => q.current < q.target);
+      if (unfinished.length > 0) {
+        alert("⚠️ لم تنهِ كل التمارين المطلوبة بعد!");
+        return;
+      }
+
+      // حفظ عدات التمارين اليوم لحساب المتوسط
+      if (!state.questHistory) state.questHistory = {};
+      state.questHistory[todayKey] = {};
+      state.routines[state.activeRoutine].forEach(q => {
+        state.questHistory[todayKey][q.id] = q.current;
+      });
+
       state.history[todayKey] = 'completed';
+      const prevLevel = state.level;
       recalculateStreakAndLevel();
       saveData();
       renderWorkouts();
-      alert("✅ عاش يا بطل! تم تسجيل يوم التمرين بنجاح.");
+
+      if (state.level > prevLevel) alert(`🔥 [LEVEL UP] وصلت إلى LEVEL ${state.level}!`);
+      else alert(`✅ تم تسجيل اليوم بنجاح! الستريك: ${state.streak} يوم.`);
     }
 
-    // ================= ADHKAR LOGIC =================
-    function renderAdhkar() {
-      const container = document.getElementById("adhkar-container");
+    // ================= ADHKAR LOGIC (تعديل + ترتيب + حذف + إضافة) =================
+    function renderAzkar() {
+      const container = document.getElementById("azkarList");
+      if (!container) return;
       container.innerHTML = "";
-      state.adhkar.forEach(a => {
-        const isDone = a.count >= a.target;
-        const card = document.createElement("div");
-        card.onclick = () => incrementZekr(a.id);
-        card.className = `p-3 rounded-xl card-bg border cursor-pointer transition ${isDone ? 'border-emerald-500 bg-emerald-950/20' : 'border-gray-800 hover:border-gray-600'}`;
-        card.innerHTML = `
-          <p class="text-xs text-gray-200 leading-relaxed mb-2">${a.text}</p>
-          <div class="flex justify-between items-center text-xs">
-            <span class="text-gray-400 font-mono">الهدف: ${a.target}</span>
-            <span class="px-3 py-1 rounded-full font-bold ${isDone ? 'bg-emerald-500 text-black' : 'bg-gray-800 text-emerald-400'}">
-              ${a.count} / ${a.target} ${isDone ? '✔' : ''}
-            </span>
+
+      state.azkar.forEach((item, index) => {
+        const isDone = item.current <= 0;
+        const div = document.createElement("div");
+        div.className = `card-bg p-3 rounded-xl border transition ${isDone ? 'border-emerald-500/70 bg-emerald-950/20' : 'border-gray-800'}`;
+        div.innerHTML = `
+          <div class="text-xs text-gray-200 leading-relaxed mb-2">${item.text}</div>
+          <div class="flex justify-between items-center pt-2 border-t border-gray-800/80">
+            <button onclick="decrementZekr(${index})" class="px-3 py-1 rounded text-xs font-bold transition ${isDone ? 'bg-emerald-500 text-black' : 'bg-emerald-950 border border-emerald-500/60 text-emerald-400'}">
+              ${isDone ? 'تم الاكتفاء ✔️' : `متبقي: ${item.current} /${item.total}`}
+            </button>
+            <div class="flex items-center gap-1">
+              <button onclick="moveZekr(${index}, -1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+              <button onclick="moveZekr(${index}, 1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+              <button onclick="editZekr(${index})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+              <button onclick="deleteZekr(${index})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+            </div>
           </div>
         `;
-        container.appendChild(card);
+        container.appendChild(div);
       });
     }
 
-    function incrementZekr(id) {
-      const item = state.adhkar.find(x => x.id === id);
-      if (!item) return;
-      if (item.count < item.target) {
-        item.count++;
+    function decrementZekr(index) {
+      if (state.azkar[index].current > 0) {
+        state.azkar[index].current -= 1;
         if (navigator.vibrate) navigator.vibrate(30);
         saveData();
-        renderAdhkar();
+        renderAzkar();
       }
     }
 
-    function resetAdhkar() {
-      state.adhkar.forEach(a => a.count = 0);
+    function resetAzkarCounters() {
+      state.azkar.forEach(item => item.current = item.total);
       saveData();
-      renderAdhkar();
+      renderAzkar();
     }
 
-    // ================= DUAA LOGIC =================
-    function renderDuaa() {
-      const container = document.getElementById("duaa-container");
+    function openAddZekrPrompt() {
+      const text = prompt("اكتب نص الذكر الجديد:");
+      if (!text || !text.trim()) return;
+      const total = parseInt(prompt("عدد التكرار:", "1"), 10) || 1;
+      state.azkar.push({ id: Date.now(), text: text.trim(), total: total, current: total });
+      saveData();
+      renderAzkar();
+    }
+
+    function editZekr(index) {
+      const item = state.azkar[index];
+      const newText = prompt("تعديل نص الذكر:", item.text);
+      if (newText && newText.trim()) {
+        const newTotal = parseInt(prompt("تعديل التكرار:", item.total), 10) || 1;
+        item.text = newText.trim();
+        item.total = newTotal;
+        item.current = newTotal;
+        saveData();
+        renderAzkar();
+      }
+    }
+
+    function deleteZekr(index) {
+      if (confirm("هل تريد حذف هذا الذكر؟")) {
+        state.azkar.splice(index, 1);
+        saveData();
+        renderAzkar();
+      }
+    }
+
+    function moveZekr(index, dir) {
+      const target = index + dir;
+      if (target < 0 || target >= state.azkar.length) return;
+      const temp = state.azkar[index];
+      state.azkar[index] = state.azkar[target];
+      state.azkar[target] = temp;
+      saveData();
+      renderAzkar();
+    }
+
+    // ================= DUAS LOGIC (صح + تعديل + ترتيب + حذف) =================
+    function renderDuas() {
+      const container = document.getElementById("duaaList");
+      if (!container) return;
       container.innerHTML = "";
-      state.duaaList.forEach((d, i) => {
-        const card = document.createElement("div");
-        card.className = "p-3 rounded-xl card-bg border border-blue-900/40 relative";
-        card.innerHTML = `
-          <p class="text-xs text-blue-100 leading-relaxed">${d}</p>
-          <button onclick="deleteDuaa(${i})" class="absolute top-2 left-2 text-gray-500 hover:text-red-400 text-xs">✕</button>
+
+      state.duas.forEach((d, index) => {
+        const div = document.createElement("div");
+        div.className = `card-bg p-3 rounded-xl border transition ${d.done ? 'border-blue-500/80 bg-blue-950/20' : 'border-gray-800'}`;
+        div.innerHTML = `
+          <div class="text-xs text-blue-100 leading-relaxed mb-2">${d.text}</div>
+          <div class="flex justify-between items-center pt-2 border-t border-gray-800/80">
+            <button onclick="toggleDuaCheck(${index})" class="px-3 py-1 rounded text-xs font-bold transition ${d.done ? 'bg-blue-500 text-black' : 'bg-gray-800 text-blue-300 border border-blue-500/40'}">
+              ${d.done ? '✔ تم الدعاء' : 'وضع علامة صح ✔'}
+            </button>
+            <div class="flex items-center gap-1">
+              <button onclick="moveDua(${index}, -1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+              <button onclick="moveDua(${index}, 1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+              <button onclick="editDua(${index})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+              <button onclick="deleteDua(${index})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+            </div>
+          </div>
         `;
-        container.appendChild(card);
+        container.appendChild(div);
       });
     }
 
-    function addNewDuaa() {
-      const text = prompt("أدخل نص الدعاء:");
+    function toggleDuaCheck(index) {
+      state.duas[index].done = !state.duas[index].done;
+      if (state.duas[index].done && navigator.vibrate) navigator.vibrate(30);
+      saveData();
+      renderDuas();
+    }
+
+    function resetDuaaChecks() {
+      state.duas.forEach(d => d.done = false);
+      saveData();
+      renderDuas();
+    }
+
+    function openAddDuaaPrompt() {
+      const text = prompt("أدخل نص الدعاء الجديد:");
       if (text && text.trim()) {
-        state.duaaList.push(text.trim());
+        state.duas.push({ id: Date.now(), text: text.trim(), done: false });
         saveData();
-        renderDuaa();
+        renderDuas();
       }
     }
 
-    function deleteDuaa(index) {
-      state.duaaList.splice(index, 1);
-      saveData();
-      renderDuaa();
+    function editDua(index) {
+      const newText = prompt("تعديل نص الدعاء:", state.duas[index].text);
+      if (newText && newText.trim()) {
+        state.duas[index].text = newText.trim();
+        saveData();
+        renderDuas();
+      }
     }
 
-    // ================= JOURNAL & AUDIO =================
+    function deleteDua(index) {
+      if (confirm("هل تريد حذف هذا الدعاء؟")) {
+        state.duas.splice(index, 1);
+        saveData();
+        renderDuas();
+      }
+    }
+
+    function moveDua(index, dir) {
+      const target = index + dir;
+      if (target < 0 || target >= state.duas.length) return;
+      const temp = state.duas[index];
+      state.duas[index] = state.duas[target];
+      state.duas[target] = temp;
+      saveData();
+      renderDuas();
+    }
+
+    // ================= EMERGENCY WHEEL (محرك العجلة الأصلي + تحكم كامل) =================
+    const wheelColors = ["#0284c7", "#16a34a", "#d97706", "#dc2626", "#7c3aed", "#059669", "#ea580c", "#4f46e5"];
+    let currentWheelAngle = 0;
+    let isWheelSpinning = false;
+
+    function drawWheel() {
+      const canvas = document.getElementById("wheelCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      const numSegments = state.wheelPlans.length;
+      if (numSegments === 0) return;
+
+      const anglePerSegment = (2 * Math.PI) / numSegments;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < numSegments; i++) {
+        const startAngle = i * anglePerSegment + currentWheelAngle;
+        const endAngle = startAngle + anglePerSegment;
+
+        ctx.beginPath();
+        ctx.moveTo(250, 250);
+        ctx.arc(250, 250, 240, startAngle, endAngle);
+        ctx.fillStyle = wheelColors[i % wheelColors.length];
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(250, 250);
+        ctx.rotate(startAngle + anglePerSegment / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 18px system-ui";
+        const shortText = state.wheelPlans[i].length > 18 ? state.wheelPlans[i].substring(0, 16) + "..." : state.wheelPlans[i];
+        ctx.fillText(shortText, 220, 6);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(250, 250, 25, 0, 2 * Math.PI);
+      ctx.fillStyle = "#0f172a";
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+
+    function spinWheel() {
+      if (isWheelSpinning || state.wheelPlans.length === 0) return;
+      isWheelSpinning = true;
+      document.getElementById('spinBtn').disabled = true;
+      document.getElementById('spinResult').innerText = "العجلة تدور بأقصى سرعة...";
+
+      const spinDuration = 3500;
+      const start = performance.now();
+      const baseRounds = (Math.PI * 2) * (5 + Math.random() * 3);
+      const startAngle = currentWheelAngle;
+
+      function animate(time) {
+        let elapsed = time - start;
+        let progress = elapsed / spinDuration;
+
+        if (progress > 1) progress = 1;
+        let easeOut = 1 - Math.pow(1 - progress, 3);
+        currentWheelAngle = startAngle + baseRounds * easeOut;
+        drawWheel();
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          isWheelSpinning = false;
+          document.getElementById('spinBtn').disabled = false;
+          determineWinner();
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+
+    function determineWinner() {
+      const numSegments = state.wheelPlans.length;
+      const anglePerSegment = (2 * Math.PI) / numSegments;
+      let normalizedAngle = (1.5 * Math.PI - (currentWheelAngle % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
+      let winningIndex = Math.floor(normalizedAngle / anglePerSegment);
+      document.getElementById('spinResult').innerText = "المهمة: " + state.wheelPlans[winningIndex];
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    }
+
+    function toggleTaskManager() {
+      const box = document.getElementById("taskManager");
+      box.classList.toggle("hidden");
+    }
+
+    function renderTasks() {
+      const list = document.getElementById("taskList");
+      if (!list) return;
+      list.innerHTML = "";
+
+      state.wheelPlans.forEach((task, idx) => {
+        const div = document.createElement("div");
+        div.className = "flex justify-between items-center bg-gray-900 border border-gray-800 p-2 rounded text-xs";
+        div.innerHTML = `
+          <span class="text-gray-200">${task}</span>
+          <div class="flex gap-1">
+            <button onclick="editTask(${idx})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded">✏️</button>
+            <button onclick="removeTask(${idx})" class="px-1.5 py-0.5 bg-red-950 text-red-400 rounded">✕</button>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById("newTaskInput");
+      const val = input.value.trim();
+      if (val) {
+        state.wheelPlans.push(val);
+        input.value = "";
+        saveData();
+        renderTasks();
+        drawWheel();
+      }
+    }
+
+    function editTask(idx) {
+      const newT = prompt("تعديل مهمة الهروب:", state.wheelPlans[idx]);
+      if (newT && newT.trim()) {
+        state.wheelPlans[idx] = newT.trim();
+        saveData();
+        renderTasks();
+        drawWheel();
+      }
+    }
+
+    function removeTask(idx) {
+      if (state.wheelPlans.length <= 2) {
+        alert("يجب بقاء خيارين على الأقل في العجلة!");
+        return;
+      }
+      state.wheelPlans.splice(idx, 1);
+      saveData();
+      renderTasks();
+      drawWheel();
+    }
+
+    // ================= TELEGRAM AUDIO & PHOTO (معالجة الأذونات) =================
     let mediaRecorder = null;
     let audioChunks = [];
-    let recordInterval = null;
-    let secondsRecorded = 0;
-    let currentImageBase64 = null;
+    let isRecording = false;
 
-    async function toggleAudioRecord() {
-      const btn = document.getElementById("record-btn");
-      const status = document.getElementById("record-status");
+    async function toggleRecord() {
+      const btn = document.getElementById('recBtn');
+      const status = document.getElementById('rec-status');
 
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-        clearInterval(recordInterval);
-        btn.innerText = "⏺";
-        btn.classList.remove("animate-pulse");
-        status.innerText = "تم حفظ المقطع الصوتي";
-      } else {
+      if (!isRecording) {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
           mediaRecorder = new MediaRecorder(stream);
           audioChunks = [];
           mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-          mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            const reader = new FileReader();
-            reader.readAsDataURL(audioBlob);
-            reader.onloadend = () => {
-              window.lastAudioBase64 = reader.result;
-            };
+
+          mediaRecorder.onstop = async () => {
+            const blob = new Blob(audioChunks, { type: 'audio/ogg' });
+            const url = URL.createObjectURL(blob);
+            const audio = document.createElement('audio');
+            audio.controls = true;
+            audio.src = url;
+            audio.className = "w-full h-8 mt-1";
+            document.getElementById('audioList').prepend(audio);
+
+            status.innerText = "⏳ جاري الإرسال لتليجرام...";
+            await sendAudioToTelegram(blob);
+            status.innerText = "جاهز للتسجيل";
+            btn.innerText = "بدء التسجيل ⏺";
+            btn.className = "px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition";
           };
+
           mediaRecorder.start();
-          secondsRecorded = 0;
-          recordInterval = setInterval(() => {
-            secondsRecorded++;
-            const m = String(Math.floor(secondsRecorded / 60)).padStart(2, '0');
-            const s = String(secondsRecorded % 60).padStart(2, '0');
-            document.getElementById("record-timer").innerText = `${m}:${s}`;
-          }, 1000);
-          btn.innerText = "⏹";
-          btn.classList.add("animate-pulse");
-          status.innerText = "جارِ التسجيل الآن...";
-        } catch (e) {
-          alert("يرجى منح إذن الميكروفون للتسجيل.");
+          isRecording = true;
+          btn.innerText = "⏹ إيقاف وإرسال";
+          btn.className = "px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition animate-pulse";
+          status.innerText = "جارِ تسجيل صوتك...";
+        } catch (err) {
+          alert("يرجى منح إذن المايكروفون من إعدادات المتصفح أو تطبيق الموبايل.");
         }
+      } else {
+        mediaRecorder.stop();
+        isRecording = false;
       }
     }
 
-    function previewJournalImg(e) {
-      const file = e.target.files[0];
+    async function sendAudioToTelegram(audioBlob) {
+      const formData = new FormData();
+      formData.append("chat_id", TELEGRAM_CHAT_ID);
+      formData.append("voice", audioBlob, "journal.ogg");
+      formData.append("caption", "🎙️ يوميات صوتية جديدة: " + new Date().toLocaleDateString('ar-EG'));
+
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVoice`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.ok) alert("🚀 تم إرسال التسجيل الصوتي لتليجرام بنجاح!");
+        else alert("خطأ تليجرام: " + data.description);
+      } catch (e) {
+        alert("تعذر الاتصال بتليجرام، تأكد من اتصال الإنترنت.");
+      }
+    }
+
+    async function sendPhotoToTelegram(fileInput) {
+      const file = fileInput.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        currentImageBase64 = ev.target.result;
-        document.getElementById("preview-img").src = currentImageBase64;
-        document.getElementById("journal-img-preview").classList.remove("hidden");
-      };
-      reader.readAsDataURL(file);
-    }
 
-    function saveJournalEntry() {
-      const text = document.getElementById("journal-input").value.trim();
-      const audio = window.lastAudioBase64 || null;
-      const img = currentImageBase64 || null;
+      const status = document.getElementById('photoStatus');
+      status.innerText = "⏳ جاري رفع وإرسال الصورة لتليجرام...";
 
-      if (!text && !audio && !img) {
-        alert("يرجى كتابة نص أو تسجيل صوت أو إرفاق صورة أولاً.");
-        return;
+      const formData = new FormData();
+      formData.append("chat_id", TELEGRAM_CHAT_ID);
+      formData.append("photo", file);
+      formData.append("caption", "📸 توثيق وإنجاز جديد: " + new Date().toLocaleDateString('ar-EG'));
+
+      try {
+        const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.ok) {
+          status.innerText = "✔️ تم إرسال الصورة بنجاح لتليجرام!";
+          setTimeout(() => { status.innerText = ""; }, 4000);
+        } else {
+          status.innerText = "❌ خطأ تليجرام: " + data.description;
+        }
+      } catch (err) {
+        status.innerText = "❌ تعذر الاتصال بالإنترنت.";
       }
-
-      state.journals.unshift({
-        id: Date.now(),
-        date: new Date().toLocaleString('ar-EG'),
-        text: text,
-        audio: audio,
-        img: img
-      });
-
-      document.getElementById("journal-input").value = "";
-      document.getElementById("journal-img-preview").classList.add("hidden");
-      currentImageBase64 = null;
-      window.lastAudioBase64 = null;
-      saveData();
-      renderJournals();
+      fileInput.value = "";
     }
 
-    function renderJournals() {
-      const container = document.getElementById("journal-entries");
-      container.innerHTML = "";
-      state.journals.forEach((j, index) => {
-        const item = document.createElement("div");
-        item.className = "p-3 rounded-xl card-bg border border-gray-800 space-y-2";
-        item.innerHTML = `
-          <div class="flex justify-between items-center text-[10px] text-gray-500">
-            <span>${j.date}</span>
-            <button onclick="deleteJournal(${index})" class="text-red-400">حذف</button>
-          </div>
-          ${j.text ? `<p class="text-xs text-gray-200 leading-relaxed">${j.text}</p>` : ''}
-          ${j.audio ? `<audio controls src="${j.audio}" class="w-full h-8 mt-1"></audio>` : ''}
-          ${j.img ? `<img src="${j.img}" class="rounded-lg max-h-48 object-cover mt-1 border border-gray-700">` : ''}
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    function deleteJournal(i) {
-      state.journals.splice(i, 1);
-      saveData();
-      renderJournals();
-    }
-
-    // ================= EMERGENCY WHEEL =================
-    const wheelTasks = [
-      "قم فوراً وتوضأ وصلِّ ركعتين خاشعتين",
-      "العب 30 عدة ضغط بأقصى سرعة وقوة",
-      "اخرج من الغرفة فوراً واغسل وجهك بماء مثلج",
-      "اتصل بصديق أو شخص مقرب وتحدث معه",
-      "اقرأ صفحة واحدة من القرآن بصوت مسموع",
-      "انزل للشارع للمشي 10 دقائق دون هاتف",
-      "استغفر 100 مرة متتالية بتركيز تام",
-      "اكتب ما تشعر به الآن على ورقة ثم مزقها"
-    ];
-
-    function drawWheel() {
-      const canvas = document.getElementById("wheel-canvas");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      const numSegments = wheelTasks.length;
-      const arcSize = (2 * Math.PI) / numSegments;
-      const colors = ["#ef4444", "#06b6d4", "#10b981", "#8b5cf6", "#f59e0b", "#3b82f6", "#ec4899", "#14b8a6"];
-
-      ctx.clearRect(0, 0, 250, 250);
-      for (let i = 0; i < numSegments; i++) {
-        const angle = i * arcSize;
-        ctx.beginPath();
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.moveTo(125, 125);
-        ctx.arc(125, 125, 120, angle, angle + arcSize);
-        ctx.lineTo(125, 125);
-        ctx.fill();
-
-        ctx.save();
-        ctx.translate(125, 125);
-        ctx.rotate(angle + arcSize / 2);
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 10px monospace";
-        ctx.fillText(`مهمة ${i+1}`, 110, 4);
-        ctx.restore();
-      }
-    }
-
-    let isSpinning = false;
-    let currentWheelAngle = 0;
-
-    function spinWheel() {
-      if (isSpinning) return;
-      isSpinning = true;
-      const canvas = document.getElementById("wheel-canvas");
-      const btn = document.getElementById("spin-btn");
-      btn.disabled = true;
-
-      const randomRounds = 5 + Math.floor(Math.random() * 5);
-      const randomTaskIndex = Math.floor(Math.random() * wheelTasks.length);
-      const arcDeg = 360 / wheelTasks.length;
-      const targetDeg = (360 - (randomTaskIndex * arcDeg)) - (arcDeg / 2);
-      currentWheelAngle += (randomRounds * 360) + targetDeg;
-
-      canvas.style.transform = `rotate(${currentWheelAngle}deg)`;
-
-      setTimeout(() => {
-        isSpinning = false;
-        btn.disabled = false;
-        const resultCard = document.getElementById("wheel-result");
-        document.getElementById("wheel-task-title").innerText = wheelTasks[randomTaskIndex];
-        resultCard.classList.remove("hidden");
-        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-      }, 3500);
-    }
-
-    // ================= EXPORT / IMPORT =================
+    // ================= EXPORT & IMPORT =================
     function exportData() {
       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
       const a = document.createElement('a');
       a.href = dataStr;
-      a.download = `hunter_life_backup_${getTodayKey()}.json`;
+      a.download = `hunter_ultimate_backup_${getTodayKey()}.json`;
       a.click();
     }
 
@@ -913,9 +1250,9 @@
           saveData();
           recalculateStreakAndLevel();
           renderAll();
-          alert("✅ تم استرجاع النسخة الاحتياطية بنجاح!");
+          alert("✅ تم استيراد كل بياناتك بنجاح!");
         } catch(err) {
-          alert("خطأ في قراءة الملف.");
+          alert("خطأ في قراءة ملف النسخة الاحتياطية.");
         }
       };
       reader.readAsText(file);
@@ -932,7 +1269,7 @@
     }
 
     function editPenaltyText() {
-      const t = prompt("مهمة العقوبة:", state.penaltyText);
+      const t = prompt("تعديل مهمة العقوبة:", state.penaltyText);
       if (t) {
         state.penaltyText = t;
         saveData();
@@ -941,7 +1278,7 @@
     }
 
     function confirmPenaltyDone() {
-      if (confirm("هل أتممت مهمة العقوبة بالكامل؟")) {
+      if (confirm("هل أتممت مهمة العقوبة؟")) {
         state.penaltyActive = false;
         saveData();
         renderWorkouts();
@@ -959,13 +1296,6 @@
       const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
       const timerEl = document.getElementById("countdown");
       if (timerEl) timerEl.innerText = `${h}:${m}:${s}`;
-    }
-
-    function renderAll() {
-      renderWorkouts();
-      renderAdhkar();
-      renderDuaa();
-      renderJournals();
     }
 
     setInterval(updateTimer, 1000);
