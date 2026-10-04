@@ -31,7 +31,6 @@
 
   <main class="w-full max-w-md">
 
-    <!-- VIEW: HOME -->
     <section id="view-home" class="space-y-3">
       <div class="card-bg p-4 rounded-xl border border-gray-800 text-center">
         <h2 class="text-base font-bold text-gray-100 mb-1">لوحة قيادة البطل ⚔️</h2>
@@ -109,7 +108,6 @@
       </div>
     </section>
 
-    <!-- VIEW: WORKOUTS -->
     <section id="view-workouts" class="hidden space-y-4">
       <div class="card-bg p-4 rounded-xl neon-cyan">
         <div class="flex items-center justify-between">
@@ -179,7 +177,6 @@
       <button id="complete-day-btn" onclick="completeDay()" class="w-full py-3 rounded-lg font-bold text-xs uppercase border border-cyan-500 text-cyan-400 hover:bg-cyan-950 transition">COMPLETE DAY</button>
     </section>
 
-    <!-- VIEW: ADHKAR -->
     <section id="view-adhkar" class="hidden space-y-3">
       <div class="card-bg p-3 rounded-xl border border-emerald-500/40 flex justify-between items-center">
         <div>
@@ -194,7 +191,6 @@
       <div id="azkarList" class="space-y-2.5"></div>
     </section>
 
-    <!-- VIEW: DUAA -->
     <section id="view-duaa" class="hidden space-y-3">
       <div class="card-bg p-3 rounded-xl border border-blue-500/40 flex justify-between items-center">
         <div>
@@ -209,7 +205,6 @@
       <div id="duaaList" class="space-y-2.5"></div>
     </section>
 
-    <!-- VIEW: JOURNAL -->
     <section id="view-journal" class="hidden space-y-3">
       <div class="card-bg p-4 rounded-xl border border-purple-500/40 space-y-3">
         <div class="flex justify-between items-start">
@@ -237,7 +232,6 @@
       </div>
     </section>
 
-    <!-- VIEW: EMERGENCY WHEEL -->
     <section id="view-wheel" class="hidden space-y-4 text-center">
       <div class="card-bg p-3.5 rounded-xl neon-red">
         <h2 class="text-sm font-bold text-red-400 glow-red mb-0.5">🚨 عجلة الطوارئ وكسر الرغبة</h2>
@@ -454,7 +448,7 @@ function toggleTodayRest() {
 function switchRoutine(r) { state.activeRoutine = r; saveData(); renderWorkouts(); }
 
 function renderWorkouts() {
-  document.getElementById("hunter-name").innerText = state.name + " ✏";
+  document.getElementById("hunter-name").innerText = state.name + " ✏️️";
   document.getElementById("top-user-name").innerText = state.name;
   const rankIndex = Math.min(Math.floor((state.level - 1) / 2), CONFIG.RANKS.length - 1);
   document.getElementById("hunter-rank-level").innerText = `${CONFIG.RANKS[rankIndex].toUpperCase()} HUNTER | LEVEL ${state.level}`;
@@ -1043,11 +1037,11 @@ if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
 setInterval(updateTimer, 1000);
 updateTimer();
 loadData();
-</script>
 
-<script>
 // ================= HABITS TRACKER =================
 (function () {
+  const WEEK_START = 6; // 6 = السبت
+  const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
   if (!state.habits) {
     state.habits = {
       list: [
@@ -1062,10 +1056,15 @@ loadData();
     };
     saveData();
   }
+  let selDay = getTodayKey();
   const H = () => state.habits;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = m => m >= 60 ? `${Math.floor(m / 60)}س ${m % 60}د` : `${m}د`;
-  const lastDays = n => { const o = []; for (let i = n - 1; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); o.push(getFormattedDate(d)); } return o; };
+  const weekDays = () => {
+    const t = new Date(); t.setHours(12);
+    t.setDate(t.getDate() - ((t.getDay() - WEEK_START + 7) % 7));
+    return Array.from({ length: 7 }, (_, i) => { const d = new Date(t); d.setDate(t.getDate() + i); return d; });
+  };
   const entry = (h, k) => (H().log[k] || {})[h.id];
   const isDone = (h, k) => {
     const e = entry(h, k);
@@ -1074,45 +1073,34 @@ loadData();
     if (e === false) return false;
     return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
   };
-  const setE = (id, k, v) => {
-    const l = H().log;
-    if (!l[k]) l[k] = {};
-    l[k][id] = v;
-    saveData(); render();
-  };
+  const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); };
   const find = id => H().list.find(h => h.id === id);
 
-  // ---- واجهة ----
   const section = document.createElement('section');
   section.id = 'view-habits';
   section.className = 'hidden space-y-3';
   section.innerHTML = `
     <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
-      <div>
-        <h2 class="text-sm font-bold text-amber-400">✅ متتبع العادات</h2>
-        <p class="text-[11px] text-gray-400">علّم اللي عملته النهاردة، وعدّل أو ضيف براحتك</p>
-      </div>
+      <div><h2 class="text-sm font-bold text-amber-400">✅ متتبع العادات</h2>
+      <p id="habitsDayLabel" class="text-[11px] text-gray-400"></p></div>
       <button onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
     </div>
+    <div id="habitsWeek" class="grid grid-cols-7 gap-1"></div>
     <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
     <div id="habitsList" class="space-y-2.5"></div>`;
   document.querySelector('main').appendChild(section);
 
   const homeBtn = document.createElement('button');
+  homeBtn.dataset.key = 'habits';
   homeBtn.onclick = () => showView('habits');
   homeBtn.className = 'p-4 rounded-xl card-bg border border-amber-500/40 hover:border-amber-400 text-right flex items-center justify-between transition hover:scale-[1.01]';
-  homeBtn.innerHTML = `
-    <div class="flex items-center gap-3">
-      <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">✅</span>
-      <div>
-        <h3 class="text-sm font-bold text-amber-400">متتبع العادات اليومية</h3>
-        <p class="text-xs text-gray-400">الفجر، المذاكرة، الورد، التمرين، قيام الليل والإجمالي الأسبوعي</p>
-      </div>
-    </div>
+  homeBtn.innerHTML = `<div class="flex items-center gap-3">
+    <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">✅</span>
+    <div><h3 class="text-sm font-bold text-amber-400">متتبع العادات اليومية</h3>
+    <p class="text-xs text-gray-400">الفجر، المذاكرة، الورد، التمرين، قيام الليل والإجمالي الأسبوعي</p></div></div>
     <span class="text-amber-400 text-sm">◀</span>`;
   document.querySelector('#view-home .grid').prepend(homeBtn);
 
-  // ---- ربط التنقل ----
   const _showView = window.showView;
   window.showView = function (v) {
     document.getElementById('view-habits').classList.add('hidden');
@@ -1120,52 +1108,58 @@ loadData();
       _showView('home');
       document.getElementById('view-home').classList.add('hidden');
       document.getElementById('view-habits').classList.remove('hidden');
+      selDay = getTodayKey();
       render();
-    } else {
-      _showView(v);
-    }
+    } else _showView(v);
   };
 
-  // ---- العرض ----
   function render() {
     const box = document.getElementById('habitsList');
     if (!box) return;
-    const today = getTodayKey(), week = lastDays(7), list = H().list;
+    const today = getTodayKey(), list = H().list, wd = weekDays();
+    const keys = wd.map(getFormattedDate);
+    const past = keys.filter(k => k <= today);
 
-    const tDone = list.filter(h => isDone(h, today)).length;
-    const wDone = list.reduce((s, h) => s + week.filter(k => isDone(h, k)).length, 0);
-    const wMax = Math.max(1, list.length * 7);
-    const tPct = list.length ? Math.round(tDone / list.length * 100) : 0;
+    document.getElementById('habitsWeek').innerHTML = wd.map((d, i) => {
+      const k = keys[i], fut = k > today, sel = k === selDay;
+      const n = list.filter(h => isDone(h, k)).length;
+      return `<button ${fut ? 'disabled' : ''} onclick="hbDay('${k}')" class="py-1.5 rounded-lg border text-center transition ${sel ? 'bg-amber-500 text-black border-amber-400 font-bold' : 'bg-gray-900 border-gray-800 text-gray-300'} ${fut ? 'opacity-30' : ''}">
+        <div class="text-[9px]">${DAYS[d.getDay()].slice(0, 3)}</div><div class="text-xs font-bold">${d.getDate()}</div>
+        <div class="text-[9px] ${sel ? '' : 'text-amber-400'}">${fut ? '·' : n + '/' + list.length}</div></button>`;
+    }).join('');
+
+    const sd = new Date(selDay + 'T12:00:00');
+    document.getElementById('habitsDayLabel').innerText = (selDay === today ? 'تسجيل اليوم' : 'تسجيل يوم') + ': ' + DAYS[sd.getDay()] + ' ' + sd.getDate();
+
+    const dDone = list.filter(h => isDone(h, selDay)).length;
+    const dPct = list.length ? Math.round(dDone / list.length * 100) : 0;
+    const wDone = list.reduce((s, h) => s + past.filter(k => isDone(h, k)).length, 0);
+    const wMax = Math.max(1, list.length * past.length);
     const wPct = Math.round(wDone / wMax * 100);
     document.getElementById('habitsSummary').innerHTML = `
-      <div class="flex justify-between text-xs"><span class="text-gray-300">النهاردة</span><span class="text-amber-400 font-bold">${tDone} / ${list.length} (${tPct}%)</span></div>
-      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-amber-400 h-2 transition-all" style="width:${tPct}%"></div></div>
-      <div class="flex justify-between text-xs pt-1"><span class="text-gray-300">إجمالي آخر 7 أيام</span><span class="text-cyan-400 font-bold">${wDone} / ${wMax} (${wPct}%)</span></div>
+      <div class="flex justify-between text-xs"><span class="text-gray-300">اليوم المختار</span><span class="text-amber-400 font-bold">${dDone} / ${list.length} (${dPct}%)</span></div>
+      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-amber-400 h-2 transition-all" style="width:${dPct}%"></div></div>
+      <div class="flex justify-between text-xs pt-1"><span class="text-gray-300">إجمالي الأسبوع الحالي</span><span class="text-cyan-400 font-bold">${wDone} / ${wMax} (${wPct}%)</span></div>
       <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-cyan-400 h-2 transition-all" style="width:${wPct}%"></div></div>`;
 
     box.innerHTML = '';
     list.forEach((h, i) => {
-      const d = isDone(h, today);
-      const wCount = week.filter(k => isDone(h, k)).length;
-      const dots = week.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === today ? 'ring-1 ring-amber-300' : ''}"></span>`).join('');
-
-      let middle = '', weekExtra = '';
+      const d = isDone(h, selDay);
+      const wCount = past.filter(k => isDone(h, k)).length;
+      const dots = keys.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
+      let middle = '', extra = '';
       if (h.type === 'time') {
-        const e = entry(h, today) || { min: 0, mode: 'study' };
-        middle = `
-          <div class="flex items-center gap-2 mt-2">
-            <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
-            <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button>
-          </div>`;
+        const e = entry(h, selDay) || { min: 0, mode: 'study' };
+        middle = `<div class="flex items-center gap-2 mt-2">
+          <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
+          <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
         let st = 0, me = 0;
-        week.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
-        weekExtra = ` • مذاكرة ${fmt(st)} • حفظ ${fmt(me)}`;
+        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
+        extra = ` • مذاكرة ${fmt(st)} • حفظ ${fmt(me)}`;
       }
-
       const mark = h.type === 'time'
         ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
         : `<button onclick="hbToggle(${h.id})" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
-
       const card = document.createElement('div');
       card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
       card.innerHTML = `
@@ -1177,27 +1171,26 @@ loadData();
             <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
             <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
           </div>
-        </div>
-        ${middle}
+        </div>${middle}
         <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
           <div class="flex gap-1">${dots}</div>
-          <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/7</strong>${weekExtra}</span>
+          <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/7</strong>${extra}</span>
         </div>`;
       box.appendChild(card);
     });
   }
 
-  // ---- العمليات ----
-  window.hbToggle = id => { const h = find(id); setE(id, getTodayKey(), !isDone(h, getTodayKey())); };
+  window.hbDay = k => { selDay = k; render(); };
+  window.hbToggle = id => setE(id, selDay, !isDone(find(id), selDay));
   window.hbMode = id => {
-    const k = getTodayKey(), e = entry(find(id), k) || { min: 0, mode: 'study' };
-    setE(id, k, { min: e.min, mode: e.mode === 'memo' ? 'study' : 'memo' });
+    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
+    setE(id, selDay, { min: e.min, mode: e.mode === 'memo' ? 'study' : 'memo' });
   };
   window.hbMin = id => {
-    const k = getTodayKey(), e = entry(find(id), k) || { min: 0, mode: 'study' };
+    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
     const v = prompt("عملت كام دقيقة؟", e.min || "");
     if (v === null) return;
-    setE(id, k, { min: Math.max(0, parseInt(v, 10) || 0), mode: e.mode });
+    setE(id, selDay, { min: Math.max(0, parseInt(v, 10) || 0), mode: e.mode });
   };
   window.hbAdd = () => {
     const n = prompt("اسم العادة:");
@@ -1206,20 +1199,60 @@ loadData();
     H().list.push({ id: Date.now(), name: n.trim(), type: timed ? 'time' : 'check' });
     saveData(); render();
   };
-  window.hbEdit = id => {
-    const h = find(id);
-    const n = prompt("تعديل اسم العادة:", h.name);
-    if (n && n.trim()) { h.name = n.trim(); saveData(); render(); }
-  };
-  window.hbDel = id => {
-    if (confirm("تحذف العادة دي؟")) { H().list = H().list.filter(h => h.id !== id); saveData(); render(); }
-  };
+  window.hbEdit = id => { const h = find(id), n = prompt("تعديل اسم العادة:", h.name); if (n && n.trim()) { h.name = n.trim(); saveData(); render(); } };
+  window.hbDel = id => { if (confirm("تحذف العادة دي؟")) { H().list = H().list.filter(h => h.id !== id); saveData(); render(); } };
   window.hbMove = (i, dir) => {
     const l = H().list, t = i + dir;
     if (t < 0 || t >= l.length) return;
     [l[i], l[t]] = [l[t], l[i]];
     saveData(); render();
   };
+})();
+
+// ================= HOME ORDER =================
+(function () {
+  const grid = document.querySelector('#view-home .grid');
+  const base = ['workouts', 'recovery', 'adhkar', 'duaa', 'journal', 'wheel'];
+  [...grid.children].filter(c => !c.dataset.key).forEach((c, i) => c.dataset.key = base[i]);
+  let edit = false;
+
+  function apply() {
+    const order = state.homeOrder || [];
+    const rank = c => { const i = order.indexOf(c.dataset.key); return i < 0 ? 999 : i; };
+    const kids = [...grid.children];
+    kids.forEach(c => { c.querySelectorAll('.ho-arrows').forEach(e => e.remove()); c.classList.remove('relative'); });
+    kids.sort((a, b) => rank(a) - rank(b)).forEach(c => grid.appendChild(c));
+    if (!edit) return;
+    [...grid.children].forEach(c => {
+      c.classList.add('relative');
+      const w = document.createElement('div');
+      w.className = 'ho-arrows absolute top-1 left-1 flex gap-1 z-10';
+      const cls = 'px-2 py-0.5 bg-gray-800 border border-gray-600 text-gray-200 rounded text-xs cursor-pointer';
+      w.innerHTML = `<span data-d="-1" class="${cls}">▲</span><span data-d="1" class="${cls}">▼</span>`;
+      c.appendChild(w);
+    });
+  }
+
+  grid.addEventListener('click', e => {
+    if (!edit) return;
+    e.stopPropagation(); e.preventDefault();
+    const a = e.target.closest('.ho-arrows span');
+    if (!a) return;
+    const keys = [...grid.children].map(c => c.dataset.key);
+    const k = a.closest('[data-key]').dataset.key, i = keys.indexOf(k), t = i + parseInt(a.dataset.d, 10);
+    if (t < 0 || t >= keys.length) return;
+    [keys[i], keys[t]] = [keys[t], keys[i]];
+    state.homeOrder = keys;
+    saveData(); apply();
+  }, true);
+
+  const head = document.querySelector('#view-home > div');
+  const btn = document.createElement('button');
+  btn.className = 'mt-2 text-[10px] border border-gray-600 text-gray-300 px-2 py-1 rounded';
+  btn.innerText = '↕ ترتيب المهام';
+  btn.onclick = () => { edit = !edit; btn.innerText = edit ? '✔ تم الترتيب' : '↕ ترتيب المهام'; apply(); };
+  head.appendChild(btn);
+  apply();
 })();
 </script>
 </body>
