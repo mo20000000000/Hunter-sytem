@@ -389,20 +389,17 @@ function reportRecoverySlip() {
 
 // ================= WORKOUTS =================
 function calculateWeeklyAverage(questId) {
-  let totalReps = 0, trainingDays = 0;
+  // المتوسط = إجمالي العدات ÷ عدد الأيام اللي عملت فيها التمرين فعلاً (آخر 7 أيام)
+  let totalReps = 0, daysDone = 0;
   const today = new Date();
   for (let i = 0; i < 7; i++) {
     const d = new Date();
     d.setDate(today.getDate() - i);
-    if (!CONFIG.OFF_DAYS.includes(d.getDay())) {
-      const key = getFormattedDate(d);
-      trainingDays++;
-      if (state.questHistory && state.questHistory[key] && state.questHistory[key][questId]) {
-        totalReps += state.questHistory[key][questId];
-      }
-    }
+    const key = getFormattedDate(d);
+    const reps = state.questHistory && state.questHistory[key] ? state.questHistory[key][questId] : 0;
+    if (reps > 0) { totalReps += reps; daysDone++; }
   }
-  return (totalReps / Math.max(1, trainingDays)).toFixed(1);
+  return { avg: daysDone ? (totalReps / daysDone).toFixed(1) : "0", days: daysDone };
 }
 
 function checkDayTransition() {
@@ -415,6 +412,9 @@ function checkDayTransition() {
     if (state.routines) {
       Object.keys(state.routines).forEach(r => state.routines[r].forEach(q => q.current = 0));
     }
+    // تصفير الأذكار والأدعية كل يوم جديد
+    if (state.azkar) state.azkar.forEach(z => z.current = z.total);
+    if (state.duas) state.duas.forEach(d => d.done = false);
     state.lastActiveDate = today;
     saveData();
   }
@@ -495,7 +495,7 @@ function renderWorkouts() {
 
   quests.forEach((q, index) => {
     const pct = Math.min(100, Math.floor((q.current / q.target) * 100));
-    const avg = calculateWeeklyAverage(q.id);
+    const wa = calculateWeeklyAverage(q.id);
     const card = document.createElement("div");
     card.className = `card-bg p-3 rounded-lg border transition ${pct >= 100 ? "border-cyan-500/70" : "border-gray-800"}`;
     card.innerHTML = `
@@ -515,7 +515,7 @@ function renderWorkouts() {
         <span class="text-cyan-400 font-semibold">${pct}%</span>
       </div>
       <div class="text-[10px] text-gray-400 mb-1.5 flex justify-between">
-        <span class="text-cyan-300 font-mono">📈 متوسط أسبوعي: <strong>${avg}</strong> عَدّة/يوم</span>
+        <span class="text-cyan-300 font-mono">📈 متوسط أسبوعي: <strong>${wa.avg}</strong> عَدّة (في ${wa.days} أيام)</span>
       </div>
       <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-2">
         <div class="bg-cyan-400 h-1.5 transition-all duration-200" style="width: ${pct}%"></div>
@@ -1056,6 +1056,9 @@ loadData();
     };
     saveData();
   }
+  // تنظيف أي نسخة قديمة من العادات لو اتلصقت مرتين
+  const oldSec = document.getElementById('view-habits'); if (oldSec) oldSec.remove();
+  document.querySelectorAll('#view-home .grid > button').forEach(b => { if (b.textContent.includes('متتبع العادات اليومية')) b.remove(); });
   let selDay = getTodayKey();
   const H = () => state.habits;
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1081,7 +1084,7 @@ loadData();
   section.className = 'hidden space-y-3';
   section.innerHTML = `
     <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
-      <div><h2 class="text-sm font-bold text-amber-400">✅ متتبع العادات</h2>
+      <div><h2 class="text-sm font-bold text-amber-400">✅ متتبع العادات <span class="text-[9px] text-gray-500">v3</span></h2>
       <p id="habitsDayLabel" class="text-[11px] text-gray-400"></p></div>
       <button onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
     </div>
