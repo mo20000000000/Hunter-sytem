@@ -1257,6 +1257,72 @@ loadData();
   head.appendChild(btn);
   apply();
 })();
+
+// ===== المعتقدات (في ركن الدعاء) =====
+(function () {
+  if (!state.beliefs) {
+    state.beliefs = [
+      { id: 1, text: "مهمتك 24 ساعة بس" },
+      { id: 2, text: "أنت بتبطّل عشان ربنا، مش عشان أي حاجة تانية" },
+      { id: 3, text: "الله يراني، الله مطّلع عليّ" },
+      { id: 4, text: "الالتزام = التعافي" },
+      { id: 5, text: "عدم الالتزام = عدم التعافي" },
+      { id: 6, text: "زلّة ساعة = تدمير 4 أيام" }
+    ];
+    saveData();
+  }
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const old = document.getElementById('beliefsBox'); if (old) old.remove();
+  const box = document.createElement('div');
+  box.id = 'beliefsBox';
+  box.className = 'card-bg p-3 rounded-xl border border-indigo-500/40 space-y-2';
+  box.innerHTML = `
+    <div class="flex justify-between items-center">
+      <h2 class="text-sm font-bold text-indigo-300">🧠 معتقداتي</h2>
+      <button onclick="blAdd()" class="text-[10px] bg-indigo-950 border border-indigo-500 px-2 py-1 rounded text-indigo-300 font-bold">+ معتقد جديد</button>
+    </div>
+    <div id="beliefsList" class="space-y-1.5"></div>`;
+  document.getElementById('duaaList').before(box);
+
+  function render() {
+    const list = document.getElementById('beliefsList');
+    list.innerHTML = '';
+    state.beliefs.forEach((b, i) => {
+      const row = document.createElement('div');
+      row.className = 'flex justify-between items-center gap-2 bg-gray-900/60 border border-gray-800 rounded-lg p-2';
+      row.innerHTML = `
+        <span class="text-xs text-indigo-100 leading-relaxed flex-1">${esc(b.text)}</span>
+        <div class="flex items-center gap-1 shrink-0">
+          <button onclick="blMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+          <button onclick="blMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+          <button onclick="blEdit(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+          <button onclick="blDel(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+        </div>`;
+      list.appendChild(row);
+    });
+  }
+
+  window.blAdd = () => {
+    const t = prompt("اكتب المعتقد الجديد:");
+    if (t && t.trim()) { state.beliefs.push({ id: Date.now(), text: t.trim() }); saveData(); render(); }
+  };
+  window.blEdit = id => {
+    const b = state.beliefs.find(x => x.id === id);
+    const t = prompt("تعديل المعتقد:", b.text);
+    if (t && t.trim()) { b.text = t.trim(); saveData(); render(); }
+  };
+  window.blDel = id => {
+    if (confirm("هل تريد حذف هذا المعتقد؟")) { state.beliefs = state.beliefs.filter(x => x.id !== id); saveData(); render(); }
+  };
+  window.blMove = (i, dir) => {
+    const t = i + dir;
+    if (t < 0 || t >= state.beliefs.length) return;
+    [state.beliefs[i], state.beliefs[t]] = [state.beliefs[t], state.beliefs[i]];
+    saveData(); render();
+  };
+  render();
+})();
 </script>
 </body>
 </html>
