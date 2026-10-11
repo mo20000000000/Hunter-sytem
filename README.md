@@ -62,37 +62,15 @@
           </div>
         </div>
 
-        <button onclick="showView('adhkar')" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
+        <button onclick="showView('recovery')" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
           <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50">📿</span>
+            <span class="text-2xl p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50">🌱</span>
             <div>
-              <h3 class="text-sm font-bold text-emerald-400">أذكار المساء والتحصين</h3>
-              <p class="text-xs text-gray-400">تعديل، إضافة، ترتيب، وتتبع بعدّاد تفاعلي</p>
+              <h3 class="text-sm font-bold text-emerald-400">ركن التعافي</h3>
+              <p class="text-xs text-gray-400">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
             </div>
           </div>
           <span class="text-emerald-400 text-sm">◀</span>
-        </button>
-
-        <button onclick="showView('duaa')" class="p-4 rounded-xl card-bg border border-blue-500/40 hover:border-blue-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-blue-950/60 border border-blue-500/50">🤲</span>
-            <div>
-              <h3 class="text-sm font-bold text-blue-400">أدعية الثبات والاستعاذة</h3>
-              <p class="text-xs text-gray-400">تحصين النفس مع تفعيل علامة الصح والإدارة الكاملة</p>
-            </div>
-          </div>
-          <span class="text-blue-400 text-sm">◀</span>
-        </button>
-
-        <button onclick="showView('journal')" class="p-4 rounded-xl card-bg border border-purple-500/40 hover:border-purple-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-purple-950/60 border border-purple-500/50">🎙️</span>
-            <div>
-              <h3 class="text-sm font-bold text-purple-400">اليوميات المربوطة بتليجرام</h3>
-              <p class="text-xs text-gray-400">تسجيلات صوتية + توثيق بالصور مباشرة لمحادثتك</p>
-            </div>
-          </div>
-          <span class="text-purple-400 text-sm">◀</span>
         </button>
 
         <button onclick="showView('wheel')" class="p-4 rounded-xl card-bg border border-red-500/50 hover:border-red-400 text-right flex items-center justify-between transition hover:scale-[1.01] bg-red-950/20">
@@ -177,57 +155,72 @@
       <button id="complete-day-btn" onclick="completeDay()" class="w-full py-3 rounded-lg font-bold text-xs uppercase border border-cyan-500 text-cyan-400 hover:bg-cyan-950 transition">COMPLETE DAY</button>
     </section>
 
-    <section id="view-adhkar" class="hidden space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-emerald-500/40 flex justify-between items-center">
-        <div>
-          <h2 class="text-sm font-bold text-emerald-400">📿 أذكار المساء والتحصين</h2>
-          <p class="text-[11px] text-gray-400">تعديل، ترتيب، وحفظ أذكارك الخاصة</p>
-        </div>
-        <div class="flex gap-1.5">
-          <button onclick="resetAzkarCounters()" class="text-[10px] bg-gray-900 border border-emerald-500/50 px-2 py-1 rounded text-emerald-400">🔄 تصفير</button>
-          <button onclick="openAddZekrPrompt()" class="text-[10px] bg-emerald-950 border border-emerald-500 px-2 py-1 rounded text-emerald-300 font-bold">+ ذكر جديد</button>
-        </div>
+    <section id="view-recovery" class="hidden space-y-3">
+      <div class="card-bg p-3 rounded-xl border border-emerald-500/40">
+        <h2 class="text-sm font-bold text-emerald-400">🌱 ركن التعافي</h2>
+        <p class="text-[11px] text-gray-400">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
       </div>
-      <div id="azkarList" class="space-y-2.5"></div>
-    </section>
-
-    <section id="view-duaa" class="hidden space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-blue-500/40 flex justify-between items-center">
-        <div>
-          <h2 class="text-sm font-bold text-blue-400">🤲 أدعية الثبات والاستعاذة</h2>
-          <p class="text-[11px] text-gray-400">اضغط ✔ لتسجيل قراءة الدعاء، أو رتب وعدل</p>
-        </div>
-        <div class="flex gap-1.5">
-          <button onclick="resetDuaaChecks()" class="text-[10px] bg-gray-900 border border-blue-500/50 px-2 py-1 rounded text-blue-400">🔄 تصفير الصح</button>
-          <button onclick="openAddDuaaPrompt()" class="text-[10px] bg-blue-950 border border-blue-500 px-2 py-1 rounded text-blue-300 font-bold">+ دعاء جديد</button>
-        </div>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button id="rtab-adhkar" onclick="recTab('adhkar')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-emerald-950 border-emerald-400 text-emerald-300">📿 الأذكار</button>
+        <button id="rtab-beliefs" onclick="recTab('beliefs')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🧠 المعتقدات</button>
+        <button id="rtab-duaa" onclick="recTab('duaa')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🤲 الدعاء</button>
+        <button id="rtab-journal" onclick="recTab('journal')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🎙️ اليوميات</button>
       </div>
-      <div id="duaaList" class="space-y-2.5"></div>
-    </section>
 
-    <section id="view-journal" class="hidden space-y-3">
-      <div class="card-bg p-4 rounded-xl border border-purple-500/40 space-y-3">
-        <div class="flex justify-between items-start">
+      <div id="pane-adhkar" class="space-y-3">
+        <div class="card-bg p-3 rounded-xl border border-emerald-500/40 flex justify-between items-center">
           <div>
-            <h2 class="text-sm font-bold text-purple-400">🎙️ ركن اليوميات الصوتية والتوثيق</h2>
-            <p class="text-[11px] text-gray-400">يتم إرسال الفويس والصور فوراً لمحادثتك على تليجرام</p>
+            <h2 class="text-sm font-bold text-emerald-400">📿 أذكار المساء والتحصين</h2>
+            <p class="text-[11px] text-gray-400">تعديل، ترتيب، وحفظ أذكارك الخاصة</p>
           </div>
-          <button onclick="setupTelegram()" class="text-[10px] border border-purple-500/50 text-purple-300 px-2 py-1 rounded whitespace-nowrap">⚙️ إعداد تليجرام</button>
-        </div>
-        <div class="p-3 bg-black/40 rounded-xl border border-gray-800 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <button id="recBtn" onclick="toggleRecord()" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">بدء التسجيل ⏺</button>
-            <span id="rec-status" class="text-xs text-gray-400">جاهز للتسجيل</span>
+          <div class="flex gap-1.5">
+            <button onclick="resetAzkarCounters()" class="text-[10px] bg-gray-900 border border-emerald-500/50 px-2 py-1 rounded text-emerald-400">🔄 تصفير</button>
+            <button onclick="openAddZekrPrompt()" class="text-[10px] bg-emerald-950 border border-emerald-500 px-2 py-1 rounded text-emerald-300 font-bold">+ ذكر جديد</button>
           </div>
         </div>
-        <div id="audioList" class="space-y-1.5"></div>
-        <div class="pt-2 border-t border-gray-800">
-          <p class="text-xs text-gray-300 mb-2">📸 توثيق بالصور (إرسال لتليجرام):</p>
-          <label class="w-full block text-center py-2.5 px-3 rounded-lg bg-gray-900 border border-purple-500/60 text-purple-300 hover:bg-purple-950/40 text-xs font-bold cursor-pointer transition">
-            📷 اختيار أو التقاط صورة
-            <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="sendPhotoToTelegram(this)">
-          </label>
-          <div id="photoStatus" class="text-[11px] text-cyan-400 text-center mt-2"></div>
+        <div id="azkarList" class="space-y-2.5"></div>
+      </div>
+
+      <div id="pane-beliefs" class="hidden space-y-3"></div>
+
+      <div id="pane-duaa" class="hidden space-y-3">
+        <div class="card-bg p-3 rounded-xl border border-blue-500/40 flex justify-between items-center">
+          <div>
+            <h2 class="text-sm font-bold text-blue-400">🤲 أدعية الثبات والاستعاذة</h2>
+            <p class="text-[11px] text-gray-400">اضغط ✔ لتسجيل قراءة الدعاء، أو رتب وعدل</p>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="resetDuaaChecks()" class="text-[10px] bg-gray-900 border border-blue-500/50 px-2 py-1 rounded text-blue-400">🔄 تصفير الصح</button>
+            <button onclick="openAddDuaaPrompt()" class="text-[10px] bg-blue-950 border border-blue-500 px-2 py-1 rounded text-blue-300 font-bold">+ دعاء جديد</button>
+          </div>
+        </div>
+        <div id="duaaList" class="space-y-2.5"></div>
+      </div>
+
+      <div id="pane-journal" class="hidden space-y-3">
+        <div class="card-bg p-4 rounded-xl border border-purple-500/40 space-y-3">
+          <div class="flex justify-between items-start">
+            <div>
+              <h2 class="text-sm font-bold text-purple-400">🎙️ ركن اليوميات الصوتية والتوثيق</h2>
+              <p class="text-[11px] text-gray-400">يتم إرسال الفويس والصور فوراً لمحادثتك على تليجرام</p>
+            </div>
+            <button onclick="setupTelegram()" class="text-[10px] border border-purple-500/50 text-purple-300 px-2 py-1 rounded whitespace-nowrap">⚙️ إعداد تليجرام</button>
+          </div>
+          <div class="p-3 bg-black/40 rounded-xl border border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <button id="recBtn" onclick="toggleRecord()" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">بدء التسجيل ⏺</button>
+              <span id="rec-status" class="text-xs text-gray-400">جاهز للتسجيل</span>
+            </div>
+          </div>
+          <div id="audioList" class="space-y-1.5"></div>
+          <div class="pt-2 border-t border-gray-800">
+            <p class="text-xs text-gray-300 mb-2">📸 توثيق بالصور (إرسال لتليجرام):</p>
+            <label class="w-full block text-center py-2.5 px-3 rounded-lg bg-gray-900 border border-purple-500/60 text-purple-300 hover:bg-purple-950/40 text-xs font-bold cursor-pointer transition">
+              📷 اختيار أو التقاط صورة
+              <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="sendPhotoToTelegram(this)">
+            </label>
+            <div id="photoStatus" class="text-[11px] text-cyan-400 text-center mt-2"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -352,17 +345,26 @@ function renderAll() {
   renderWorkouts(); renderAzkar(); renderDuas(); renderTasks(); drawWheel(); calculateRecoveryDays();
 }
 
+// ===== التنقل =====
 function showView(view) {
-  ['home', 'workouts', 'adhkar', 'duaa', 'journal', 'wheel'].forEach(v => {
+  ['home', 'workouts', 'recovery', 'wheel'].forEach(v => {
     const el = document.getElementById(`view-${v}`);
     if (el) el.classList.add('hidden');
   });
   const target = document.getElementById(`view-${view}`);
   if (target) target.classList.remove('hidden');
   if (view === 'wheel') drawWheel();
-  if (view === 'adhkar') renderAzkar();
-  if (view === 'duaa') renderDuas();
+  if (view === 'recovery') { renderAzkar(); renderDuas(); }
   if (view === 'workouts') renderWorkouts();
+}
+
+// تبويبات ركن التعافي
+function recTab(name) {
+  ['adhkar', 'beliefs', 'duaa', 'journal'].forEach(n => {
+    document.getElementById('pane-' + n).classList.toggle('hidden', n !== name);
+    document.getElementById('rtab-' + n).className = 'py-2 rounded-lg border text-[11px] font-bold transition ' +
+      (n === name ? 'bg-emerald-950 border-emerald-400 text-emerald-300' : 'bg-gray-900 border-gray-800 text-gray-400');
+  });
 }
 
 // ================= RECOVERY =================
@@ -1061,6 +1063,8 @@ loadData();
     dirty = true;
   }
   if (!state.habits.reviews) { state.habits.reviews = {}; dirty = true; }
+  if (!state.habits.blocks) { state.habits.blocks = {}; dirty = true; }
+  if (!state.habits.sleep) { state.habits.sleep = {}; dirty = true; }
   if (dirty) saveData();
 
   // تنظيف أي نسخة قديمة من العادات لو اتلصقت مرتين
@@ -1108,6 +1112,7 @@ loadData();
   }
 
   let selDay = getTodayKey();
+  let editBlock = null;
   let viewY = new Date().getFullYear(), viewM = new Date().getMonth();
 
   const section = document.createElement('section');
@@ -1121,7 +1126,9 @@ loadData();
     </div>
     <div id="habitsMonth" class="card-bg p-3 rounded-xl border border-gray-800"></div>
     <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
-    <div id="habitsList" class="space-y-2.5"></div>`;
+    <div id="habitsList" class="space-y-2.5"></div>
+    <div id="habitsBlocks" class="card-bg p-3 rounded-xl border border-teal-500/40 space-y-2"></div>
+    <div id="habitsSleep" class="card-bg p-3 rounded-xl border border-sky-500/40 space-y-2"></div>`;
   document.querySelector('main').appendChild(section);
 
   const homeBtn = document.createElement('button');
@@ -1131,7 +1138,7 @@ loadData();
   homeBtn.innerHTML = `<div class="flex items-center gap-3">
     <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">✅</span>
     <div><h3 class="text-sm font-bold text-amber-400">متتبع العادات اليومية</h3>
-    <p class="text-xs text-gray-400">تسجيل من السبت للخميس، والجمعة مراجعة أسبوعية، وعرض الشهر كامل</p></div></div>
+    <p class="text-xs text-gray-400">تسجيل من السبت للخميس، مراجعة الجمعة، جدول الوقت ومتابعة النوم</p></div></div>
     <span class="text-amber-400 text-sm">◀</span>`;
   document.querySelector('#view-home .grid').prepend(homeBtn);
 
@@ -1142,7 +1149,7 @@ loadData();
       _showView('home');
       document.getElementById('view-home').classList.add('hidden');
       document.getElementById('view-habits').classList.remove('hidden');
-      selDay = getTodayKey();
+      selDay = getTodayKey(); editBlock = null;
       viewY = new Date().getFullYear(); viewM = new Date().getMonth();
       render();
     } else _showView(v);
@@ -1223,6 +1230,8 @@ loadData();
     const past = trk.filter(k => k <= today);
     const fri = isFri(selDay);
     renderMonth(today);
+    renderBlocks();
+    renderSleep();
 
     const sd = keyToDate(selDay);
     document.getElementById('habitsDayLabel').innerText = fri
@@ -1284,7 +1293,119 @@ loadData();
     });
   }
 
-  window.hbDay = k => { selDay = k; render(); };
+  // ===== Time Blocking =====
+  const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
+  const durMin = (a, b) => { const x = toMin(a), y = toMin(b); if (x == null || y == null) return 0; let d = y - x; if (d < 0) d += 1440; return d; };
+  const fmtDur = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
+  const fmt12 = t => { if (!t) return '--'; const p = t.split(':'), h = +p[0]; return `${h % 12 || 12}:${p[1]} ${h >= 12 ? 'م' : 'ص'}`; };
+  const minToTime = m => { m = Math.round(m) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  const inCls = 'text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200';
+
+  function renderBlocks() {
+    const box = document.getElementById('habitsBlocks');
+    if (!box) return;
+    const arr = (H().blocks[selDay] || []).slice().sort((a, b) => toMin(a.start) - toMin(b.start));
+    const total = arr.reduce((s, b) => s + durMin(b.start, b.end), 0);
+    const eb = editBlock ? arr.find(b => b.id === editBlock) : null;
+    const rows = arr.map(b => `
+      <div class="flex items-center justify-between gap-2 bg-gray-900/60 border border-gray-800 rounded-lg p-2">
+        <div class="flex-1">
+          <div class="text-xs font-bold text-teal-100">${esc(b.title)}</div>
+          <div class="text-[10px] text-gray-400">${fmt12(b.start)} – ${fmt12(b.end)} • ${fmtDur(durMin(b.start, b.end))}</div>
+        </div>
+        <div class="flex gap-1">
+          <button onclick="tbEdit(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+          <button onclick="tbDel(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+        </div>
+      </div>`).join('');
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-teal-300">⏱ جدول اليوم (Time Blocking)</h3>
+        <button onclick="tbCopy()" class="text-[10px] bg-gray-900 border border-teal-500/50 px-2 py-1 rounded text-teal-300">📋 انسخ من آخر يوم</button>
+      </div>
+      ${arr.length ? `<div class="space-y-1.5">${rows}</div><p class="text-[10px] text-gray-400">إجمالي الوقت المخطط: <strong class="text-teal-300">${fmtDur(total)}</strong></p>` : '<p class="text-[11px] text-gray-500">مفيش بلوكات لليوم ده. ضيف أول بلوك من تحت.</p>'}
+      <div class="space-y-1.5 pt-2 border-t border-gray-800">
+        <input id="tbTitle" type="text" placeholder="اسم البلوك (مثلاً: مذاكرة B1)" value="${eb ? esc(eb.title) : ''}" class="w-full ${inCls}">
+        <div class="flex gap-1.5 items-center">
+          <input id="tbStart" type="time" value="${eb ? eb.start : ''}" class="flex-1 ${inCls}">
+          <span class="text-gray-500 text-xs">→</span>
+          <input id="tbEnd" type="time" value="${eb ? eb.end : ''}" class="flex-1 ${inCls}">
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="tbSave()" class="flex-1 text-xs py-1.5 rounded bg-teal-600 text-white font-bold">${eb ? 'حفظ التعديل' : '+ إضافة بلوك'}</button>
+          ${eb ? '<button onclick="tbCancel()" class="text-xs px-3 py-1.5 rounded bg-gray-800 text-gray-300">إلغاء</button>' : ''}
+        </div>
+      </div>`;
+  }
+
+  // ===== النوم والاستيقاظ =====
+  function renderSleep() {
+    const box = document.getElementById('habitsSleep');
+    if (!box) return;
+    const today = getTodayKey();
+    const sl = Object.assign({ bed: '', wake: '' }, H().sleep[selDay]);
+    const dur = sl.bed && sl.wake ? durMin(sl.bed, sl.wake) : 0;
+    let n = 0, sumD = 0, sumBed = 0, sumWake = 0;
+    weekKeysOf(selDay).filter(k => k <= today).forEach(k => {
+      const x = H().sleep[k];
+      if (x && x.bed && x.wake) {
+        n++; sumD += durMin(x.bed, x.wake);
+        let b = toMin(x.bed); if (b < 720) b += 1440;
+        sumBed += b; sumWake += toMin(x.wake);
+      }
+    });
+    box.innerHTML = `
+      <h3 class="text-sm font-bold text-sky-300">😴 النوم والاستيقاظ</h3>
+      <p class="text-[10px] text-gray-400">سجّل نمت إمتى امبارح وصحيت إمتى في اليوم المختار</p>
+      <div class="grid grid-cols-2 gap-2">
+        <div><label class="text-[11px] text-gray-300 block mb-1">🌙 وقت النوم</label><input type="time" value="${sl.bed}" onchange="slSet('bed',this.value)" class="w-full ${inCls}"></div>
+        <div><label class="text-[11px] text-gray-300 block mb-1">☀️ وقت الاستيقاظ</label><input type="time" value="${sl.wake}" onchange="slSet('wake',this.value)" class="w-full ${inCls}"></div>
+      </div>
+      ${dur ? `<p class="text-xs text-sky-200">مدة النوم: <strong>${fmtDur(dur)}</strong></p>` : ''}
+      <div class="pt-2 border-t border-gray-800 text-[11px] text-gray-300 space-y-0.5">
+        ${n ? `<div>📊 متوسط الأسبوع (${n} أيام): نوم <strong class="text-sky-300">${fmtDur(Math.round(sumD / n))}</strong></div>
+        <div>🌙 متوسط وقت النوم: <strong class="text-sky-300">${fmt12(minToTime(sumBed / n))}</strong> • ☀️ متوسط الاستيقاظ: <strong class="text-sky-300">${fmt12(minToTime(sumWake / n))}</strong></div>` : '<div class="text-gray-500">لسه مفيش أيام مسجلة الأسبوع ده</div>'}
+      </div>`;
+  }
+
+  window.slSet = (field, v) => {
+    H().sleep[selDay] = Object.assign({ bed: '', wake: '' }, H().sleep[selDay], { [field]: v });
+    saveData(); renderSleep();
+  };
+  window.tbSave = () => {
+    const title = document.getElementById('tbTitle').value.trim();
+    const start = document.getElementById('tbStart').value;
+    const end = document.getElementById('tbEnd').value;
+    if (!title || !start || !end) { alert('اكتب اسم البلوك وحدد وقت البداية والنهاية'); return; }
+    const arr = H().blocks[selDay] = H().blocks[selDay] || [];
+    const b = editBlock ? arr.find(x => x.id === editBlock) : null;
+    if (b) { b.title = title; b.start = start; b.end = end; }
+    else arr.push({ id: Date.now(), title, start, end });
+    editBlock = null; saveData(); renderBlocks();
+  };
+  window.tbEdit = id => { editBlock = id; renderBlocks(); };
+  window.tbCancel = () => { editBlock = null; renderBlocks(); };
+  window.tbDel = id => {
+    if (!confirm('تحذف البلوك ده؟')) return;
+    H().blocks[selDay] = (H().blocks[selDay] || []).filter(b => b.id !== id);
+    editBlock = null; saveData(); renderBlocks();
+  };
+  window.tbCopy = () => {
+    const d = keyToDate(selDay);
+    let src = null;
+    for (let i = 0; i < 60; i++) {
+      d.setDate(d.getDate() - 1);
+      const k = getFormattedDate(d);
+      if (H().blocks[k] && H().blocks[k].length) { src = k; break; }
+    }
+    if (!src) { alert('مفيش يوم قبل كده فيه بلوكات'); return; }
+    const cur = H().blocks[selDay] || [];
+    if (cur.length && !confirm('اليوم ده فيه بلوكات، تضيف عليها؟')) return;
+    H().blocks[selDay] = cur.concat(H().blocks[src].map((b, i) => ({ id: Date.now() + i, title: b.title, start: b.start, end: b.end })));
+    saveData(); renderBlocks();
+  };
+
+  window.hbDay = k => { selDay = k; editBlock = null; render(); };
   window.hbMonth = dir => {
     let y = viewY, m = viewM + dir;
     if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
@@ -1327,7 +1448,16 @@ loadData();
 // ================= HOME ORDER =================
 (function () {
   const grid = document.querySelector('#view-home .grid');
-  const base = ['workouts', 'recovery', 'adhkar', 'duaa', 'journal', 'wheel'];
+  const base = ['workouts', 'recovery', 'recoveryHub', 'wheel'];
+  // ترحيل الترتيب القديم: الأذكار والدعاء واليوميات بقوا جوه ركن التعافي
+  if (state.homeOrder) {
+    let placed = false;
+    state.homeOrder = state.homeOrder.reduce((a, k) => {
+      if (['adhkar', 'duaa', 'journal'].includes(k)) { if (!placed) { a.push('recoveryHub'); placed = true; } }
+      else a.push(k);
+      return a;
+    }, []);
+  }
   [...grid.children].filter(c => !c.dataset.key).forEach((c, i) => c.dataset.key = base[i]);
   let edit = false;
 
@@ -1370,7 +1500,7 @@ loadData();
   apply();
 })();
 
-// ===== المعتقدات (في ركن الدعاء) =====
+// ===== المعتقدات (في ركن التعافي) =====
 (function () {
   if (!state.beliefs) {
     state.beliefs = [
@@ -1395,7 +1525,7 @@ loadData();
       <button onclick="blAdd()" class="text-[10px] bg-indigo-950 border border-indigo-500 px-2 py-1 rounded text-indigo-300 font-bold">+ معتقد جديد</button>
     </div>
     <div id="beliefsList" class="space-y-1.5"></div>`;
-  document.getElementById('duaaList').before(box);
+  document.getElementById('pane-beliefs').appendChild(box);
 
   function render() {
     const list = document.getElementById('beliefsList');
