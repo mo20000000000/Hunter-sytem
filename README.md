@@ -1038,10 +1038,9 @@ setInterval(updateTimer, 1000);
 updateTimer();
 loadData();
 
-// ===== متتبع العادات (3 تبويبات فقط: العادات، التايم بلوكينج، النوم) =====
+// ===== متتبع العادات (مع ستريك مستقل لكل عادة + 3 تبويبات أساسية) =====
 (function () {
   const WEEK_START = 6;
-  const STREAK_MIN_PERCENT = 100;
   const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
   const SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
 
@@ -1089,17 +1088,15 @@ loadData();
   const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); };
   const find = id => H().list.find(h => h.id === id);
 
-  function habitsStreak() {
-    const list = H().list;
-    if (!list.length) return 0;
-    const ok = k => (list.filter(h => isDone(h, k)).length / list.length) * 100 >= STREAK_MIN_PERCENT;
+  // حساب الستريك المنفصل لكل عادة (الجمعة معفية لا تخصم ولا تزيد)
+  function habitStreak(h) {
     const tk = getTodayKey();
     const d = new Date(); d.setHours(12);
     let s = 0;
     for (let i = 0; i < 400; i++) {
       const k = getFormattedDate(d);
       if (!isFri(k)) {
-        if (ok(k)) s++;
+        if (isDone(h, k)) s++;
         else if (k !== tk) break;
       }
       d.setDate(d.getDate() - 1);
@@ -1133,7 +1130,7 @@ loadData();
   homeBtn.innerHTML = `<div class="flex items-center gap-3">
     <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">✅</span>
     <div><h3 class="text-sm font-bold text-amber-400">متتبع العادات اليومية</h3>
-    <p class="text-xs text-gray-400">العادات، التايم بلوكينج، وتراكينج النوم</p></div></div>
+    <p class="text-xs text-gray-400">ستريك منفصل لكل عادة، التايم بلوكينج، وتراكينج النوم</p></div></div>
     <span class="text-amber-400 text-sm">◀</span>`;
   document.querySelector('#view-home .grid').prepend(homeBtn);
 
@@ -1250,8 +1247,7 @@ loadData();
         <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-amber-400 h-2 transition-all" style="width:${dPct}%"></div></div>`;
     }
     sum += `<div class="flex justify-between text-xs pt-1"><span class="text-gray-300">إجمالي الأسبوع</span><span class="text-cyan-400 font-bold">${wDone} / ${wMax} (${wPct}%)</span></div>
-      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-cyan-400 h-2 transition-all" style="width:${wPct}%"></div></div>
-      <div class="flex justify-between text-xs pt-1"><span class="text-gray-300">🔥 ستريك العادات (الجمعة معفية)</span><span class="text-orange-400 font-bold">${habitsStreak()} يوم</span></div>`;
+      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-cyan-400 h-2 transition-all" style="width:${wPct}%"></div></div>`;
     document.getElementById('habitsSummary').innerHTML = sum;
 
     if (fri) { box.innerHTML = reviewHTML(wk, past); return; }
@@ -1260,10 +1256,11 @@ loadData();
     if (mainTab === 'blocks') { box.innerHTML = renderBlocksHTML(); return; }
     if (mainTab === 'sleep') { box.innerHTML = renderSleepHTML(); return; }
 
-    // تبويب العادات (يعرض كل العادات تحت بعضها)
+    // تبويب العادات (كل عادة مع ستريكها المنفصل)
     list.forEach((h, i) => {
       const d = isDone(h, selDay);
       const wCount = past.filter(k => isDone(h, k)).length;
+      const hStr = habitStreak(h);
       const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
       let middle = '', extra = '';
       if (h.type === 'time') {
@@ -1283,7 +1280,13 @@ loadData();
       card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
       card.innerHTML = `
         <div class="flex justify-between items-center">
-          <div class="flex items-center gap-2.5">${mark}<span class="text-xs font-bold text-gray-200">${esc(h.name)}</span></div>
+          <div class="flex items-center gap-2.5">
+            ${mark}
+            <div>
+              <span class="text-xs font-bold text-gray-200">${esc(h.name)}</span>
+              <span class="text-[10px] bg-orange-950/60 border border-orange-500/40 text-orange-400 px-1.5 py-0.5 rounded-md mr-2 font-mono">🔥 ${hStr} يوم</span>
+            </div>
+          </div>
           <div class="flex items-center gap-1">
             <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
             <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
@@ -1299,7 +1302,7 @@ loadData();
     });
   }
 
-  // ===== التايم بلوكينج المظبوط بالظبط =====
+  // ===== التايم بلوكينج =====
   const FIXED_SLOTS = [
     { id: 's1', label: 'من 7 إلى 10 صباحاً', defaultTitle: 'صباح الخير / البلوك الأول' },
     { id: 's2', label: 'من 10 صباحاً إلى الظهر', defaultTitle: 'البلوك الصباحي الثاني' },
