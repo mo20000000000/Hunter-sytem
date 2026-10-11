@@ -1038,7 +1038,7 @@ setInterval(updateTimer, 1000);
 updateTimer();
 loadData();
 
-// ===== متتبع العادات (تبويبات لكل عادة + بلوكات ثابتة + شهر + ستريك) =====
+// ===== متتبع العادات (3 تبويبات فقط: العادات، التايم بلوكينج، النوم) =====
 (function () {
   const WEEK_START = 6;
   const STREAK_MIN_PERCENT = 100;
@@ -1108,7 +1108,7 @@ loadData();
   }
 
   let selDay = getTodayKey();
-  let selHabitTab = null; // التبويب النشط حالياً (id العادة أو 'blocks' أو 'sleep')
+  let mainTab = 'habits'; // 'habits', 'blocks', 'sleep'
   let viewY = new Date().getFullYear(), viewM = new Date().getMonth();
 
   const section = document.createElement('section');
@@ -1121,7 +1121,7 @@ loadData();
       <button onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
     </div>
     <div id="habitsMonth" class="card-bg p-3 rounded-xl border border-gray-800"></div>
-    <div id="habitsTabs" class="flex gap-1 overflow-x-auto pb-1"></div>
+    <div id="mainTabs" class="grid grid-cols-3 gap-1.5"></div>
     <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
     <div id="habitsContent" class="space-y-2.5"></div>`;
   document.querySelector('main').appendChild(section);
@@ -1133,7 +1133,7 @@ loadData();
   homeBtn.innerHTML = `<div class="flex items-center gap-3">
     <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">✅</span>
     <div><h3 class="text-sm font-bold text-amber-400">متتبع العادات اليومية</h3>
-    <p class="text-xs text-gray-400">تبويبات العادات، التايم بلوكينج الثابت، النوم والمراجعة الأسبوعية</p></div></div>
+    <p class="text-xs text-gray-400">العادات، التايم بلوكينج، وتراكينج النوم</p></div></div>
     <span class="text-amber-400 text-sm">◀</span>`;
   document.querySelector('#view-home .grid').prepend(homeBtn);
 
@@ -1145,7 +1145,7 @@ loadData();
       document.getElementById('view-home').classList.add('hidden');
       document.getElementById('view-habits').classList.remove('hidden');
       selDay = getTodayKey();
-      if (!selHabitTab && H().list.length) selHabitTab = H().list[0].id;
+      mainTab = 'habits';
       viewY = new Date().getFullYear(); viewM = new Date().getMonth();
       render();
     } else _showView(v);
@@ -1182,20 +1182,17 @@ loadData();
       <div class="grid grid-cols-7 gap-1">${cells}</div>`;
   }
 
-  function renderTabs() {
-    const tabsBox = document.getElementById('habitsTabs');
-    const list = H().list;
-    if (!selHabitTab || (!list.find(h => h.id === selHabitTab) && selHabitTab !== 'blocks' && selHabitTab !== 'sleep')) {
-      selHabitTab = list.length ? list[0].id : 'blocks';
-    }
-    let html = '';
-    list.forEach(h => {
-      const active = selHabitTab === h.id;
-      html += `<button onclick="hbTab('${h.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition border ${active ? 'bg-amber-500 text-black border-amber-400' : 'bg-gray-900 text-gray-300 border-gray-800'}">${esc(h.name)}</button>`;
-    });
-    html += `<button onclick="hbTab('blocks')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition border ${selHabitTab === 'blocks' ? 'bg-teal-500 text-black border-teal-400' : 'bg-gray-900 text-gray-300 border-gray-800'}">⏱ البلوكات</button>`;
-    html += `<button onclick="hbTab('sleep')" class="px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition border ${selHabitTab === 'sleep' ? 'bg-sky-500 text-black border-sky-400' : 'bg-gray-900 text-gray-300 border-gray-800'}">😴 النوم</button>`;
-    tabsBox.innerHTML = html;
+  function renderMainTabs() {
+    const tabsBox = document.getElementById('mainTabs');
+    const tabs = [
+      { id: 'habits', label: '✅ العادات', activeColor: 'bg-amber-500 text-black border-amber-400' },
+      { id: 'blocks', label: '⏱ التايم بلوكينج', activeColor: 'bg-teal-500 text-black border-teal-400' },
+      { id: 'sleep', label: '😴 تراكينج النوم', activeColor: 'bg-sky-500 text-black border-sky-400' }
+    ];
+    tabsBox.innerHTML = tabs.map(t => {
+      const active = mainTab === t.id;
+      return `<button onclick="setMainTab('${t.id}')" class="py-2 rounded-lg text-xs font-bold transition border ${active ? t.activeColor : 'bg-gray-900 text-gray-300 border-gray-800'}">${t.label}</button>`;
+    }).join('');
   }
 
   function reviewHTML(wk, past) {
@@ -1235,7 +1232,7 @@ loadData();
     const past = trk.filter(k => k <= today);
     const fri = isFri(selDay);
     renderMonth(today);
-    renderTabs();
+    renderMainTabs();
 
     const sd = keyToDate(selDay);
     document.getElementById('habitsDayLabel').innerText = fri
@@ -1260,53 +1257,49 @@ loadData();
     if (fri) { box.innerHTML = reviewHTML(wk, past); return; }
 
     box.innerHTML = '';
-    if (selHabitTab === 'blocks') {
-      box.innerHTML = renderBlocksHTML();
-      return;
-    }
-    if (selHabitTab === 'sleep') {
-      box.innerHTML = renderSleepHTML();
-      return;
-    }
+    if (mainTab === 'blocks') { box.innerHTML = renderBlocksHTML(); return; }
+    if (mainTab === 'sleep') { box.innerHTML = renderSleepHTML(); return; }
 
-    const h = list.find(x => x.id === selHabitTab);
-    if (!h) return;
+    // تبويب العادات (يعرض كل العادات تحت بعضها)
+    list.forEach((h, i) => {
+      const d = isDone(h, selDay);
+      const wCount = past.filter(k => isDone(h, k)).length;
+      const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
+      let middle = '', extra = '';
+      if (h.type === 'time') {
+        const e = entry(h, selDay) || { min: 0, mode: 'study' };
+        middle = `<div class="flex items-center gap-2 mt-2">
+          <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
+          <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
+        let st = 0, me = 0;
+        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
+        extra = ` • مذاكرة ${fmt(st)} • حفظ ${fmt(me)}`;
+      }
+      const mark = h.type === 'time'
+        ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
+        : `<button onclick="hbToggle(${h.id})" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
 
-    const d = isDone(h, selDay);
-    const wCount = past.filter(k => isDone(h, k)).length;
-    const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
-    let middle = '', extra = '';
-    if (h.type === 'time') {
-      const e = entry(h, selDay) || { min: 0, mode: 'study' };
-      middle = `<div class="flex items-center gap-2 mt-2">
-        <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
-        <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
-      let st = 0, me = 0;
-      past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
-      extra = ` • مذاكرة ${fmt(st)} • حفظ ${fmt(me)}`;
-    }
-    const mark = h.type === 'time'
-      ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
-      : `<button onclick="hbToggle(${h.id})" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
-
-    const card = document.createElement('div');
-    card.className = `card-bg p-4 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'} space-y-3`;
-    card.innerHTML = `
-      <div class="flex justify-between items-center">
-        <div class="flex items-center gap-2.5">${mark}<span class="text-sm font-bold text-amber-300">${esc(h.name)}</span></div>
-        <div class="flex items-center gap-1">
-          <button onclick="hbEdit(${h.id})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded text-xs">✏️ تعديل</button>
-          <button onclick="hbDel(${h.id})" class="px-2 py-1 bg-gray-800 text-red-400 rounded text-xs">✕ حذف</button>
-        </div>
-      </div>${middle}
-      <div class="flex justify-between items-center pt-2 border-t border-gray-800/80">
-        <div class="flex gap-1.5">${dots}</div>
-        <span class="text-[11px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
-      </div>`;
-    box.appendChild(card);
+      const card = document.createElement('div');
+      card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
+      card.innerHTML = `
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2.5">${mark}<span class="text-xs font-bold text-gray-200">${esc(h.name)}</span></div>
+          <div class="flex items-center gap-1">
+            <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+            <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+            <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+            <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+          </div>
+        </div>${middle}
+        <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
+          <div class="flex gap-1">${dots}</div>
+          <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
+        </div>`;
+      box.appendChild(card);
+    });
   }
 
-  // ===== Time Blocking الثابت بالمواعيد الجديدة =====
+  // ===== التايم بلوكينج المظبوط بالظبط =====
   const FIXED_SLOTS = [
     { id: 's1', label: 'من 7 إلى 10 صباحاً', defaultTitle: 'صباح الخير / البلوك الأول' },
     { id: 's2', label: 'من 10 صباحاً إلى الظهر', defaultTitle: 'البلوك الصباحي الثاني' },
@@ -1321,9 +1314,7 @@ loadData();
     const slotsHTML = FIXED_SLOTS.map(slot => {
       const val = dayBlocks[slot.id] || '';
       return `<div class="card-bg p-3 rounded-xl border border-gray-800 space-y-1.5">
-        <div class="flex justify-between items-center">
-          <span class="text-xs font-bold text-teal-300">📌 ${slot.label}</span>
-        </div>
+        <span class="text-xs font-bold text-teal-300">📌 ${slot.label}</span>
         <input type="text" placeholder="${slot.defaultTitle}" value="${esc(val)}" onchange="tbSetSlot('${slot.id}', this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded px-2.5 py-1.5 text-gray-200">
       </div>`;
     }).join('');
@@ -1331,7 +1322,7 @@ loadData();
     return `<div class="space-y-3">
       <div class="card-bg p-3 rounded-xl border border-teal-500/40 flex justify-between items-center">
         <div>
-          <h3 class="text-sm font-bold text-teal-300">⏱ جدول اليوم (Time Blocks الثابتة)</h3>
+          <h3 class="text-sm font-bold text-teal-300">⏱ جدول اليوم (Time Blocks)</h3>
           <p class="text-[11px] text-gray-400">اكتب قدام كل فترة عملت فيها إيه</p>
         </div>
         <button onclick="tbCopy()" class="text-[10px] bg-gray-900 border border-teal-500/50 px-2 py-1 rounded text-teal-300">📋 نسخ من الأمس</button>
@@ -1357,10 +1348,10 @@ loadData();
     if (!src) { alert('مفيش يوم قبل كده فيه بلوكات مسجلة'); return; }
     H().blocks[selDay] = Object.assign({}, H().blocks[src]);
     saveData(); render();
-    alert('✅ تم نسخ بلوكات اليوم السابق بنجاح!');
+    alert('✅ تم نسخ بلوكات الأمس بنجاح!');
   };
 
-  // ===== النوم والاستيقاظ =====
+  // ===== تراكينج النوم =====
   function renderSleepHTML() {
     const inCls = 'text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200';
     const sl = Object.assign({ bed: '', wake: '' }, H().sleep[selDay]);
@@ -1385,7 +1376,7 @@ loadData();
     });
 
     return `<div class="card-bg p-4 rounded-xl border border-sky-500/40 space-y-3">
-      <h3 class="text-sm font-bold text-sky-300">😴 النوم والاستيقاظ</h3>
+      <h3 class="text-sm font-bold text-sky-300">😴 تراكينج النوم والاستيقاظ</h3>
       <p class="text-[11px] text-gray-400">سجّل نمت إمتى وصحيت إمتى في اليوم المختار</p>
       <div class="grid grid-cols-2 gap-2">
         <div><label class="text-[11px] text-gray-300 block mb-1">🌙 وقت النوم</label><input type="time" value="${sl.bed}" onchange="slSet('bed',this.value)" class="w-full ${inCls}"></div>
@@ -1404,7 +1395,7 @@ loadData();
     saveData(); render();
   };
 
-  window.hbTab = id => { selHabitTab = id; render(); };
+  window.setMainTab = t => { mainTab = t; render(); };
   window.hbDay = k => { selDay = k; render(); };
   window.hbMonth = dir => {
     let y = viewY, m = viewM + dir;
@@ -1432,18 +1423,16 @@ loadData();
     const n = prompt("اسم العادة:");
     if (!n || !n.trim()) return;
     const timed = confirm("العادة دي بالوقت؟\nموافق = بالوقت (دقايق)\nإلغاء = علامة صح");
-    const newId = Date.now();
-    H().list.push({ id: newId, name: n.trim(), type: timed ? 'time' : 'check' });
-    selHabitTab = newId;
+    H().list.push({ id: Date.now(), name: n.trim(), type: timed ? 'time' : 'check' });
     saveData(); render();
   };
   window.hbEdit = id => { const h = find(id), n = prompt("تعديل اسم العادة:", h.name); if (n && n.trim()) { h.name = n.trim(); saveData(); render(); } };
-  window.hbDel = id => {
-    if (confirm("تحذف العادة دي؟")) {
-      H().list = H().list.filter(h => h.id !== id);
-      if (selHabitTab === id && H().list.length) selHabitTab = H().list[0].id;
-      saveData(); render();
-    }
+  window.hbDel = id => { if (confirm("تحذف العادة دي؟")) { H().list = H().list.filter(h => h.id !== id); saveData(); render(); } };
+  window.hbMove = (i, dir) => {
+    const l = H().list, t = i + dir;
+    if (t < 0 || t >= l.length) return;
+    [l[i], l[t]] = [l[t], l[i]];
+    saveData(); render();
   };
 })();
 
