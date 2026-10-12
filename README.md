@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hunter Life System - Ultimate</title>
+  <title>Hunter Life System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background-color: #08090d; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
@@ -14,8 +14,10 @@
     .glow-red { text-shadow: 0 0 8px rgba(255, 51, 51, 0.7); }
     .wheel-container { position: relative; width: 260px; height: 260px; margin: 0 auto; }
     .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 20px solid #ef4444; z-index: 10; }
-    @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-    .pop-anim { animation: pop 0.3s ease-in-out; }
+    @keyframes popfx { 0%{opacity:0;transform:translate(-50%,0) scale(.6)} 20%{opacity:1;transform:translate(-50%,-10px) scale(1.15)} 100%{opacity:0;transform:translate(-50%,-60px) scale(1)} }
+    .fx-pop { position: fixed; z-index: 9999; pointer-events: none; font-weight: 700; font-size: 14px; color: #fde047; text-shadow: 0 0 8px rgba(250,204,21,.8); animation: popfx .9s ease-out forwards; }
+    @keyframes toastin { from{opacity:0;transform:translate(-50%,-20px)} to{opacity:1;transform:translate(-50%,0)} }
+    .toast-badge { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 10000; background: #78350f; border: 1px solid #f59e0b; color: #fde68a; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; box-shadow: 0 0 18px rgba(245,158,11,.5); animation: toastin .3s ease-out; text-align: center; }
   </style>
 </head>
 <body class="p-3 pb-20 min-h-screen flex flex-col items-center select-none text-right">
@@ -33,7 +35,6 @@
 
   <main class="w-full max-w-md">
 
-    <!-- HOME VIEW -->
     <section id="view-home" class="space-y-3">
       <div class="card-bg p-4 rounded-xl border border-gray-800 text-center">
         <h2 class="text-base font-bold text-gray-100 mb-1">لوحة قيادة البطل ⚔️</h2>
@@ -45,7 +46,7 @@
             <span class="text-2xl p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/50">⚔️</span>
             <div>
               <h3 class="text-sm font-bold text-cyan-400">نظام تمارين Hunter</h3>
-              <p class="text-xs text-gray-400">مجموعات التمارين، مؤقت التدريب، الرتب والسجل</p>
+              <p class="text-xs text-gray-400">Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي</p>
             </div>
           </div>
           <span class="text-cyan-400 text-sm">◀</span>
@@ -89,7 +90,6 @@
       </div>
     </section>
 
-    <!-- WORKOUTS VIEW -->
     <section id="view-workouts" class="hidden space-y-4">
       <div class="card-bg p-4 rounded-xl neon-cyan">
         <div class="flex items-center justify-between">
@@ -102,16 +102,6 @@
             <span id="countdown" class="text-xs font-bold text-cyan-400 font-mono">00:00:00</span>
           </div>
         </div>
-        
-        <!-- WORKOUT TIMER & BADGES -->
-        <div class="mt-3 pt-3 border-t border-gray-800 flex justify-between items-center">
-          <div class="flex items-center gap-2">
-            <button id="workout-timer-btn" onclick="toggleWorkoutTimer()" class="px-3 py-1 bg-cyan-950 border border-cyan-500 text-cyan-400 rounded-lg text-xs font-bold">⏱️ بدء التمرين</button>
-            <span id="workout-timer-display" class="text-xs font-mono text-cyan-300">00:00</span>
-          </div>
-          <button onclick="openBadgesModal()" class="px-2.5 py-1 bg-gray-900 border border-amber-500/60 text-amber-400 rounded-lg text-xs font-bold">🏆 الأوسمة</button>
-        </div>
-
         <div class="mt-3 pt-3 border-t border-gray-800">
           <div class="flex justify-between text-xs mb-1">
             <span class="text-gray-300">Streak: <strong id="streak-count" class="text-cyan-400">0</strong> Days</span>
@@ -121,6 +111,15 @@
             <div id="streak-bar" class="bg-cyan-400 h-2 transition-all duration-300" style="width: 0%"></div>
           </div>
         </div>
+      </div>
+
+      <div class="card-bg p-3 rounded-xl border border-orange-500/40 flex items-center justify-between">
+        <div>
+          <div class="text-[10px] text-gray-400">⏱ وقت التمرين</div>
+          <div id="wt-display" class="text-2xl font-bold text-orange-400 font-mono">00:00:00</div>
+          <div id="wt-info" class="text-[10px] text-gray-400"></div>
+        </div>
+        <button id="wt-btn" onclick="toggleWorkoutTimer(event)" class="px-4 py-2 rounded-lg text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white">▶ ابدأ التمرين</button>
       </div>
 
       <div class="flex justify-between items-center text-xs px-1">
@@ -166,10 +165,9 @@
 
       <div id="quest-list" class="space-y-2.5"></div>
 
-      <button id="complete-day-btn" onclick="completeDay()" class="w-full py-3 rounded-lg font-bold text-xs uppercase border border-cyan-500 text-cyan-400 hover:bg-cyan-950 transition">COMPLETE DAY</button>
+      <button id="complete-day-btn" onclick="completeDay(event)" class="w-full py-3 rounded-lg font-bold text-xs uppercase border border-cyan-500 text-cyan-400 hover:bg-cyan-950 transition">COMPLETE DAY</button>
     </section>
 
-    <!-- RECOVERY VIEW -->
     <section id="view-recovery" class="hidden space-y-3">
       <div class="card-bg p-3 rounded-xl border border-emerald-500/40">
         <h2 class="text-sm font-bold text-emerald-400">🌱 ركن التعافي</h2>
@@ -240,7 +238,6 @@
       </div>
     </section>
 
-    <!-- WHEEL VIEW -->
     <section id="view-wheel" class="hidden space-y-4 text-center">
       <div class="card-bg p-3.5 rounded-xl neon-red">
         <h2 class="text-sm font-bold text-red-400 glow-red mb-0.5">🚨 عجلة الطوارئ وكسر الرغبة</h2>
@@ -266,24 +263,13 @@
 
   </main>
 
-  <!-- BADGES MODAL -->
-  <div id="badgesModal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4">
-    <div class="card-bg p-4 rounded-xl border border-amber-500 w-full max-w-sm space-y-3">
-      <div class="flex justify-between items-center">
-        <h3 class="text-sm font-bold text-amber-400">🏆 أوسمة وإنجازات البطل</h3>
-        <button onclick="closeBadgesModal()" class="text-gray-400 hover:text-white text-sm font-bold">✕</button>
-      </div>
-      <div id="badgesList" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
-    </div>
-  </div>
-
 <script>
 // ================= CONFIG =================
 const CONFIG = {
   get TELEGRAM_BOT_TOKEN() { return localStorage.getItem("tg_token") || ""; },
   get TELEGRAM_CHAT_ID() { return localStorage.getItem("tg_chat") || ""; },
-  STORAGE_KEY: "hunter_ultimate_v5",
-  OLD_STORAGE_KEY: "hunter_ultimate_v4",
+  STORAGE_KEY: "hunter_ultimate_v4",
+  OLD_STORAGE_KEY: "hunter_system_data_v2",
   RANKS: ["E-Rank", "D-Rank", "C-Rank", "B-Rank", "A-Rank", "S-Rank"],
   OFF_DAYS: [4, 5]
 };
@@ -337,14 +323,14 @@ let state = {
   recoveryPenaltyDays: 0,
   routines: {
     day1: [
-      { id: 101, name: "Push-ups", sets: [{ reps: 25 }, { reps: 25 }, { reps: 25 }, { reps: 25 }] },
-      { id: 102, name: "Sit-ups", sets: [{ reps: 30 }, { reps: 30 }, { reps: 40 }] },
-      { id: 103, name: "Squats", sets: [{ reps: 30 }, { reps: 35 }, { reps: 35 }] }
+      { id: 101, name: "Push-ups", current: 0, target: 100 },
+      { id: 102, name: "Sit-ups", current: 0, target: 100 },
+      { id: 103, name: "Squats", current: 0, target: 100 }
     ],
     day2: [
-      { id: 201, name: "Pull-ups", sets: [{ reps: 10 }, { reps: 10 }, { reps: 10 }] },
-      { id: 202, name: "Plank (sec)", sets: [{ reps: 60 }, { reps: 60 }] },
-      { id: 203, name: "Lunges", sets: [{ reps: 20 }, { reps: 20 }, { reps: 20 }] }
+      { id: 201, name: "Pull-ups", current: 0, target: 30 },
+      { id: 202, name: "Plank (sec)", current: 0, target: 120 },
+      { id: 203, name: "Lunges", current: 0, target: 60 }
     ]
   },
   azkar: defaultAzkar,
@@ -360,20 +346,6 @@ function loadData() {
     const v2 = localStorage.getItem(CONFIG.OLD_STORAGE_KEY);
     if (v2) { try { state = Object.assign(state, JSON.parse(v2)); } catch (e) {} }
   }
-  // Convert old quest structure to sets structure if needed
-  ['day1', 'day2'].forEach(r => {
-    if (state.routines && state.routines[r]) {
-      state.routines[r].forEach(q => {
-        if (!q.sets) {
-          const target = q.target || 100;
-          q.sets = [{ reps: target }];
-          delete q.current;
-          delete q.target;
-        }
-      });
-    }
-  });
-
   checkDayTransition();
   recalculateStreakAndLevel();
   calculateRecoveryDays();
@@ -386,7 +358,29 @@ function renderAll() {
   renderWorkouts(); renderAzkar(); renderDuas(); renderTasks(); drawWheel(); calculateRecoveryDays();
 }
 
-// ================= NAVIGATION =================
+// ===== تأثيرات التفاعل (اهتزاز + نص طاير) =====
+function fx(e, text) {
+  if (navigator.vibrate) navigator.vibrate(30);
+  const t = e && e.target ? e.target : null;
+  const r = t && t.getBoundingClientRect ? t.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0 };
+  const el = document.createElement('div');
+  el.className = 'fx-pop';
+  el.textContent = text || '✨';
+  el.style.left = (r.left + r.width / 2) + 'px';
+  el.style.top = r.top + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 950);
+}
+
+function showToast(text) {
+  const el = document.createElement('div');
+  el.className = 'toast-badge';
+  el.textContent = text;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// ===== التنقل =====
 function showView(view) {
   ['home', 'workouts', 'recovery', 'wheel'].forEach(v => {
     const el = document.getElementById(`view-${v}`);
@@ -399,6 +393,7 @@ function showView(view) {
   if (view === 'workouts') renderWorkouts();
 }
 
+// تبويبات ركن التعافي
 function recTab(name) {
   ['adhkar', 'beliefs', 'duaa', 'journal'].forEach(n => {
     document.getElementById('pane-' + n).classList.toggle('hidden', n !== name);
@@ -429,92 +424,9 @@ function reportRecoverySlip() {
   }
 }
 
-// ================= WORKOUT TIMER =================
-let workoutTimerInterval = null;
-let workoutSeconds = 0;
-let isWorkoutRunning = false;
-
-function toggleWorkoutTimer() {
-  const btn = document.getElementById('workout-timer-btn');
-  const display = document.getElementById('workout-timer-display');
-  if (!isWorkoutRunning) {
-    isWorkoutRunning = true;
-    workoutSeconds = 0;
-    btn.innerText = "⏹️ إيقاف التمرين";
-    btn.className = "px-3 py-1 bg-red-950 border border-red-500 text-red-400 rounded-lg text-xs font-bold animate-pulse";
-    workoutTimerInterval = setInterval(() => {
-      workoutSeconds++;
-      const m = String(Math.floor(workoutSeconds / 60)).padStart(2, '0');
-      const s = String(workoutSeconds % 60).padStart(2, '0');
-      display.innerText = `${m}:${s}`;
-    }, 1000);
-  } else {
-    isWorkoutRunning = false;
-    clearInterval(workoutTimerInterval);
-    btn.innerText = "⏱️ بدء التمرين";
-    btn.className = "px-3 py-1 bg-cyan-950 border border-cyan-500 text-cyan-400 rounded-lg text-xs font-bold";
-    alert(`🎯 ممتاز! استغرق وقت تمرينك: ${Math.floor(workoutSeconds/60)} دقيقة و ${workoutSeconds%60} ثانية.`);
-  }
-}
-
-// ================= BADGES / ACHIEVEMENTS =================
-function checkBadges() {
-  let badges = [];
-  const totalCompletedDays = Object.values(state.history).filter(v => v === 'completed' || v === true).length;
-  if (state.streak >= 7) badges.exports = true;
-
-  return [
-    { title: "صقر الفجر 🌅", desc: "الحفاظ على صلاة الفجر متصلة", unlocked: habitStreakByName("الفجر") >= 7 },
-    { title: "بطل الحديد 💪", desc: "إتمام التمارين بدون انقطاع لـ 5 أيام", unlocked: totalCompletedDays >= 5 },
-    { title: "سيد الانضباط ⚡", desc: "الوصول لـ Level 3 في النظام", unlocked: state.level >= 3 },
-    { title: "صامد الأسبوع 🛡️", desc: "إتمام ستريك 7 أيام كاملة", unlocked: state.streak >= 7 },
-    { title: "فارس التعافي 🌱", desc: "الوصول لـ 14 يوم تعافي متواصل", unlocked: parseInt(document.getElementById("recovery-days-count")?.innerText || 0) >= 14 }
-  ];
-}
-
-function habitStreakByName(name) {
-  if (!state.habits || !state.habits.list) return 0;
-  const h = state.habits.list.find(x => x.name.includes(name));
-  if (!h) return 0;
-  // Simple check based on history or log
-  let s = 0;
-  const d = new Date();
-  for (let i = 0; i < 30; i++) {
-    const k = getFormattedDate(d);
-    const log = state.habits.log[k] || {};
-    if (log[h.id] === true || (h.type === 'time' && log[h.id]?.min > 0)) s++;
-    else if (i > 0) break;
-    d.setDate(d.getDate() - 1);
-  }
-  return s;
-}
-
-function openBadgesModal() {
-  const list = document.getElementById("badgesList");
-  list.innerHTML = "";
-  checkBadges().forEach(b => {
-    const div = document.createElement("div");
-    div.className = `p-2.5 rounded-lg border flex items-center justify-between ${b.unlocked ? 'bg-amber-950/30 border-amber-500/60 text-amber-300' : 'bg-gray-900 border-gray-800 text-gray-500'}`;
-    div.innerHTML = `
-      <div>
-        <div class="text-xs font-bold">${b.title}</div>
-        <div class="text-[10px] text-gray-400">${b.desc}</div>
-      </div>
-      <span class="text-xs">${b.unlocked ? '🔓 مفتوح' : '🔒 مقفل'}</span>
-    `;
-    list.appendChild(div);
-  });
-  document.getElementById("badgesModal").classList.remove("hidden");
-}
-function closeBadgesModal() { document.getElementById("badgesModal").classList.add("hidden"); }
-
-// ================= WORKOUTS LOGIC =================
-function calculateTotalReps(q) {
-  if (!q.sets) return 0;
-  return q.sets.reduce((sum, s) => sum + (parseInt(s.reps) || 0), 0);
-}
-
+// ================= WORKOUTS =================
 function calculateWeeklyAverage(questId) {
+  // المتوسط = إجمالي العدات ÷ عدد الأيام اللي عملت فيها التمرين فعلاً (آخر 7 أيام)
   let totalReps = 0, daysDone = 0;
   const today = new Date();
   for (let i = 0; i < 7; i++) {
@@ -534,6 +446,12 @@ function checkDayTransition() {
     const status = state.history[state.lastActiveDate];
     const wasDone = status === 'completed' || status === 'rest' || status === true;
     if (!wasDone && !state.penaltyActive) { state.penaltyActive = true; state.streak = 0; }
+    if (state.routines) {
+      Object.keys(state.routines).forEach(r => state.routines[r].forEach(q => { q.current = 0; q.sets = []; }));
+    }
+    // تصفير الأذكار والأدعية كل يوم جديد
+    if (state.azkar) state.azkar.forEach(z => z.current = z.total);
+    if (state.duas) state.duas.forEach(d => d.done = false);
     state.lastActiveDate = today;
     saveData();
   }
@@ -566,8 +484,128 @@ function toggleTodayRest() {
 
 function switchRoutine(r) { state.activeRoutine = r; saveData(); renderWorkouts(); }
 
+// ===== مؤقت التمرين =====
+function fmtHMS(s) {
+  s = Math.max(0, Math.floor(s));
+  return [Math.floor(s / 3600), Math.floor((s % 3600) / 60), s % 60].map(n => String(n).padStart(2, '0')).join(':');
+}
+function workoutElapsed() { return state.workoutTimer ? (Date.now() - state.workoutTimer.start) / 1000 : 0; }
+
+function toggleWorkoutTimer(e) { if (state.workoutTimer) stopWorkout(e); else startWorkout(e); }
+
+function startWorkout(e) {
+  state.workoutTimer = { start: Date.now() };
+  fx(e, '▶ يلا!');
+  saveData();
+  renderWorkoutTimer();
+}
+
+function stopWorkout(e, silent) {
+  if (!state.workoutTimer) return 0;
+  const sec = Math.round(workoutElapsed());
+  const k = getTodayKey();
+  if (!state.workoutTimes) state.workoutTimes = {};
+  state.workoutTimes[k] = (state.workoutTimes[k] || 0) + sec;
+  state.workoutTimer = null;
+  if (!silent) fx(e, '⏱ ' + fmtHMS(sec));
+  saveData();
+  renderWorkoutTimer();
+  return sec;
+}
+
+function renderWorkoutTimer() {
+  const disp = document.getElementById('wt-display');
+  if (!disp) return;
+  const btn = document.getElementById('wt-btn'), info = document.getElementById('wt-info');
+  const times = state.workoutTimes || {};
+  const todayTotal = times[getTodayKey()] || 0;
+  const running = !!state.workoutTimer;
+  disp.innerText = fmtHMS(running ? workoutElapsed() : todayTotal);
+  const vals = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const v = times[getFormattedDate(d)];
+    if (v) vals.push(v);
+  }
+  const avg = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length / 60) : 0;
+  info.innerText = `إجمالي اليوم: ${fmtHMS(todayTotal)} • متوسط آخر 7 أيام: ${avg} دقيقة`;
+  if (running) {
+    btn.className = "px-4 py-2 rounded-lg text-xs font-bold bg-red-600 hover:bg-red-500 text-white animate-pulse";
+    btn.innerText = "⏹ إنهاء التمرين";
+  } else {
+    btn.className = "px-4 py-2 rounded-lg text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white";
+    btn.innerText = "▶ ابدأ التمرين";
+  }
+}
+
+function tickWorkoutTimer() {
+  if (!state.workoutTimer) return;
+  const disp = document.getElementById('wt-display');
+  if (disp) disp.innerText = fmtHMS(workoutElapsed());
+}
+
+// ===== مجموعات التمرين (Sets) =====
+function setsHTML(q, dis) {
+  const prev = (state.lastSets && state.lastSets[q.id]) || [];
+  const cols = "grid grid-cols-[28px_1fr_70px_36px_20px] gap-1.5 items-center";
+  const rows = (q.sets || []).map((s, i) => `
+    <div class="${cols} text-xs">
+      <span class="text-gray-400 text-center">${i + 1}</span>
+      <span class="text-gray-500 text-center">${prev[i] != null ? prev[i] + ' reps' : '—'}</span>
+      <input type="number" inputmode="numeric" min="0" value="${s.reps}" ${dis} onchange="setReps(${q.id}, ${i}, this.value)" class="w-full text-center bg-gray-800 border border-gray-700 rounded py-1 text-gray-100 disabled:opacity-40">
+      <button onclick="toggleSet(${q.id}, ${i}, event)" ${dis} class="py-1 rounded transition ${s.done ? 'bg-cyan-500 text-black font-bold' : 'bg-gray-800 text-gray-400 border border-gray-700'} disabled:opacity-40">✔</button>
+      <button onclick="delSet(${q.id}, ${i})" ${dis} class="text-gray-600 hover:text-red-400 text-xs disabled:opacity-40">✕</button>
+    </div>`).join('');
+  return `
+    <div class="mt-2 pt-2 border-t border-gray-800/80 space-y-1.5">
+      <div class="${cols} text-[10px] text-gray-500 text-center"><span>SET</span><span>PREVIOUS</span><span>REPS</span><span>✔</span><span></span></div>
+      ${rows}
+      <button onclick="addSet(${q.id})" ${dis} class="w-full text-xs text-cyan-400 py-1 disabled:opacity-40">+ ADD SET</button>
+    </div>`;
+}
+
+function addSet(id) {
+  const q = findQuest(id);
+  if (!q) return;
+  if (!q.sets) q.sets = [];
+  const prev = (state.lastSets && state.lastSets[id]) || [];
+  const i = q.sets.length;
+  const reps = prev[i] != null ? prev[i] : (i ? q.sets[i - 1].reps : 10);
+  q.sets.push({ reps, done: false });
+  saveData(); renderWorkouts();
+}
+
+function setReps(id, i, v) {
+  const q = findQuest(id);
+  if (!q || !q.sets || !q.sets[i]) return;
+  const s = q.sets[i];
+  const n = Math.max(0, parseInt(v, 10) || 0);
+  if (s.done) q.current = Math.max(0, q.current + n - s.reps);
+  s.reps = n;
+  saveData(); renderWorkouts();
+}
+
+function toggleSet(id, i, e) {
+  if (state.penaltyActive || isTodayRest()) return;
+  const q = findQuest(id);
+  if (!q || !q.sets || !q.sets[i]) return;
+  const s = q.sets[i];
+  s.done = !s.done;
+  if (s.done) { fx(e, '💪 +' + s.reps); q.current += s.reps; }
+  else q.current = Math.max(0, q.current - s.reps);
+  saveData(); renderWorkouts();
+}
+
+function delSet(id, i) {
+  const q = findQuest(id);
+  if (!q || !q.sets || !q.sets[i]) return;
+  if (q.sets[i].done) q.current = Math.max(0, q.current - q.sets[i].reps);
+  q.sets.splice(i, 1);
+  saveData(); renderWorkouts();
+}
+
 function renderWorkouts() {
-  document.getElementById("hunter-name").innerText = state.name + " ✏";
+  document.getElementById("hunter-name").innerText = state.name + " ✏️️";
   document.getElementById("top-user-name").innerText = state.name;
   const rankIndex = Math.min(Math.floor((state.level - 1) / 2), CONFIG.RANKS.length - 1);
   document.getElementById("hunter-rank-level").innerText = `${CONFIG.RANKS[rankIndex].toUpperCase()} HUNTER | LEVEL ${state.level}`;
@@ -604,39 +642,24 @@ function renderWorkouts() {
   else penaltyEl.classList.add("hidden");
 
   renderCalendar();
+  renderWorkoutTimer();
 
   const listEl = document.getElementById("quest-list");
   listEl.innerHTML = "";
   const todayKey = getTodayKey();
   const doneToday = state.history[todayKey] === 'completed' || state.history[todayKey] === true;
   const quests = state.routines[state.activeRoutine] || [];
+  const dis = state.penaltyActive || doneToday || restActive ? 'disabled' : '';
 
   quests.forEach((q, index) => {
-    const totalReps = calculateTotalReps(q);
+    const pct = Math.min(100, Math.floor((q.current / q.target) * 100));
     const wa = calculateWeeklyAverage(q.id);
-    
-    let setsHTML = "";
-    if (q.sets) {
-      q.sets.forEach((set, sIdx) => {
-        setsHTML += `
-          <div class="flex items-center justify-between bg-gray-900/80 px-2 py-1 rounded border border-gray-800 text-[11px]">
-            <span class="text-gray-400">مجموعة ${sIdx + 1}</span>
-            <div class="flex items-center gap-1.5">
-              <input type="number" value="${set.reps}" onchange="updateSetReps(${q.id}, ${sIdx}, this.value)" class="w-14 text-center bg-gray-950 border border-gray-700 rounded text-cyan-300 font-bold py-0.5">
-              <span class="text-gray-400">عدة</span>
-              <button onclick="removeSet(${q.id}, ${sIdx})" class="text-red-400 hover:text-red-300 px-1">✕</button>
-            </div>
-          </div>
-        `;
-      });
-    }
-
     const card = document.createElement("div");
-    card.className = `card-bg p-3 rounded-xl border border-gray-800 space-y-2`;
+    card.className = `card-bg p-3 rounded-lg border transition ${pct >= 100 ? "border-cyan-500/70" : "border-gray-800"}`;
     card.innerHTML = `
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center mb-1">
         <div class="flex items-center gap-1.5">
-          <span class="font-bold text-xs text-cyan-300">${q.name}</span>
+          <span class="font-bold text-xs text-gray-200">${q.name}</span>
           <button onclick="editQuestName(${q.id})" class="text-[10px] text-gray-400 hover:text-cyan-400">✏️</button>
         </div>
         <div class="flex items-center gap-1">
@@ -645,11 +668,22 @@ function renderWorkouts() {
           <button onclick="deleteQuest(${q.id})" class="text-xs text-gray-500 hover:text-red-400 px-1">✕</button>
         </div>
       </div>
-      <div class="space-y-1">${setsHTML}</div>
-      <div class="flex justify-between items-center pt-1 text-[11px]">
-        <button onclick="addSet(${q.id})" class="text-cyan-400 border border-cyan-500/50 px-2 py-0.5 rounded bg-cyan-950/40">+ إضافة مجموعة</button>
-        <span class="text-gray-400 font-mono">الإجمالي: <strong class="text-cyan-300">${totalReps}</strong> عدة (متوسط أسبوعي: ${wa.avg})</span>
+      <div class="flex justify-between items-center text-xs text-gray-400 mb-1">
+        <span>Progress: ${q.current} / <strong onclick="editTarget(${q.id})" class="text-cyan-400 underline cursor-pointer">${q.target}</strong></span>
+        <span class="text-cyan-400 font-semibold">${pct}%</span>
       </div>
+      <div class="text-[10px] text-gray-400 mb-1.5 flex justify-between">
+        <span class="text-cyan-300 font-mono">📈 متوسط أسبوعي: <strong>${wa.avg}</strong> عَدّة (في ${wa.days} أيام)</span>
+      </div>
+      <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-2">
+        <div class="bg-cyan-400 h-1.5 transition-all duration-200" style="width: ${pct}%"></div>
+      </div>
+      <div class="flex justify-end gap-1.5 text-xs">
+        <button onclick="updateQuest(${q.id}, -1)" ${dis} class="px-2 py-0.5 bg-gray-800 rounded hover:bg-gray-700 text-gray-300 disabled:opacity-30">-1</button>
+        <button onclick="updateQuest(${q.id}, 1)" ${dis} class="px-2.5 py-0.5 bg-gray-800 rounded hover:bg-cyan-900 text-cyan-400 disabled:opacity-30">+1</button>
+        <button onclick="completeSingleQuest(${q.id}, event)" ${dis} class="px-2.5 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-400 hover:bg-cyan-900 rounded font-semibold disabled:opacity-30">✔ Done</button>
+      </div>
+      ${setsHTML(q, dis)}
     `;
     listEl.appendChild(card);
   });
@@ -668,28 +702,6 @@ function renderWorkouts() {
     btn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition shadow-[0_0_12px_rgba(0,229,255,0.3)] cursor-pointer";
     btn.innerText = "COMPLETE DAY";
   }
-}
-
-function updateSetReps(qId, sIdx, val) {
-  const q = findQuest(qId);
-  if (!q || !q.sets[sIdx]) return;
-  q.sets[sIdx].reps = Math.max(0, parseInt(val, 10) || 0);
-  saveData(); renderWorkouts();
-}
-
-function addSet(qId) {
-  const q = findQuest(qId);
-  if (!q) return;
-  const lastReps = q.sets.length ? q.sets[q.sets.length - 1].reps : 20;
-  q.sets.push({ reps: lastReps });
-  saveData(); renderWorkouts();
-}
-
-function removeSet(qId, sIdx) {
-  const q = findQuest(qId);
-  if (!q || q.sets.length <= 1) { alert("يجب أن تبقى مجموعة واحدة على الأقل!"); return; }
-  q.sets.splice(sIdx, 1);
-  saveData(); renderWorkouts();
 }
 
 function renderCalendar() {
@@ -729,6 +741,30 @@ function toggleDayStatus(k) {
 
 function findQuest(id) { return state.routines[state.activeRoutine].find(x => x.id === id); }
 
+function updateQuest(id, amt) {
+  if (state.penaltyActive || isTodayRest()) return;
+  const q = findQuest(id);
+  if (!q) return;
+  q.current = Math.max(0, q.current + amt);
+  saveData(); renderWorkouts();
+}
+
+function completeSingleQuest(id, e) {
+  if (state.penaltyActive || isTodayRest()) return;
+  const q = findQuest(id);
+  if (!q) return;
+  fx(e, '✅ كملت!');
+  q.current = q.target;
+  saveData(); renderWorkouts();
+}
+
+function editTarget(id) {
+  const q = findQuest(id);
+  if (!q) return;
+  const t = prompt("Target:", q.target);
+  if (t && parseInt(t) > 0) { q.target = parseInt(t); saveData(); renderWorkouts(); }
+}
+
 function editQuestName(id) {
   const q = findQuest(id);
   if (!q) return;
@@ -747,7 +783,8 @@ function moveQuest(index, dir) {
 function openAddQuestModal() {
   const n = prompt(`Enter Quest Name for ${state.activeRoutine.toUpperCase()}:`);
   if (!n) return;
-  state.routines[state.activeRoutine].push({ id: Date.now(), name: n.trim(), sets: [{ reps: 25 }, { reps: 25 }] });
+  const t = parseInt(prompt("Enter Target Count:", "100"), 10) || 100;
+  state.routines[state.activeRoutine].push({ id: Date.now(), name: n.trim(), current: 0, target: t, sets: [] });
   saveData(); renderWorkouts();
 }
 
@@ -758,22 +795,33 @@ function deleteQuest(id) {
   }
 }
 
-function completeDay() {
+function completeDay(e) {
   const todayKey = getTodayKey();
   if (state.history[todayKey] === 'completed') { alert("You already completed your quests for today!"); return; }
   if (isTodayRest()) { alert("Today is a Rest Day!"); return; }
+  if (state.routines[state.activeRoutine].some(q => q.current < q.target)) { alert("⚠️ لم تنهِ كل التمارين المطلوبة بعد!"); return; }
+
+  fx(e, '🎉 يوم مكتمل!');
+  if (state.workoutTimer) stopWorkout(null, true);
 
   if (!state.questHistory) state.questHistory = {};
   state.questHistory[todayKey] = {};
-  state.routines[state.activeRoutine].forEach(q => { state.questHistory[todayKey][q.id] = calculateTotalReps(q); });
+  if (!state.lastSets) state.lastSets = {};
+  state.routines[state.activeRoutine].forEach(q => {
+    state.questHistory[todayKey][q.id] = q.current;
+    const done = (q.sets || []).filter(s => s.done).map(s => s.reps);
+    if (done.length) state.lastSets[q.id] = done;
+  });
 
   state.history[todayKey] = 'completed';
   const prevLevel = state.level;
   recalculateStreakAndLevel();
   saveData(); renderWorkouts();
 
-  if (state.level > prevLevel) alert(`🔥 [LEVEL UP] وصلت إلى LEVEL ${state.level}!`);
-  else alert(`✅ تم تسجيل اليوم بنجاح! الستريك: ${state.streak} يوم.`);
+  const wt = (state.workoutTimes && state.workoutTimes[todayKey]) || 0;
+  const timeMsg = wt ? `\n⏱ مدة التمرين: ${fmtHMS(wt)}` : '';
+  if (state.level > prevLevel) alert(`🔥 [LEVEL UP] وصلت إلى LEVEL ${state.level}!${timeMsg}`);
+  else alert(`✅ تم تسجيل اليوم بنجاح! الستريك: ${state.streak} يوم.${timeMsg}`);
 }
 
 function editPenaltyText() {
@@ -800,7 +848,7 @@ function renderAzkar() {
     div.innerHTML = `
       <div class="text-xs text-gray-200 leading-relaxed mb-2">${item.text}</div>
       <div class="flex justify-between items-center pt-2 border-t border-gray-800/80">
-        <button onclick="decrementZekr(${index}, this)" class="px-3 py-1 rounded text-xs font-bold transition ${isDone ? 'bg-emerald-500 text-black' : 'bg-emerald-950 border border-emerald-500/60 text-emerald-400'}">
+        <button onclick="decrementZekr(${index})" class="px-3 py-1 rounded text-xs font-bold transition ${isDone ? 'bg-emerald-500 text-black' : 'bg-emerald-950 border border-emerald-500/60 text-emerald-400'}">
           ${isDone ? 'تم الاكتفاء ✔️' : `متبقي: ${item.current} /${item.total}`}
         </button>
         <div class="flex items-center gap-1">
@@ -814,12 +862,10 @@ function renderAzkar() {
     container.appendChild(div);
   });
 }
-function decrementZekr(i, btn) {
+function decrementZekr(i) {
   if (state.azkar[i].current > 0) {
     state.azkar[i].current -= 1;
-    btn.classList.add('pop-anim');
-    setTimeout(() => btn.classList.remove('pop-anim'), 300);
-    if (navigator.vibrate) navigator.vibrate(40);
+    if (navigator.vibrate) navigator.vibrate(30);
     saveData(); renderAzkar();
   }
 }
@@ -861,7 +907,7 @@ function renderDuas() {
     div.innerHTML = `
       <div class="text-xs text-blue-100 leading-relaxed mb-2">${d.text}</div>
       <div class="flex justify-between items-center pt-2 border-t border-gray-800/80">
-        <button onclick="toggleDuaCheck(${index}, this)" class="px-3 py-1 rounded text-xs font-bold transition ${d.done ? 'bg-blue-500 text-black' : 'bg-gray-800 text-blue-300 border border-blue-500/40'}">
+        <button onclick="toggleDuaCheck(${index})" class="px-3 py-1 rounded text-xs font-bold transition ${d.done ? 'bg-blue-500 text-black' : 'bg-gray-800 text-blue-300 border border-blue-500/40'}">
           ${d.done ? '✔ تم الدعاء' : 'وضع علامة صح ✔'}
         </button>
         <div class="flex items-center gap-1">
@@ -875,11 +921,9 @@ function renderDuas() {
     container.appendChild(div);
   });
 }
-function toggleDuaCheck(i, btn) {
+function toggleDuaCheck(i) {
   state.duas[i].done = !state.duas[i].done;
-  btn.classList.add('pop-anim');
-  setTimeout(() => btn.classList.remove('pop-anim'), 300);
-  if (state.duas[i].done && navigator.vibrate) navigator.vibrate(40);
+  if (state.duas[i].done && navigator.vibrate) navigator.vibrate(30);
   saveData(); renderDuas();
 }
 function resetDuaaChecks() { state.duas.forEach(d => d.done = false); saveData(); renderDuas(); }
@@ -1152,6 +1196,7 @@ function updateTimer() {
   midnight.setHours(24, 0, 0, 0);
   const diff = midnight - now;
   checkDayTransition();
+  if (typeof tickWorkoutTimer === 'function') tickWorkoutTimer();
   const h = String(Math.floor((diff / 3600000) % 24)).padStart(2, '0');
   const m = String(Math.floor((diff / 60000) % 60)).padStart(2, '0');
   const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
@@ -1164,11 +1209,19 @@ setInterval(updateTimer, 1000);
 updateTimer();
 loadData();
 
-// ===== متتبع العادات (3 تبويبات: العادات، التايم بلوكينج المحدد بدقة، وتراكينج النوم + المهام الجانبية) =====
+// ===== التراكينج: 3 تبويبات (العادات / تايم بلوكينج / تراكينج اليوم) =====
 (function () {
-  const WEEK_START = 6;
+  const WEEK_START = 6;            // 6 = السبت
   const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
   const SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+  const BADGE_NAMES = { 1: ['صقر الفجر', '🦅'], 2: ['عقل الصقر', '🧠'], 3: ['حارس الورد', '📖'], 4: ['الحديد', '🏋️'], 5: ['درع التعافي', '🛡️'], 6: ['فارس الليل', '🌙'] };
+  const TIERS = [7, 14, 30];
+  const POINT_TIERS = [100, 300, 1000];
+  const QUICK = [['💧 شرب 3 لتر ميه', 10], ['🧹 تنظيف المكتب', 10], ['📖 قراءة 10 صفحات', 10]];
+  const DEFAULT_BLOCKS = [
+    { id: 1, label: '7 – 10 صباحًا' }, { id: 2, label: '10 صباحًا – الظهر' }, { id: 3, label: 'الظهر – العصر' },
+    { id: 4, label: 'العصر – المغرب' }, { id: 5, label: 'العشاء – 12' }, { id: 6, label: '12 – 3' }
+  ];
 
   let dirty = false;
   if (!state.habits) {
@@ -1185,12 +1238,14 @@ loadData();
     };
     dirty = true;
   }
-  if (!state.habits.sideQuests) { state.habits.sideQuests = {}; dirty = true; } // المهام الجانبية اليومية
   if (!state.habits.reviews) { state.habits.reviews = {}; dirty = true; }
-  if (!state.habits.blocks) { state.habits.blocks = {}; dirty = true; }
+  if (!state.habits.blockTpl) { state.habits.blockTpl = DEFAULT_BLOCKS.map(b => Object.assign({}, b)); dirty = true; }
+  if (!state.habits.blockText) { state.habits.blockText = {}; dirty = true; }
   if (!state.habits.sleep) { state.habits.sleep = {}; dirty = true; }
+  if (!state.habits.side) { state.habits.side = {}; dirty = true; }
   if (dirty) saveData();
 
+  // تنظيف أي نسخة قديمة من العادات لو اتلصقت مرتين
   const oldSec = document.getElementById('view-habits'); if (oldSec) oldSec.remove();
   document.querySelectorAll('#view-home .grid > button').forEach(b => { if (b.textContent.includes('متتبع العادات اليومية')) b.remove(); });
 
@@ -1215,38 +1270,128 @@ loadData();
   const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); };
   const find = id => H().list.find(h => h.id === id);
 
-  function habitStreak(h) {
+  const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
+  const durMin = (a, b) => { const x = toMin(a), y = toMin(b); if (x == null || y == null) return 0; let d = y - x; if (d < 0) d += 1440; return d; };
+  const fmtDur = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
+  const fmt12 = t => { if (!t) return '--'; const p = t.split(':'), h = +p[0]; return `${h % 12 || 12}:${p[1]} ${h >= 12 ? 'م' : 'ص'}`; };
+  const minToTime = m => { m = Math.round(m) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  const inCls = 'text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200';
+
+  // ===== ستريك كل عادة لوحدها (الجمعة معفية: مش بتزود ولا بتكسر) =====
+  function firstKey() {
+    const ks = Object.keys(H().log).concat(Object.keys(state.history || {})).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+    return ks.length ? ks[0] : getTodayKey();
+  }
+  function streakOf(h) {
     const tk = getTodayKey();
-    const d = new Date(); d.setHours(12);
-    let s = 0;
-    for (let i = 0; i < 400; i++) {
+    const d = keyToDate(firstKey()), end = keyToDate(tk);
+    let run = 0, best = 0;
+    for (; d <= end; d.setDate(d.getDate() + 1)) {
       const k = getFormattedDate(d);
-      if (!isFri(k)) {
-        if (isDone(h, k)) s++;
-        else if (k !== tk) break;
-      }
-      d.setDate(d.getDate() - 1);
+      if (isFri(k)) continue;
+      if (isDone(h, k)) { run++; if (run > best) best = run; }
+      else if (k !== tk) run = 0;
     }
-    return s;
+    return { cur: run, best };
+  }
+  let ST = {};
+
+  // ===== نقاط المهام الجانبية =====
+  const sideOf = k => H().side[k] || [];
+  const dayPts = k => sideOf(k).filter(q => q.done).reduce((s, q) => s + q.pts, 0);
+  const totalPts = () => Object.keys(H().side).reduce((s, k) => s + dayPts(k), 0);
+
+  // ===== الإنجازات =====
+  function badgeList() {
+    const out = [];
+    H().list.forEach(h => {
+      const st = ST[h.id] || streakOf(h);
+      const nm = BADGE_NAMES[h.id] || [h.name, '🏅'];
+      let shownLocked = false;
+      TIERS.forEach((t, i) => {
+        const un = st.best >= t;
+        if (un || !shownLocked) {
+          out.push({ key: `h${h.id}_${t}`, emoji: nm[1], title: nm[0] + ' ' + '⭐'.repeat(i + 1), desc: `${t} يوم متواصل — ${h.name}`, un, prog: `${Math.min(st.cur, t)}/${t}` });
+          if (!un) shownLocked = true;
+        }
+      });
+    });
+    const P = totalPts();
+    let locked = false;
+    POINT_TIERS.forEach((t, i) => {
+      const un = P >= t;
+      if (un || !locked) {
+        out.push({ key: `pts_${t}`, emoji: '🎯', title: 'صائد المهام ' + '⭐'.repeat(i + 1), desc: `${t} نقطة من المهام الجانبية`, un, prog: `${Math.min(P, t)}/${t}` });
+        if (!un) locked = true;
+      }
+    });
+    return out;
+  }
+  function checkBadges(list) {
+    if (!H().badgesSeen) {
+      H().badgesSeen = {};
+      list.filter(b => b.un).forEach(b => { H().badgesSeen[b.key] = 1; });
+      saveData();
+      return;
+    }
+    const fresh = list.filter(b => b.un && !H().badgesSeen[b.key]);
+    fresh.forEach((b, i) => {
+      H().badgesSeen[b.key] = 1;
+      setTimeout(() => showToast(`🏅 وسام جديد: ${b.emoji} ${b.title}`), i * 3300);
+    });
+    if (fresh.length) saveData();
+  }
+  function renderBadges() {
+    const box = document.getElementById('habitsBadges');
+    if (!box) return;
+    const bl = badgeList();
+    checkBadges(bl);
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-yellow-300">🏅 الإنجازات</h3>
+        <span class="text-[10px] text-gray-400">${bl.filter(b => b.un).length} مفتوحة • نقاط: ${totalPts()}</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2">${bl.map(b => `
+        <div class="rounded-lg border p-2 text-center ${b.un ? 'border-yellow-500/60 bg-yellow-950/20' : 'border-gray-800 opacity-50'}">
+          <div class="text-2xl">${b.un ? b.emoji : '🔒'}</div>
+          <div class="text-[11px] font-bold ${b.un ? 'text-yellow-200' : 'text-gray-400'}">${esc(b.title)}</div>
+          <div class="text-[9px] text-gray-400">${esc(b.desc)}</div>
+          ${b.un ? '' : `<div class="text-[9px] text-amber-400">${b.prog}</div>`}
+        </div>`).join('')}</div>`;
   }
 
   let selDay = getTodayKey();
-  let mainTab = 'habits'; // 'habits', 'blocks', 'sleep'
+  let hbTab = 'habits';
   let viewY = new Date().getFullYear(), viewM = new Date().getMonth();
 
   const section = document.createElement('section');
   section.id = 'view-habits';
   section.className = 'hidden space-y-3';
+  const tabCls = 'py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400';
   section.innerHTML = `
     <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
-      <div><h2 class="text-sm font-bold text-amber-400">✅ متتبع العادات اليومية</h2>
+      <div><h2 class="text-sm font-bold text-amber-400">📊 التراكينج <span class="text-[9px] text-gray-500">v5</span></h2>
       <p id="habitsDayLabel" class="text-[11px] text-gray-400"></p></div>
-      <button onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
+      <button id="hbAddBtn" onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
+    </div>
+    <div class="grid grid-cols-3 gap-1.5">
+      <button id="htab-habits" onclick="hbTabSet('habits')" class="${tabCls}">✅ العادات</button>
+      <button id="htab-blocks" onclick="hbTabSet('blocks')" class="${tabCls}">⏱ تايم بلوكينج</button>
+      <button id="htab-day" onclick="hbTabSet('day')" class="${tabCls}">📅 تراكينج اليوم</button>
     </div>
     <div id="habitsMonth" class="card-bg p-3 rounded-xl border border-gray-800"></div>
-    <div id="mainTabs" class="grid grid-cols-3 gap-1.5"></div>
-    <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
-    <div id="habitsContent" class="space-y-2.5"></div>`;
+    <div id="paneHabits" class="space-y-3">
+      <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
+      <div id="habitsList" class="space-y-2.5"></div>
+      <div id="habitsBadges" class="card-bg p-3 rounded-xl border border-yellow-500/40 space-y-2"></div>
+    </div>
+    <div id="paneBlocks" class="hidden space-y-3">
+      <div id="habitsBlocks" class="card-bg p-3 rounded-xl border border-teal-500/40 space-y-2"></div>
+    </div>
+    <div id="paneDay" class="hidden space-y-3">
+      <div id="habitsSleep" class="card-bg p-3 rounded-xl border border-sky-500/40 space-y-2"></div>
+      <div id="habitsSide" class="card-bg p-3 rounded-xl border border-yellow-500/40 space-y-2"></div>
+    </div>`;
   document.querySelector('main').appendChild(section);
 
   const homeBtn = document.createElement('button');
@@ -1254,9 +1399,9 @@ loadData();
   homeBtn.onclick = () => showView('habits');
   homeBtn.className = 'p-4 rounded-xl card-bg border border-amber-500/40 hover:border-amber-400 text-right flex items-center justify-between transition hover:scale-[1.01]';
   homeBtn.innerHTML = `<div class="flex items-center gap-3">
-    <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">✅</span>
+    <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">📊</span>
     <div><h3 class="text-sm font-bold text-amber-400">متتبع العادات اليومية</h3>
-    <p class="text-xs text-gray-400">العادات، التايم بلوكينج المحدد، وتراكينج النوم</p></div></div>
+    <p class="text-xs text-gray-400">العادات، تايم بلوكينج، وتراكينج اليوم (نوم + مهام جانبية)</p></div></div>
     <span class="text-amber-400 text-sm">◀</span>`;
   document.querySelector('#view-home .grid').prepend(homeBtn);
 
@@ -1267,12 +1412,20 @@ loadData();
       _showView('home');
       document.getElementById('view-home').classList.add('hidden');
       document.getElementById('view-habits').classList.remove('hidden');
-      selDay = getTodayKey();
-      mainTab = 'habits';
+      selDay = getTodayKey(); hbTab = 'habits';
       viewY = new Date().getFullYear(); viewM = new Date().getMonth();
       render();
     } else _showView(v);
   };
+
+  function setTabUI() {
+    [['habits', 'paneHabits'], ['blocks', 'paneBlocks'], ['day', 'paneDay']].forEach(x => {
+      document.getElementById(x[1]).classList.toggle('hidden', x[0] !== hbTab);
+      document.getElementById('htab-' + x[0]).className = 'py-2 rounded-lg border text-[11px] font-bold transition ' +
+        (x[0] === hbTab ? 'bg-amber-950 border-amber-400 text-amber-300' : 'bg-gray-900 border-gray-800 text-gray-400');
+    });
+    document.getElementById('hbAddBtn').classList.toggle('hidden', hbTab !== 'habits');
+  }
 
   function renderMonth(today) {
     const list = H().list;
@@ -1305,19 +1458,6 @@ loadData();
       <div class="grid grid-cols-7 gap-1">${cells}</div>`;
   }
 
-  function renderMainTabs() {
-    const tabsBox = document.getElementById('mainTabs');
-    const tabs = [
-      { id: 'habits', label: '✅ العادات', activeColor: 'bg-amber-500 text-black border-amber-400' },
-      { id: 'blocks', label: '⏱ التايم بلوكينج', activeColor: 'bg-teal-500 text-black border-teal-400' },
-      { id: 'sleep', label: '😴 تراكينج النوم', activeColor: 'bg-sky-500 text-black border-sky-400' }
-    ];
-    tabsBox.innerHTML = tabs.map(t => {
-      const active = mainTab === t.id;
-      return `<button onclick="setMainTab('${t.id}')" class="py-2 rounded-lg text-xs font-bold transition border ${active ? t.activeColor : 'bg-gray-900 text-gray-300 border-gray-800'}">${t.label}</button>`;
-    }).join('');
-  }
-
   function reviewHTML(wk, past) {
     const list = H().list;
     const rv = Object.assign({ won: '', change: '' }, H().reviews[wk[0]]);
@@ -1335,9 +1475,18 @@ loadData();
         <div class="flex justify-between text-xs"><span class="text-gray-200">${esc(h.name)}</span><span class="text-amber-400 font-bold">${c}/${past.length} (${p}%)</span></div>
         <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-1"><div class="bg-amber-400 h-1.5" style="width:${p}%"></div></div>${extra}</div>`;
     }).join('');
+    const qs = [].concat((state.routines && state.routines.day1) || [], (state.routines && state.routines.day2) || []);
+    const wrows = qs.map(q => {
+      let t = 0, n = 0;
+      wk.forEach(k => { const r = state.questHistory && state.questHistory[k] ? state.questHistory[k][q.id] : 0; if (r > 0) { t += r; n++; } });
+      return n ? `<div class="flex justify-between text-xs"><span class="text-gray-300">${esc(q.name)}</span><span class="text-cyan-300">${(t / n).toFixed(1)} (في ${n} أيام)</span></div>` : '';
+    }).join('');
+    let wsec = 0;
+    wk.forEach(k => { wsec += (state.workoutTimes && state.workoutTimes[k]) || 0; });
     return `<div class="card-bg p-3 rounded-xl border border-indigo-500/40 space-y-3">
       <h3 class="text-sm font-bold text-indigo-300">📝 مراجعة الأسبوع (${a.getDate()}/${a.getMonth() + 1} – ${b.getDate()}/${b.getMonth() + 1})</h3>
       <div class="space-y-2">${rows || '<p class="text-xs text-gray-500">مفيش عادات</p>'}</div>
+      ${wrows ? `<div class="pt-2 border-t border-gray-800 space-y-1"><p class="text-[11px] text-gray-400">📈 متوسط التمارين${wsec ? ` • إجمالي وقت التمرين: ${fmtDur(Math.round(wsec / 60))}` : ''}</p>${wrows}</div>` : ''}
       <div class="pt-2 border-t border-gray-800 space-y-2">
         <label class="text-[11px] text-gray-300">✅ إيه اللي نجح الأسبوع ده؟</label>
         <textarea rows="3" onchange="hbReview('${wk[0]}','won',this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded p-2 text-gray-200">${esc(rv.won)}</textarea>
@@ -1347,20 +1496,27 @@ loadData();
   }
 
   function render() {
-    const box = document.getElementById('habitsContent');
-    if (!box) return;
-    const today = getTodayKey(), list = H().list;
+    const today = getTodayKey();
+    ST = {};
+    H().list.forEach(h => { ST[h.id] = streakOf(h); });
+    setTabUI();
+    renderMonth(today);
+    const sd = keyToDate(selDay), fri = isFri(selDay);
+    document.getElementById('habitsDayLabel').innerText = (hbTab === 'habits' && fri)
+      ? 'الجمعة: مراجعة الأسبوع (معفية من العادات)'
+      : (selDay === today ? 'اليوم' : 'يوم') + ': ' + DAYS[sd.getDay()] + ' ' + sd.getDate();
+    if (hbTab === 'habits') renderHabitsPane(today);
+    else if (hbTab === 'blocks') renderBlocks();
+    else { renderSleep(); renderSide(); }
+  }
+
+  function renderHabitsPane(today) {
+    const box = document.getElementById('habitsList');
+    const list = H().list;
     const wk = weekKeysOf(selDay);
     const trk = wk.filter(k => !isFri(k));
     const past = trk.filter(k => k <= today);
     const fri = isFri(selDay);
-    renderMonth(today);
-    renderMainTabs();
-
-    const sd = keyToDate(selDay);
-    document.getElementById('habitsDayLabel').innerText = fri
-      ? 'الجمعة: مراجعة الأسبوع (معفية من العادات)'
-      : (selDay === today ? 'تسجيل اليوم' : 'تسجيل يوم') + ': ' + DAYS[sd.getDay()] + ' ' + sd.getDate();
 
     const wDone = list.reduce((s, h) => s + past.filter(k => isDone(h, k)).length, 0);
     const wMax = Math.max(1, list.length * past.length);
@@ -1376,18 +1532,13 @@ loadData();
       <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-cyan-400 h-2 transition-all" style="width:${wPct}%"></div></div>`;
     document.getElementById('habitsSummary').innerHTML = sum;
 
-    if (fri) { box.innerHTML = reviewHTML(wk, past); return; }
+    if (fri) { box.innerHTML = reviewHTML(wk, past); renderBadges(); return; }
 
     box.innerHTML = '';
-    if (mainTab === 'blocks') { box.innerHTML = renderBlocksHTML(); return; }
-    if (mainTab === 'sleep') { box.innerHTML = renderSleepHTML(); return; }
-
-    // Habits tab with Side Quests
-    let html = '';
     list.forEach((h, i) => {
       const d = isDone(h, selDay);
+      const st = ST[h.id] || { cur: 0, best: 0 };
       const wCount = past.filter(k => isDone(h, k)).length;
-      const hStr = habitStreak(h);
       const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
       let middle = '', extra = '';
       if (h.type === 'time') {
@@ -1395,131 +1546,73 @@ loadData();
         middle = `<div class="flex items-center gap-2 mt-2">
           <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
           <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
-        let st = 0, me = 0;
-        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
-        extra = ` • مذاكرة ${fmt(st)} • حفظ ${fmt(me)}`;
+        let ss = 0, me = 0;
+        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else ss += x.min; } });
+        extra = ` • مذاكرة ${fmt(ss)} • حفظ ${fmt(me)}`;
       }
       const mark = h.type === 'time'
         ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
-        : `<button onclick="hbToggle(${h.id}, this)" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
-
-      html += `
-        <div class="card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2.5">
-              ${mark}
-              <div>
-                <span class="text-xs font-bold text-gray-200">${esc(h.name)}</span>
-                <span class="text-[10px] bg-orange-950/60 border border-orange-500/40 text-orange-400 px-1.5 py-0.5 rounded-md mr-2 font-mono">🔥 ${hStr} يوم</span>
-              </div>
-            </div>
-            <div class="flex items-center gap-1">
-              <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-              <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-              <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-              <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
-            </div>
-          </div>${middle}
-          <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
-            <div class="flex gap-1">${dots}</div>
-            <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
-          </div>
-        </div>`;
-    });
-
-    // Side Quests Section
-    const daySideQuests = H().sideQuests[selDay] || [];
-    let sqHTML = daySideQuests.map((sq, sIdx) => `
-      <div class="flex items-center justify-between bg-gray-900 border border-gray-800 p-2 rounded-lg text-xs">
-        <div class="flex items-center gap-2">
-          <input type="checkbox" ${sq.done ? 'checked' : ''} onchange="toggleSideQuest(${sIdx})" class="w-4 h-4 accent-amber-500 cursor-pointer">
-          <span class="${sq.done ? 'line-through text-gray-500' : 'text-gray-200'}">${esc(sq.text)}</span>
-        </div>
-        <button onclick="deleteSideQuest(${sIdx})" class="text-red-400 text-xs px-1">✕</button>
-      </div>
-    `).join('');
-
-    html += `
-      <div class="card-bg p-3 rounded-xl border border-cyan-500/40 space-y-2 mt-4">
+        : `<button onclick="hbToggle(${h.id}, event)" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
+      const card = document.createElement('div');
+      card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
+      card.innerHTML = `
         <div class="flex justify-between items-center">
-          <h3 class="text-xs font-bold text-cyan-300">⚡ المهام الجانبية الطارئة</h3>
-          <button onclick="openAddSideQuestPrompt()" class="text-[10px] bg-cyan-950 border border-cyan-500 px-2 py-0.5 rounded text-cyan-300 font-bold">+ مهمة جديدة</button>
-        </div>
-        <div class="space-y-1.5">${sqHTML || '<p class="text-[11px] text-gray-500">لا توجد مهام جانبية اليوم</p>'}</div>
-      </div>
-    `;
-
-    box.innerHTML = html;
+          <div class="flex items-center gap-2.5">${mark}
+            <div>
+              <div class="text-xs font-bold text-gray-200">${esc(h.name)}</div>
+              <div class="text-[10px] text-orange-400">🔥 ${st.cur} يوم <span class="text-gray-500">• 🏆 أفضل ${st.best}</span></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+            <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+            <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+            <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+          </div>
+        </div>${middle}
+        <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
+          <div class="flex gap-1">${dots}</div>
+          <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
+        </div>`;
+      box.appendChild(card);
+    });
+    renderBadges();
   }
 
-  // ===== التايم بلوكينج المحدد بالظبط =====
-  const FIXED_SLOTS = [
-    { id: 's1', label: 'من 7 إلى 10 صباحاً', defaultTitle: 'صباح الخير / البلوك الأول' },
-    { id: 's2', label: 'من 10 صباحاً إلى الظهر', defaultTitle: 'البلوك الصباحي الثاني' },
-    { id: 's3', label: 'من الظهر إلى العصر', defaultTitle: 'بلوك ما بعد الظهر' },
-    { id: 's4', label: 'من العصر إلى المغرب', defaultTitle: 'بلوك العصر' },
-    { id: 's5', label: 'من العشاء إلى 12', defaultTitle: 'بلوك المساء' },
-    { id: 's6', label: 'من 12 إلى 3 صباحاً', defaultTitle: 'بلوك سهر الليل' }
-  ];
-
-  function renderBlocksHTML() {
-    const dayBlocks = H().blocks[selDay] || {};
-    const slotsHTML = FIXED_SLOTS.map(slot => {
-      const val = dayBlocks[slot.id] || '';
-      return `<div class="card-bg p-3 rounded-xl border border-gray-800 space-y-1.5">
-        <span class="text-xs font-bold text-teal-300">📌 ${slot.label}</span>
-        <input type="text" placeholder="${slot.defaultTitle}" value="${esc(val)}" onchange="tbSetSlot('${slot.id}', this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded px-2.5 py-1.5 text-gray-200">
-      </div>`;
-    }).join('');
-
-    return `<div class="space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-teal-500/40 flex justify-between items-center">
-        <div>
-          <h3 class="text-sm font-bold text-teal-300">⏱ جدول اليوم (Time Blocks)</h3>
-          <p class="text-[11px] text-gray-400">اكتب قدام كل فترة عملت فيها إيه</p>
+  // ===== تايم بلوكينج: بلوكات ثابتة (قابلة للتعديل) وانت بتكتب قدام كل بلوك لكل يوم =====
+  function renderBlocks() {
+    const box = document.getElementById('habitsBlocks');
+    const tpl = H().blockTpl, txt = H().blockText[selDay] || {};
+    const rows = tpl.map((b, i) => `
+      <div class="bg-gray-900/60 border border-gray-800 rounded-lg p-2 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-teal-200">${esc(b.label)}</span>
+          <div class="flex items-center gap-1">
+            <button onclick="tbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+            <button onclick="tbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+            <button onclick="tbRename(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+            <button onclick="tbDel(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+          </div>
         </div>
-        <button onclick="tbCopy()" class="text-[10px] bg-gray-900 border border-teal-500/50 px-2 py-1 rounded text-teal-300">📋 نسخ من الأمس</button>
+        <input type="text" value="${esc(txt[b.id] || '')}" placeholder="هتعمل إيه في البلوك ده؟" onchange="tbText(${b.id}, this.value)" class="w-full ${inCls}">
+      </div>`).join('');
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-teal-300">⏱ تايم بلوكينج</h3>
+        <button onclick="tbAdd()" class="text-[10px] bg-teal-950 border border-teal-500 px-2 py-1 rounded text-teal-300 font-bold">+ بلوك جديد</button>
       </div>
-      <div class="space-y-2">${slotsHTML}</div>
-    </div>`;
+      <p class="text-[10px] text-gray-400">البلوكات ثابتة لكل الأيام، واللي بتكتبه قدام كل بلوك بيتحفظ لليوم المختار بس.</p>
+      ${tpl.length ? `<div class="space-y-2">${rows}</div>` : '<p class="text-[11px] text-gray-500">مفيش بلوكات. ضيف أول بلوك.</p>'}`;
   }
 
-  window.tbSetSlot = (slotId, text) => {
-    H().blocks[selDay] = H().blocks[selDay] || {};
-    H().blocks[selDay][slotId] = text.trim();
-    saveData();
-  };
-
-  window.tbCopy = () => {
-    const d = keyToDate(selDay);
-    let src = null;
-    for (let i = 0; i < 60; i++) {
-      d.setDate(d.getDate() - 1);
-      const k = getFormattedDate(d);
-      if (H().blocks[k] && Object.keys(H().blocks[k]).length) { src = k; break; }
-    }
-    if (!src) { alert('مفيش يوم قبل كده فيه بلوكات مسجلة'); return; }
-    H().blocks[selDay] = Object.assign({}, H().blocks[src]);
-    saveData(); render();
-    alert('✅ تم نسخ بلوكات الأمس بنجاح!');
-  };
-
-  // ===== تراكينج النوم =====
-  function renderSleepHTML() {
-    const inCls = 'text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200';
+  // ===== النوم والاستيقاظ =====
+  function renderSleep() {
+    const box = document.getElementById('habitsSleep');
+    const today = getTodayKey();
     const sl = Object.assign({ bed: '', wake: '' }, H().sleep[selDay]);
-    const durMin = (a, b) => {
-      const x = toMin(a), y = toMin(b);
-      if (x == null || y == null) return 0;
-      let d = y - x; if (d < 0) d += 1440; return d;
-    };
-    const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
-    const minToTime = m => { m = Math.round(m) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
-    const fmt12 = t => { if (!t) return '--'; const p = t.split(':'), h = +p[0]; return `${h % 12 || 12}:${p[1]} ${h >= 12 ? 'م' : 'ص'}`; };
     const dur = sl.bed && sl.wake ? durMin(sl.bed, sl.wake) : 0;
-    
     let n = 0, sumD = 0, sumBed = 0, sumWake = 0;
-    weekKeysOf(selDay).filter(k => k <= getTodayKey()).forEach(k => {
+    weekKeysOf(selDay).filter(k => k <= today).forEach(k => {
       const x = H().sleep[k];
       if (x && x.bed && x.wake) {
         n++; sumD += durMin(x.bed, x.wake);
@@ -1527,28 +1620,47 @@ loadData();
         sumBed += b; sumWake += toMin(x.wake);
       }
     });
-
-    return `<div class="card-bg p-4 rounded-xl border border-sky-500/40 space-y-3">
-      <h3 class="text-sm font-bold text-sky-300">😴 تراكينج النوم والاستيقاظ</h3>
-      <p class="text-[11px] text-gray-400">سجّل نمت إمتى وصحيت إمتى في اليوم المختار</p>
+    box.innerHTML = `
+      <h3 class="text-sm font-bold text-sky-300">😴 النوم والاستيقاظ</h3>
+      <p class="text-[10px] text-gray-400">سجّل نمت إمتى امبارح وصحيت إمتى في اليوم المختار</p>
       <div class="grid grid-cols-2 gap-2">
         <div><label class="text-[11px] text-gray-300 block mb-1">🌙 وقت النوم</label><input type="time" value="${sl.bed}" onchange="slSet('bed',this.value)" class="w-full ${inCls}"></div>
         <div><label class="text-[11px] text-gray-300 block mb-1">☀️ وقت الاستيقاظ</label><input type="time" value="${sl.wake}" onchange="slSet('wake',this.value)" class="w-full ${inCls}"></div>
       </div>
-      ${dur ? `<p class="text-xs text-sky-200">مدة النوم: <strong>${fmt(dur)}</strong></p>` : ''}
-      <div class="pt-2 border-t border-gray-800 text-[11px] text-gray-300 space-y-1">
-        ${n ? `<div>📊 متوسط الأسبوع (${n} أيام): نوم <strong class="text-sky-300">${fmt(Math.round(sumD / n))}</strong></div>
-        <div>🌙 متوسط النوم: <strong class="text-sky-300">${fmt12(minToTime(sumBed / n))}</strong> • ☀️ متوسط الاستيقاظ: <strong class="text-sky-300">${fmt12(minToTime(sumWake / n))}</strong></div>` : '<div class="text-gray-500">لسه مفيش أيام مسجلة الأسبوع ده</div>'}
-      </div>
-    </div>`;
+      ${dur ? `<p class="text-xs text-sky-200">مدة النوم: <strong>${fmtDur(dur)}</strong></p>` : ''}
+      <div class="pt-2 border-t border-gray-800 text-[11px] text-gray-300 space-y-0.5">
+        ${n ? `<div>📊 متوسط الأسبوع (${n} أيام): نوم <strong class="text-sky-300">${fmtDur(Math.round(sumD / n))}</strong></div>
+        <div>🌙 متوسط وقت النوم: <strong class="text-sky-300">${fmt12(minToTime(sumBed / n))}</strong> • ☀️ متوسط الاستيقاظ: <strong class="text-sky-300">${fmt12(minToTime(sumWake / n))}</strong></div>` : '<div class="text-gray-500">لسه مفيش أيام مسجلة الأسبوع ده</div>'}
+      </div>`;
   }
 
-  window.slSet = (field, v) => {
-    H().sleep[selDay] = Object.assign({ bed: '', wake: '' }, H().sleep[selDay], { [field]: v });
-    saveData(); render();
-  };
+  // ===== المهام الجانبية (Side Quests) =====
+  function renderSide() {
+    const box = document.getElementById('habitsSide');
+    const arr = sideOf(selDay);
+    const rows = arr.map(q => `
+      <div class="flex items-center justify-between gap-2 bg-gray-900/60 border ${q.done ? 'border-yellow-500/60' : 'border-gray-800'} rounded-lg p-2">
+        <button onclick="sqToggle(${q.id}, event)" class="w-7 h-7 rounded-full text-sm font-bold transition ${q.done ? 'bg-yellow-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>
+        <span class="flex-1 text-xs ${q.done ? 'text-yellow-200 line-through' : 'text-gray-200'}">${esc(q.name)}</span>
+        <span class="text-[10px] text-yellow-400">+${q.pts}</span>
+        <button onclick="sqDel(${q.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+      </div>`).join('');
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-yellow-300">⭐ المهام الجانبية</h3>
+        <span class="text-[10px] text-gray-400">نقاط اليوم: <strong class="text-yellow-300">${dayPts(selDay)}</strong> • الإجمالي: <strong class="text-yellow-300">${totalPts()}</strong></span>
+      </div>
+      <div class="flex flex-wrap gap-1.5">${QUICK.map((q, i) => `<button onclick="sqQuick(${i})" class="text-[10px] bg-gray-900 border border-yellow-500/40 px-2 py-1 rounded text-yellow-200">+ ${esc(q[0])}</button>`).join('')}</div>
+      ${arr.length ? `<div class="space-y-1.5">${rows}</div>` : '<p class="text-[11px] text-gray-500">مفيش مهام جانبية لليوم ده.</p>'}
+      <div class="flex gap-1.5 pt-2 border-t border-gray-800">
+        <input id="sqName" type="text" placeholder="مهمة جديدة..." class="flex-1 ${inCls}">
+        <input id="sqPts" type="number" inputmode="numeric" value="10" min="1" class="w-16 text-center ${inCls}">
+        <button onclick="sqAdd()" class="text-xs px-3 py-1 bg-yellow-600 text-white rounded font-bold">إضافة</button>
+      </div>`;
+  }
 
-  window.setMainTab = t => { mainTab = t; render(); };
+  // ===== العمليات =====
+  window.hbTabSet = n => { hbTab = n; render(); };
   window.hbDay = k => { selDay = k; render(); };
   window.hbMonth = dir => {
     let y = viewY, m = viewM + dir;
@@ -1561,10 +1673,8 @@ loadData();
     H().reviews[wk] = Object.assign({ won: '', change: '' }, H().reviews[wk], { [field]: v });
     saveData();
   };
-  window.hbToggle = (id, btn) => {
-    btn.classList.add('pop-anim');
-    setTimeout(() => btn.classList.remove('pop-anim'), 300);
-    if (navigator.vibrate) navigator.vibrate(40);
+  window.hbToggle = (id, e) => {
+    if (!isDone(find(id), selDay)) fx(e, '✅ تمام');
     setE(id, selDay, !isDone(find(id), selDay));
   };
   window.hbMode = id => {
@@ -1593,37 +1703,72 @@ loadData();
     saveData(); render();
   };
 
-  // Side Quests Functions
-  window.openAddSideQuestPrompt = () => {
-    const t = prompt("اكتب اسم المهمة الجانبية (مثلاً: شرب 3 لتر ماء):");
-    if (t && t.trim()) {
-      H().sideQuests[selDay] = H().sideQuests[selDay] || [];
-      H().sideQuests[selDay].push({ text: t.trim(), done: false });
-      saveData(); render();
-    }
+  // تايم بلوكينج
+  window.tbText = (id, v) => {
+    H().blockText[selDay] = H().blockText[selDay] || {};
+    H().blockText[selDay][id] = v;
+    saveData();
   };
-  window.toggleSideQuest = sIdx => {
-    const list = H().sideQuests[selDay];
-    if (list && list[sIdx]) {
-      list[sIdx].done = !list[sIdx].done;
-      if (list[sIdx].done && navigator.vibrate) navigator.vibrate(40);
-      saveData(); render();
-    }
+  window.tbAdd = () => {
+    const l = prompt("وقت البلوك (مثلاً: 3 – 6 م أو المغرب – العشاء):");
+    if (l && l.trim()) { H().blockTpl.push({ id: Date.now(), label: l.trim() }); saveData(); renderBlocks(); }
   };
-  window.deleteSideQuest = sIdx => {
-    const list = H().sideQuests[selDay];
-    if (list) { list.splice(sIdx, 1); saveData(); render(); }
+  window.tbRename = id => {
+    const b = H().blockTpl.find(x => x.id === id);
+    const l = prompt("تعديل وقت البلوك:", b.label);
+    if (l && l.trim()) { b.label = l.trim(); saveData(); renderBlocks(); }
+  };
+  window.tbDel = id => {
+    if (confirm("تحذف البلوك ده؟")) { H().blockTpl = H().blockTpl.filter(b => b.id !== id); saveData(); renderBlocks(); }
+  };
+  window.tbMove = (i, dir) => {
+    const l = H().blockTpl, t = i + dir;
+    if (t < 0 || t >= l.length) return;
+    [l[i], l[t]] = [l[t], l[i]];
+    saveData(); renderBlocks();
+  };
+
+  // النوم
+  window.slSet = (field, v) => {
+    H().sleep[selDay] = Object.assign({ bed: '', wake: '' }, H().sleep[selDay], { [field]: v });
+    saveData(); renderSleep();
+  };
+
+  // المهام الجانبية
+  function sqPush(name, pts) {
+    (H().side[selDay] = H().side[selDay] || []).push({ id: Date.now() + Math.floor(Math.random() * 1000), name, pts, done: false });
+    saveData(); renderSide();
+  }
+  window.sqAdd = () => {
+    const n = document.getElementById('sqName').value.trim();
+    const p = Math.max(1, parseInt(document.getElementById('sqPts').value, 10) || 10);
+    if (!n) { alert('اكتب اسم المهمة'); return; }
+    sqPush(n, p);
+  };
+  window.sqQuick = i => sqPush(QUICK[i][0], QUICK[i][1]);
+  window.sqToggle = (id, e) => {
+    const q = sideOf(selDay).find(x => x.id === id);
+    if (!q) return;
+    q.done = !q.done;
+    if (q.done) fx(e, '⭐ +' + q.pts);
+    saveData(); renderSide();
+    checkBadges(badgeList());
+  };
+  window.sqDel = id => {
+    H().side[selDay] = sideOf(selDay).filter(q => q.id !== id);
+    saveData(); renderSide();
   };
 })();
 
 // ================= HOME ORDER =================
 (function () {
   const grid = document.querySelector('#view-home .grid');
-  const base = ['workouts', 'recovery', 'wheel'];
+  const base = ['workouts', 'recovery', 'recoveryHub', 'wheel'];
+  // ترحيل الترتيب القديم: الأذكار والدعاء واليوميات بقوا جوه ركن التعافي
   if (state.homeOrder) {
     let placed = false;
     state.homeOrder = state.homeOrder.reduce((a, k) => {
-      if (['adhkar', 'duaa', 'journal'].includes(k)) { if (!placed) { a.push('recovery'); placed = true; } }
+      if (['adhkar', 'duaa', 'journal'].includes(k)) { if (!placed) { a.push('recoveryHub'); placed = true; } }
       else a.push(k);
       return a;
     }, []);
@@ -1670,7 +1815,7 @@ loadData();
   apply();
 })();
 
-// ===== المعتقدات =====
+// ===== المعتقدات (في ركن التعافي) =====
 (function () {
   if (!state.beliefs) {
     state.beliefs = [
