@@ -2000,4 +2000,19 @@ async function backupToTelegram(manual, e) {
   }
 }
 
-// تلقائي: كل جمعة (أو
+// تلقائي: كل جمعة (أول فتحة)، أو لو عدّى 7 أيام على آخر نسخة
+function autoBackupCheck() {
+  const today = getTodayKey();
+  const last = state.lastBackup ? state.lastBackup.date : null;
+  if (last === today) return;
+  const isFriday = new Date().getDay() === 5;
+  const daysSince = last ? Math.floor((new Date(today + 'T12:00:00') - new Date(last + 'T12:00:00')) / 86400000) : 999;
+  if (isFriday || daysSince >= 7) backupToTelegram(false);
+}
+
+renderBackupStatus();
+autoBackupCheck();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) autoBackupCheck(); });
+</script>
+</body>
+</html>
