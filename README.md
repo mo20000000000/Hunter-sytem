@@ -40,7 +40,6 @@
         <h2 class="text-base font-bold text-gray-100 mb-1">لوحة قيادة البطل ⚔️</h2>
         <p class="text-xs text-gray-400">اختر البوابة المطلوبة لمواصلة التطوير والتعافي:</p>
       </div>
-      <div id="today-card" class="card-bg p-3 rounded-xl border border-cyan-500/40 space-y-2"></div>
       <div class="grid grid-cols-1 gap-2.5">
         <button onclick="showView('workouts')" class="p-4 rounded-xl card-bg border border-cyan-500/40 hover:border-cyan-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
           <div class="flex items-center gap-3">
@@ -371,7 +370,6 @@ function saveData() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(st
 
 function renderAll() {
   renderWorkouts(); renderAzkar(); renderDuas(); renderTasks(); drawWheel(); calculateRecoveryDays();
-  if (typeof renderToday === 'function') renderToday();
 }
 
 // ===== تأثيرات التفاعل (اهتزاز + نص طاير) =====
@@ -405,7 +403,6 @@ function showView(view) {
   const target = document.getElementById(`view-${view}`);
   if (target) target.classList.remove('hidden');
   if (view === 'wheel') drawWheel();
-  if (view === 'home' && typeof renderToday === 'function') renderToday();
   if (view === 'recovery') { renderAzkar(); renderDuas(); }
   if (view === 'workouts') renderWorkouts();
 }
@@ -698,6 +695,7 @@ function renderWorkouts() {
       <div class="flex justify-end gap-1.5 text-xs">
         <button onclick="updateQuest(${q.id}, -1)" ${dis} class="px-2 py-0.5 bg-gray-800 rounded hover:bg-gray-700 text-gray-300 disabled:opacity-30">-1</button>
         <button onclick="updateQuest(${q.id}, 1)" ${dis} class="px-2.5 py-0.5 bg-gray-800 rounded hover:bg-cyan-900 text-cyan-400 disabled:opacity-30">+1</button>
+        <button onclick="completeSingleQuest(${q.id}, event)" ${dis} class="px-2.5 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-400 hover:bg-cyan-900 rounded font-semibold disabled:opacity-30">✔ Done</button>
       </div>
       ${setsHTML(q, dis)}
     `;
@@ -762,6 +760,15 @@ function updateQuest(id, amt) {
   const q = findQuest(id);
   if (!q) return;
   q.current = Math.max(0, q.current + amt);
+  saveData(); renderWorkouts();
+}
+
+function completeSingleQuest(id, e) {
+  if (state.penaltyActive || isTodayRest()) return;
+  const q = findQuest(id);
+  if (!q) return;
+  fx(e, '✅ كملت!');
+  q.current = q.target;
   saveData(); renderWorkouts();
 }
 
@@ -1888,76 +1895,6 @@ loadData();
   render();
 })();
 
-// ===== كارت النهارده في الرئيسية =====
-function renderToday() {
-  const box = document.getElementById('today-card');
-  if (!box) return;
-  const k = getTodayKey();
-  const now = new Date();
-  const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  const isFri = now.getDay() === 5;
-  const bar = (p, c) => `<div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden mt-1.5"><div class="${c} h-1" style="width:${Math.max(0, Math.min(100, p))}%"></div></div>`;
-  const tile = (label, value, pct, done, go, color) => `
-    <button onclick="${go}" class="rounded-lg border p-2 text-right transition ${done ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-gray-800 bg-gray-900/40'}">
-      <div class="text-[10px] text-gray-400">${label}</div>
-      <div class="text-sm font-bold ${done ? 'text-emerald-300' : 'text-gray-100'}">${value}</div>
-      ${bar(pct, done ? 'bg-emerald-400' : color)}
-    </button>`;
-
-  // العادات
-  const hb = state.habits;
-  const habitDone = h => {
-    const e = ((hb.log || {})[k] || {})[h.id];
-    if (h.type === 'time') return !!(e && e.min > 0);
-    if (e === true) return true;
-    if (e === false) return false;
-    return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
-  };
-  let habitsTile;
-  if (!hb) habitsTile = tile('✅ العادات', '—', 0, false, "showView('habits')", 'bg-amber-400');
-  else if (isFri) habitsTile = tile('✅ العادات', '📝 مراجعة الجمعة', 0, false, "showView('habits')", 'bg-amber-400');
-  else {
-    const n = hb.list.filter(habitDone).length;
-    habitsTile = tile('✅ العادات', `${n} / ${hb.list.length}`, hb.list.length ? n / hb.list.length * 100 : 0, hb.list.length > 0 && n === hb.list.length, "showView('habits')", 'bg-amber-400');
-  }
-
-  // التمرين
-  const completed = state.history[k] === 'completed' || state.history[k] === true;
-  const rest = state.history[k] === 'rest';
-  const qs = (state.routines && state.routines[state.activeRoutine]) || [];
-  const qd = qs.filter(q => q.current >= q.target).length;
-  let wv, wp = 0, wdone = false;
-  if (completed) { wv = '✅ خلصت'; wp = 100; wdone = true; }
-  else if (rest) { wv = '🌿 يوم راحة'; wp = 100; wdone = true; }
-  else if (state.penaltyActive) { wv = '⚠️ عقوبة'; }
-  else { wv = `${qd} / ${qs.length} تمرين`; wp = qs.length ? qd / qs.length * 100 : 0; }
-  const wt = (state.workoutTimes && state.workoutTimes[k]) || 0;
-  if (wt) wv += ` • ⏱ ${Math.round(wt / 60)}د`;
-  const workoutTile = tile('🏋️ التمرين', wv, wp, wdone, "showView('workouts')", 'bg-cyan-400');
-
-  // الأذكار
-  const az = state.azkar || [];
-  const rem = az.filter(z => z.current > 0).length;
-  const azTile = tile('📿 الأذكار', rem ? `باقي ${rem} من ${az.length}` : '✅ خلصتهم', az.length ? (az.length - rem) / az.length * 100 : 0, az.length > 0 && rem === 0, "showView('recovery');recTab('adhkar')", 'bg-emerald-400');
-
-  // الأدعية
-  const du = state.duas || [];
-  const dn = du.filter(d => d.done).length;
-  const duTile = tile('🤲 الدعاء', `${dn} / ${du.length}`, du.length ? dn / du.length * 100 : 0, du.length > 0 && dn === du.length, "showView('recovery');recTab('duaa')", 'bg-blue-400');
-
-  const pts = ((hb && hb.side && hb.side[k]) || []).filter(q => q.done).reduce((s, q) => s + q.pts, 0);
-
-  box.innerHTML = `
-    <div class="flex justify-between items-center">
-      <h3 class="text-sm font-bold text-cyan-300">📍 النهارده</h3>
-      <span class="text-[10px] text-gray-400">${DAYS[now.getDay()]} ${now.getDate()}</span>
-    </div>
-    <div class="grid grid-cols-2 gap-2">${habitsTile}${workoutTile}${azTile}${duTile}</div>
-    <div class="text-[10px] text-gray-400">⭐ نقاط اليوم: <strong class="text-yellow-300">${pts}</strong> • 🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
-}
-
-renderToday();
-
 // ===== النسخ الاحتياطي على تليجرام =====
 let backupBusy = false;
 
@@ -2000,4 +1937,19 @@ async function backupToTelegram(manual, e) {
   }
 }
 
-// تلقائي: كل جمعة (أو
+// تلقائي: كل جمعة (أول فتحة)، أو لو عدّى 7 أيام على آخر نسخة
+function autoBackupCheck() {
+  const today = getTodayKey();
+  const last = state.lastBackup ? state.lastBackup.date : null;
+  if (last === today) return;
+  const isFriday = new Date().getDay() === 5;
+  const daysSince = last ? Math.floor((new Date(today + 'T12:00:00') - new Date(last + 'T12:00:00')) / 86400000) : 999;
+  if (isFriday || daysSince >= 7) backupToTelegram(false);
+}
+
+renderBackupStatus();
+autoBackupCheck();
+document.addEventListener('visibilitychange', () => { if (!document.hidden) autoBackupCheck(); });
+</script>
+</body>
+</html>
