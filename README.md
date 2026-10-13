@@ -40,6 +40,7 @@
         <h2 class="text-base font-bold text-gray-100 mb-1">لوحة قيادة البطل ⚔️</h2>
         <p class="text-xs text-gray-400">اختر البوابة المطلوبة لمواصلة التطوير والتعافي:</p>
       </div>
+      <div id="today-card" class="card-bg p-3 rounded-xl border border-cyan-500/40 space-y-2"></div>
       <div class="grid grid-cols-1 gap-2.5">
         <button onclick="showView('workouts')" class="p-4 rounded-xl card-bg border border-cyan-500/40 hover:border-cyan-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
           <div class="flex items-center gap-3">
@@ -87,6 +88,20 @@
           </div>
           <span class="text-red-400 text-sm">◀</span>
         </button>
+      </div>
+
+      <div class="card-bg p-3 rounded-xl border border-sky-500/40 space-y-2">
+        <div class="flex items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-bold text-sky-300">☁️ النسخ الاحتياطي</h3>
+            <p id="backup-status" class="text-[11px] text-gray-400">لسه مفيش نسخة احتياطية</p>
+          </div>
+          <div class="flex gap-1.5">
+            <button onclick="backupToTelegram(true, event)" class="text-[11px] bg-sky-950 border border-sky-500 px-2.5 py-1 rounded text-sky-300 font-bold">☁️ انسخ الآن</button>
+            <button onclick="document.getElementById('import-file').click()" class="text-[11px] bg-gray-900 border border-gray-700 px-2.5 py-1 rounded text-gray-300">📂 استرجاع</button>
+          </div>
+        </div>
+        <p class="text-[10px] text-gray-500">بتتبعت لوحدها على تليجرام كل جمعة (أو لو عدّى 7 أيام على آخر نسخة).</p>
       </div>
     </section>
 
@@ -356,6 +371,7 @@ function saveData() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(st
 
 function renderAll() {
   renderWorkouts(); renderAzkar(); renderDuas(); renderTasks(); drawWheel(); calculateRecoveryDays();
+  if (typeof renderToday === 'function') renderToday();
 }
 
 // ===== تأثيرات التفاعل (اهتزاز + نص طاير) =====
@@ -389,6 +405,7 @@ function showView(view) {
   const target = document.getElementById(`view-${view}`);
   if (target) target.classList.remove('hidden');
   if (view === 'wheel') drawWheel();
+  if (view === 'home' && typeof renderToday === 'function') renderToday();
   if (view === 'recovery') { renderAzkar(); renderDuas(); }
   if (view === 'workouts') renderWorkouts();
 }
@@ -681,7 +698,6 @@ function renderWorkouts() {
       <div class="flex justify-end gap-1.5 text-xs">
         <button onclick="updateQuest(${q.id}, -1)" ${dis} class="px-2 py-0.5 bg-gray-800 rounded hover:bg-gray-700 text-gray-300 disabled:opacity-30">-1</button>
         <button onclick="updateQuest(${q.id}, 1)" ${dis} class="px-2.5 py-0.5 bg-gray-800 rounded hover:bg-cyan-900 text-cyan-400 disabled:opacity-30">+1</button>
-        <button onclick="completeSingleQuest(${q.id}, event)" ${dis} class="px-2.5 py-0.5 bg-cyan-950 border border-cyan-500 text-cyan-400 hover:bg-cyan-900 rounded font-semibold disabled:opacity-30">✔ Done</button>
       </div>
       ${setsHTML(q, dis)}
     `;
@@ -746,15 +762,6 @@ function updateQuest(id, amt) {
   const q = findQuest(id);
   if (!q) return;
   q.current = Math.max(0, q.current + amt);
-  saveData(); renderWorkouts();
-}
-
-function completeSingleQuest(id, e) {
-  if (state.penaltyActive || isTodayRest()) return;
-  const q = findQuest(id);
-  if (!q) return;
-  fx(e, '✅ كملت!');
-  q.current = q.target;
   saveData(); renderWorkouts();
 }
 
@@ -1880,6 +1887,117 @@ loadData();
   };
   render();
 })();
-</script>
-</body>
-</html>
+
+// ===== كارت النهارده في الرئيسية =====
+function renderToday() {
+  const box = document.getElementById('today-card');
+  if (!box) return;
+  const k = getTodayKey();
+  const now = new Date();
+  const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const isFri = now.getDay() === 5;
+  const bar = (p, c) => `<div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden mt-1.5"><div class="${c} h-1" style="width:${Math.max(0, Math.min(100, p))}%"></div></div>`;
+  const tile = (label, value, pct, done, go, color) => `
+    <button onclick="${go}" class="rounded-lg border p-2 text-right transition ${done ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-gray-800 bg-gray-900/40'}">
+      <div class="text-[10px] text-gray-400">${label}</div>
+      <div class="text-sm font-bold ${done ? 'text-emerald-300' : 'text-gray-100'}">${value}</div>
+      ${bar(pct, done ? 'bg-emerald-400' : color)}
+    </button>`;
+
+  // العادات
+  const hb = state.habits;
+  const habitDone = h => {
+    const e = ((hb.log || {})[k] || {})[h.id];
+    if (h.type === 'time') return !!(e && e.min > 0);
+    if (e === true) return true;
+    if (e === false) return false;
+    return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
+  };
+  let habitsTile;
+  if (!hb) habitsTile = tile('✅ العادات', '—', 0, false, "showView('habits')", 'bg-amber-400');
+  else if (isFri) habitsTile = tile('✅ العادات', '📝 مراجعة الجمعة', 0, false, "showView('habits')", 'bg-amber-400');
+  else {
+    const n = hb.list.filter(habitDone).length;
+    habitsTile = tile('✅ العادات', `${n} / ${hb.list.length}`, hb.list.length ? n / hb.list.length * 100 : 0, hb.list.length > 0 && n === hb.list.length, "showView('habits')", 'bg-amber-400');
+  }
+
+  // التمرين
+  const completed = state.history[k] === 'completed' || state.history[k] === true;
+  const rest = state.history[k] === 'rest';
+  const qs = (state.routines && state.routines[state.activeRoutine]) || [];
+  const qd = qs.filter(q => q.current >= q.target).length;
+  let wv, wp = 0, wdone = false;
+  if (completed) { wv = '✅ خلصت'; wp = 100; wdone = true; }
+  else if (rest) { wv = '🌿 يوم راحة'; wp = 100; wdone = true; }
+  else if (state.penaltyActive) { wv = '⚠️ عقوبة'; }
+  else { wv = `${qd} / ${qs.length} تمرين`; wp = qs.length ? qd / qs.length * 100 : 0; }
+  const wt = (state.workoutTimes && state.workoutTimes[k]) || 0;
+  if (wt) wv += ` • ⏱ ${Math.round(wt / 60)}د`;
+  const workoutTile = tile('🏋️ التمرين', wv, wp, wdone, "showView('workouts')", 'bg-cyan-400');
+
+  // الأذكار
+  const az = state.azkar || [];
+  const rem = az.filter(z => z.current > 0).length;
+  const azTile = tile('📿 الأذكار', rem ? `باقي ${rem} من ${az.length}` : '✅ خلصتهم', az.length ? (az.length - rem) / az.length * 100 : 0, az.length > 0 && rem === 0, "showView('recovery');recTab('adhkar')", 'bg-emerald-400');
+
+  // الأدعية
+  const du = state.duas || [];
+  const dn = du.filter(d => d.done).length;
+  const duTile = tile('🤲 الدعاء', `${dn} / ${du.length}`, du.length ? dn / du.length * 100 : 0, du.length > 0 && dn === du.length, "showView('recovery');recTab('duaa')", 'bg-blue-400');
+
+  const pts = ((hb && hb.side && hb.side[k]) || []).filter(q => q.done).reduce((s, q) => s + q.pts, 0);
+
+  box.innerHTML = `
+    <div class="flex justify-between items-center">
+      <h3 class="text-sm font-bold text-cyan-300">📍 النهارده</h3>
+      <span class="text-[10px] text-gray-400">${DAYS[now.getDay()]} ${now.getDate()}</span>
+    </div>
+    <div class="grid grid-cols-2 gap-2">${habitsTile}${workoutTile}${azTile}${duTile}</div>
+    <div class="text-[10px] text-gray-400">⭐ نقاط اليوم: <strong class="text-yellow-300">${pts}</strong> • 🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
+}
+
+renderToday();
+
+// ===== النسخ الاحتياطي على تليجرام =====
+let backupBusy = false;
+
+function renderBackupStatus() {
+  const el = document.getElementById('backup-status');
+  if (!el) return;
+  const b = state.lastBackup;
+  el.innerText = b ? `آخر نسخة: ${b.date}${b.auto ? ' (تلقائية)' : ''}` : 'لسه مفيش نسخة احتياطية';
+}
+
+async function backupToTelegram(manual, e) {
+  if (backupBusy) return false;
+  if (!(CONFIG.TELEGRAM_BOT_TOKEN && CONFIG.TELEGRAM_CHAT_ID)) {
+    if (manual) alert('اضغط ⚙️ إعداد تليجرام (ركن التعافي ← اليوميات) وحط التوكن والـ chat id الأول.');
+    return false;
+  }
+  backupBusy = true;
+  const el = document.getElementById('backup-status');
+  if (manual && el) el.innerText = '⏳ جاري الإرسال...';
+  try {
+    const today = getTodayKey();
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const fd = new FormData();
+    fd.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
+    fd.append('document', blob, `hunter_backup_${today}.json`);
+    fd.append('caption', `☁️ نسخة احتياطية Hunter • ${today}`);
+    const res = await fetch(`${TG_API()}/sendDocument`, { method: 'POST', body: fd });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.description);
+    state.lastBackup = { date: today, ts: Date.now(), auto: !manual };
+    saveData();
+    if (manual) fx(e, '☁️ اتبعتت');
+    return true;
+  } catch (err) {
+    if (manual) alert('تعذر إرسال النسخة: ' + (err.message || 'تأكد من الإنترنت'));
+    return false;
+  } finally {
+    backupBusy = false;
+    renderBackupStatus();
+  }
+}
+
+// تلقائي: كل جمعة (أو
