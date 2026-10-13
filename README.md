@@ -1997,7 +1997,7 @@ async function backupToTelegram(manual, e) {
   } finally {
     backupBusy = false;
     renderBackupStatus();
-  }
+}
 }
 
 // تلقائي: كل جمعة (أول فتحة)، أو لو عدّى 7 أيام على آخر نسخة
