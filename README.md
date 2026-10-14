@@ -73,8 +73,8 @@
           <div class="flex items-center gap-3.5">
             <span class="text-2xl p-2.5 rounded-xl bg-sky-950/60 border border-sky-500/50 hb-icon">📅</span>
             <div>
-              <h3 class="text-sm font-bold text-sky-400 hb-title">تراكينج اليوم (نوم ومياه)</h3>
-              <p class="text-xs text-gray-400 hb-desc">تسجيل ساعات النوم والاستيقاظ وعداد الماء اليومي</p>
+              <h3 class="text-sm font-bold text-sky-400 hb-title">تراكينج اليوم (نوم ومياه وعادات)</h3>
+              <p class="text-xs text-gray-400 hb-desc">العادات، تايم بلوكينج، النوم والمياه والمهام الجانبية</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -87,22 +87,22 @@
           </div>
         </div>
 
-        <!-- عداد التعافي (شكل المقاومة) -->
-        <div data-home-key="recoveryCounter" class="p-4 rounded-2xl card-bg border border-amber-500/40 hover:border-amber-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01] shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
+        <!-- شكل المقاومة (عداد التعافي) -->
+        <div data-home-key="recoveryCounter" class="p-4 rounded-2xl card-bg border border-orange-500/40 hover:border-orange-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01] shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
           <div class="flex items-center gap-3.5">
-            <div class="w-12 h-12 rounded-xl bg-amber-950/60 border border-amber-500/50 flex items-center justify-center text-2xl hb-icon">✊🔥</div>
+            <div class="w-12 h-12 rounded-xl bg-orange-950/60 border border-orange-500/50 flex items-center justify-center text-2xl hb-icon">✊🔥</div>
             <div>
-              <h3 class="text-sm font-bold text-amber-400 hb-title">شكل المقاومة (عداد التعافي)</h3>
+              <h3 class="text-sm font-bold text-orange-400 hb-title">شكل المقاومة (عداد التعافي)</h3>
               <p class="text-xs text-gray-400 hb-desc">دورة الـ 90 يوم، الأوسمة، والدروع والأيام</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <div class="order-arrows hidden flex gap-1" onclick="event.stopPropagation()">
-              <button class="px-2 py-1 bg-gray-800 border border-amber-400 text-amber-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', -1)">▲</button>
-              <button class="px-2 py-1 bg-gray-800 border border-amber-400 text-amber-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', 1)">▼</button>
+              <button class="px-2 py-1 bg-gray-800 border border-orange-400 text-orange-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-orange-400 text-orange-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', 1)">▼</button>
             </div>
-            <button class="edit-btn hidden text-[10px] bg-amber-950 border border-amber-400 text-amber-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
-            <span class="text-amber-400 text-sm arrow-icon">◀</span>
+            <button class="edit-btn hidden text-[10px] bg-orange-950 border border-orange-400 text-orange-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
+            <span class="text-orange-400 text-sm arrow-icon">◀</span>
           </div>
         </div>
 
@@ -160,58 +160,54 @@
       </div>
     </section>
 
-    <!-- ركن عداد شكل المقاومة وتلوين الـ 90 يوم -->
+    <!-- واجهة شكل المقاومة الـمطابقة للصورة -->
     <section id="view-recoveryCounterView" class="hidden space-y-4">
-      <div class="card-bg p-5 rounded-2xl border border-amber-500/40 space-y-4 text-center relative shadow-lg">
+      <div class="card-bg p-5 rounded-2xl border border-orange-500/40 space-y-4 text-center relative shadow-lg">
+        
+        <!-- رأس الكارت: زر الزلة وتاريخ البداية -->
         <div class="flex justify-between items-center">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">✊🔥</span>
-            <div class="text-right">
-              <h2 class="text-sm font-bold text-amber-400">شكل المقاومة (دورة الـ 90 يوم)</h2>
-              <p class="text-[11px] text-gray-400">كل 90 يوم تبدأ دورة تلوين وبناء جديدة</p>
-            </div>
-          </div>
           <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-2.5 py-1.5 rounded-xl hover:bg-red-950 transition">سجلت زلة (-1)</button>
-        </div>
-
-        <!-- عداد الدائرة ودورة الـ 90 يوم -->
-        <div class="relative w-52 h-52 mx-auto flex flex-col items-center justify-center">
-          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="42" stroke="#1e293b" stroke-width="8" fill="transparent"></circle>
-            <circle id="progress-ring-circle" cx="50" cy="50" r="42" stroke="#f59e0b" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" fill="transparent" class="transition-all duration-500"></circle>
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span class="text-3xl font-extrabold text-amber-400 font-mono" id="rc-days-num">0</span>
-            <span class="text-xs text-gray-300 font-bold">يوم مقاومة</span>
-            <span class="text-[10px] text-amber-300 font-mono mt-0.5" id="rc-cycle-text">الدورة 1 (من 90)</span>
+          <div class="text-left bg-black/40 px-3 py-1.5 rounded-xl border border-gray-800">
+            <span class="text-[9px] text-gray-400 block">البداية</span>
+            <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-transparent text-orange-400 font-bold outline-none cursor-pointer">
           </div>
         </div>
 
-        <!-- الساعات والدقايق والثواني بالتفصيل -->
-        <div class="grid grid-cols-3 gap-2 bg-black/50 p-3.5 rounded-2xl border border-gray-800 text-center font-mono">
-          <div>
-            <div class="text-lg font-bold text-amber-300" id="rc-hours">00</div>
+        <!-- أيقونة شكل المقاومة (القبضة المشتعلة) في المنتصف بشكل بارز -->
+        <div class="py-2 flex flex-col items-center justify-center">
+          <div class="w-32 h-32 rounded-3xl bg-orange-950/40 border border-orange-500/50 flex items-center justify-center text-6xl shadow-[0_0_20px_rgba(249,115,22,0.25)] relative">
+            ✊🔥
+          </div>
+        </div>
+
+        <!-- عداد الأيام (مثال: 43/90)[span_0](start_span)[span_0](end_span) -->
+        <div class="space-y-1">
+          <div class="text-[11px] text-gray-400">يوم</div>
+          <div class="text-4xl font-extrabold text-orange-400 font-mono tracking-wider" id="rc-days-fraction">0/90</div>
+          <div class="text-[10px] text-orange-300 font-mono" id="rc-cycle-text">الدورة 1</div>
+        </div>
+
+        <!-- مربعات الساعات والدقايق والثواني بالتفصيل[span_1](start_span)[span_1](end_span) -->
+        <div class="grid grid-cols-3 gap-2.5 pt-2">
+          <div class="bg-black/50 p-3 rounded-2xl border border-gray-800 text-center font-mono">
+            <div class="text-lg font-bold text-orange-300" id="rc-hours">00</div>
             <div class="text-[10px] text-gray-400">ساعة</div>
           </div>
-          <div>
-            <div class="text-lg font-bold text-amber-300" id="rc-mins">00</div>
+          <div class="bg-black/50 p-3 rounded-2xl border border-gray-800 text-center font-mono">
+            <div class="text-lg font-bold text-orange-300" id="rc-mins">00</div>
             <div class="text-[10px] text-gray-400">دقيقة</div>
           </div>
-          <div>
-            <div class="text-lg font-bold text-amber-300" id="rc-secs">00</div>
+          <div class="bg-black/50 p-3 rounded-2xl border border-gray-800 text-center font-mono">
+            <div class="text-lg font-bold text-orange-300" id="rc-secs">00</div>
             <div class="text-[10px] text-gray-400">ثانية</div>
           </div>
         </div>
 
-        <div class="flex items-center justify-center gap-2 pt-1">
-          <label class="text-xs text-gray-400">تاريخ البداية:</label>
-          <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded-xl px-3 py-1.5 text-gray-200">
-        </div>
       </div>
 
       <!-- تبويبات الأوسمة والدروع -->
       <div class="grid grid-cols-4 gap-1.5">
-        <button id="btab-badges" onclick="badgeTab('badges')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-amber-500 text-black border-amber-400">الأوسمة</button>
+        <button id="btab-badges" onclick="badgeTab('badges')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-orange-500 text-black border-orange-400">الأوسمة</button>
         <button id="btab-shields" onclick="badgeTab('shields')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الدروع</button>
         <button id="btab-cups" onclick="badgeTab('cups')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الكؤوس</button>
         <button id="btab-certs" onclick="badgeTab('certs')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الشهادات</button>
@@ -399,8 +395,8 @@
 const CONFIG = {
   get TELEGRAM_BOT_TOKEN() { return localStorage.getItem("tg_token") || ""; },
   get TELEGRAM_CHAT_ID() { return localStorage.getItem("tg_chat") || ""; },
-  STORAGE_KEY: "hunter_ultimate_v6",
-  OLD_STORAGE_KEY: "hunter_ultimate_v5",
+  STORAGE_KEY: "hunter_ultimate_v7",
+  OLD_STORAGE_KEY: "hunter_ultimate_v6",
   RANKS: ["E-Rank", "D-Rank", "C-Rank", "B-Rank", "A-Rank", "S-Rank"]
 };
 
@@ -490,6 +486,7 @@ function saveData() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(st
 
 function renderAll() {
   renderWorkouts(); renderAzkar(); renderDuas(); renderTasks(); drawWheel(); calculateRecoveryTime(); renderBadges();
+  if (typeof renderHabitsView === 'function') renderHabitsView();
   if (typeof renderToday === 'function') renderToday();
 }
 
@@ -508,6 +505,14 @@ function fx(e, text) {
 }
 
 // ================= التنقل =================
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 bg-amber-500 text-black px-4 py-2 rounded-xl font-bold text-xs shadow-lg z-50 animate-bounce';
+  t.innerText = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
 function showView(view) {
   ['home', 'workouts', 'recovery', 'wheel', 'habits', 'recoveryCounterView'].forEach(v => {
     const el = document.getElementById(`view-${v}`);
@@ -519,6 +524,7 @@ function showView(view) {
   if (view === 'home' && typeof renderToday === 'function') renderToday();
   if (view === 'recovery') { renderAzkar(); renderDuas(); }
   if (view === 'workouts') renderWorkouts();
+  if (view === 'habits' && typeof renderHabitsView === 'function') renderHabitsView();
   if (view === 'recoveryCounterView') calculateRecoveryTime();
 }
 
@@ -571,7 +577,7 @@ function badgeTab(tab) {
     const btn = document.getElementById('btab-' + t);
     if (!btn) return;
     const active = t === tab;
-    btn.className = `py-2.5 rounded-xl text-xs font-bold transition border ${active ? 'bg-amber-500 text-black border-amber-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
+    btn.className = `py-2.5 rounded-xl text-xs font-bold transition border ${active ? 'bg-orange-500 text-black border-orange-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
   });
   renderBadges();
 }
@@ -596,8 +602,14 @@ function calculateRecoveryTime() {
   const mins = Math.floor(((totalH * 60) % 60));
   const secs = Math.floor(((totalH * 3600) % 60));
 
-  const numEl = document.getElementById("rc-days-num");
-  if (numEl) numEl.innerText = totalDays;
+  const cycleDay = (totalDays % 90) || (totalDays > 0 && totalDays % 90 === 0 ? 90 : 0);
+  const cycleNum = Math.floor(totalDays / 90) + 1;
+
+  const fracEl = document.getElementById("rc-days-fraction");
+  if (fracEl) fracEl.innerText = `${cycleDay}/90`;
+
+  const cycleText = document.getElementById("rc-cycle-text");
+  if (cycleText) cycleText.innerText = `الدورة ${cycleNum} (إجمالي الأيام: ${totalDays})`;
 
   const hEl = document.getElementById("rc-hours");
   const mEl = document.getElementById("rc-mins");
@@ -605,20 +617,6 @@ function calculateRecoveryTime() {
   if (hEl) hEl.innerText = String(hours).padStart(2, '0');
   if (mEl) mEl.innerText = String(mins).padStart(2, '0');
   if (sEl) sEl.innerText = String(secs).padStart(2, '0');
-
-  // حساب دورة الـ 90 يوم والتلوين التدريجي
-  const cycleDay = (totalDays % 90) || (totalDays > 0 && totalDays % 90 === 0 ? 90 : 0);
-  const cycleNum = Math.floor(totalDays / 90) + 1;
-  const cycleText = document.getElementById("rc-cycle-text");
-  if (cycleText) cycleText.innerText = `الدورة ${cycleNum} (اليوم ${cycleDay} من 90)`;
-
-  const circle = document.getElementById("progress-ring-circle");
-  if (circle) {
-    const circumference = 264; // 2 * PI * 42
-    const progress = Math.min(1, cycleDay / 90);
-    const offset = circumference - (progress * circumference);
-    circle.style.strokeDashoffset = offset;
-  }
 }
 
 function updateRecoveryStart() {
@@ -653,12 +651,12 @@ function renderBadges() {
   list.forEach(item => {
     const unlocked = curDays >= item.days;
     const card = document.createElement('div');
-    card.className = `p-3.5 rounded-2xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
+    card.className = `p-3.5 rounded-2xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-orange-500/60 shadow-[0_0_10px_rgba(249,115,22,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
     card.innerHTML = `
-      <div class="text-3xl mb-1.5 p-2 rounded-2xl ${unlocked ? 'bg-amber-950/80 border border-amber-500/50' : 'bg-gray-800'}">${item.icon}</div>
-      <h3 class="text-xs font-bold ${unlocked ? 'text-amber-300' : 'text-gray-400'}">${item.title}</h3>
+      <div class="text-3xl mb-1.5 p-2 rounded-2xl ${unlocked ? 'bg-orange-950/80 border border-orange-500/50' : 'bg-gray-800'}">${item.icon}</div>
+      <h3 class="text-xs font-bold ${unlocked ? 'text-orange-300' : 'text-gray-400'}">${item.title}</h3>
       <p class="text-[10px] text-gray-400 mt-0.5">${item.desc}</p>
-      <div class="mt-2.5 text-[10px] px-2.5 py-0.5 rounded-xl border font-mono ${unlocked ? 'bg-amber-950 text-amber-300 border-amber-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
+      <div class="mt-2.5 text-[10px] px-2.5 py-0.5 rounded-xl border font-mono ${unlocked ? 'bg-orange-950 text-orange-300 border-orange-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
         ${unlocked ? '✔ تم الفتح' : `متبقي ${item.days - curDays} يوم`}
       </div>
     `;
@@ -1552,13 +1550,566 @@ loadData();
   render();
 })();
 
-// ===== كارت النهارده في الرئيسية =====
-function renderToday() {
+// ===== وحدة التراكينج (العادات / تايم بلوكينج / تراكينج اليوم) =====
+(function () {
+  const WEEK_START = 6;            // 6 = السبت
+  const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
+  const BADGE_NAMES = { 1: ['صقر الفجر', '🦅'], 2: ['عقل الصقر', '🧠'], 3: ['حارس الورد', '📖'], 4: ['الحديد', '🏋️'], 5: ['درع التعافي', '🛡️'], 6: ['فارس الليل', '🌙'] };
+  const TIERS = [7, 14, 30];
+  const POINT_TIERS = [100, 300, 1000];
+  const QUICK = [['💧 شرب 3 لتر ميه', 10], ['🧹 تنظيف المكتب', 10], ['📖 قراءة 10 صفحات', 10]];
+  const DEFAULT_BLOCKS = [
+    { id: 1, label: '7 – 10 صباحًا' }, { id: 2, label: '10 صباحًا – الظهر' }, { id: 3, label: 'الظهر – العصر' },
+    { id: 4, label: 'العصر – المغرب' }, { id: 5, label: 'العشاء – 12' }, { id: 6, label: '12 – 3' }
+  ];
+
+  let dirty = false;
+  if (!state.habits) {
+    state.habits = {
+      list: [
+        { id: 1, name: "الفجر", type: "check" },
+        { id: 2, name: "المذاكرة / الحفظ", type: "time" },
+        { id: 3, name: "ورد المراجعة", type: "check" },
+        { id: 4, name: "التمرين", type: "check", auto: "workout" },
+        { id: 5, name: "التعافي (اليوميات والأذكار)", type: "check" },
+        { id: 6, name: "قيام الليل", type: "check" }
+      ],
+      log: {}
+    };
+    dirty = true;
+  }
+  if (!state.habits.reviews) { state.habits.reviews = {}; dirty = true; }
+  if (!state.habits.blockTpl) { state.habits.blockTpl = DEFAULT_BLOCKS.map(b => Object.assign({}, b)); dirty = true; }
+  if (!state.habits.blockText) { state.habits.blockText = {}; dirty = true; }
+  if (!state.habits.sleep) { state.habits.sleep = {}; dirty = true; }
+  if (!state.habits.side) { state.habits.side = {}; dirty = true; }
+  if (!state.habits.water) { state.habits.water = {}; dirty = true; }
+  if (!state.habits.waterGoal) { state.habits.waterGoal = 12; dirty = true; }
+  if (dirty) saveData();
+
+  const oldSec = document.getElementById('view-habits'); if (oldSec) oldSec.remove();
+
+  const H = () => state.habits;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmt = m => m >= 60 ? `${Math.floor(m / 60)}س ${m % 60}د` : `${m}د`;
+  const keyToDate = k => new Date(k + 'T12:00:00');
+  const isFri = k => keyToDate(k).getDay() === 5;
+  const weekKeysOf = k => {
+    const d = keyToDate(k);
+    d.setDate(d.getDate() - ((d.getDay() - WEEK_START + 7) % 7));
+    return Array.from({ length: 7 }, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return getFormattedDate(x); });
+  };
+  const entry = (h, k) => (H().log[k] || {})[h.id];
+  const isDone = (h, k) => {
+    const e = entry(h, k);
+    if (h.type === 'time') return !!(e && e.min > 0);
+    if (e === true) return true;
+    if (e === false) return false;
+    return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
+  };
+  const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); };
+  const find = id => H().list.find(h => h.id === id);
+
+  const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
+  const durMin = (a, b) => { const x = toMin(a), y = toMin(b); if (x == null || y == null) return 0; let d = y - x; if (d < 0) d += 1440; return d; };
+  const fmtDur = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
+  const fmt12 = t => { if (!t) return '--'; const p = t.split(':'), h = +p[0]; return `${h % 12 || 12}:${p[1]} ${h >= 12 ? 'م' : 'ص'}`; };
+  const minToTime = m => { m = Math.round(m) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
+  const inCls = 'text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200';
+
+  function firstKey() {
+    const ks = Object.keys(H().log).concat(Object.keys(state.history || {})).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+    return ks.length ? ks[0] : getTodayKey();
+  }
+  function streakOf(h) {
+    const tk = getTodayKey();
+    const d = keyToDate(firstKey()), end = keyToDate(tk);
+    let run = 0, best = 0;
+    for (; d <= end; d.setDate(d.getDate() + 1)) {
+      const k = getFormattedDate(d);
+      if (isFri(k)) continue;
+      if (isDone(h, k)) { run++; if (run > best) best = run; }
+      else if (k !== tk) run = 0;
+    }
+    return { cur: run, best };
+  }
+  let ST = {};
+
+  const sideOf = k => H().side[k] || [];
+  const dayPts = k => sideOf(k).filter(q => q.done).reduce((s, q) => s + q.pts, 0);
+  const totalPts = () => Object.keys(H().side).reduce((s, k) => s + dayPts(k), 0);
+
+  function badgeList() {
+    const out = [];
+    H().list.forEach(h => {
+      const st = ST[h.id] || streakOf(h);
+      const nm = BADGE_NAMES[h.id] || [h.name, '🏅'];
+      let shownLocked = false;
+      TIERS.forEach((t, i) => {
+        const un = st.best >= t;
+        if (un || !shownLocked) {
+          out.push({ key: `h${h.id}_${t}`, emoji: nm[1], title: nm[0] + ' ' + '⭐'.repeat(i + 1), desc: `${t} يوم متواصل — ${h.name}`, un, prog: `${Math.min(st.cur, t)}/${t}` });
+          if (!un) shownLocked = true;
+        }
+      });
+    });
+    const P = totalPts();
+    let locked = false;
+    POINT_TIERS.forEach((t, i) => {
+      const un = P >= t;
+      if (un || !locked) {
+        out.push({ key: `pts_${t}`, emoji: '🎯', title: 'صائد المهام ' + '⭐'.repeat(i + 1), desc: `${t} نقطة من المهام الجانبية`, un, prog: `${Math.min(P, t)}/${t}` });
+        if (!un) locked = true;
+      }
+    });
+    return out;
+  }
+  function checkBadges(list) {
+    if (!H().badgesSeen) {
+      H().badgesSeen = {};
+      list.filter(b => b.un).forEach(b => { H().badgesSeen[b.key] = 1; });
+      saveData();
+      return;
+    }
+    const fresh = list.filter(b => b.un && !H().badgesSeen[b.key]);
+    fresh.forEach((b, i) => {
+      H().badgesSeen[b.key] = 1;
+      setTimeout(() => showToast(`🏅 وسام جديد: ${b.emoji} ${b.title}`), i * 3300);
+    });
+    if (fresh.length) saveData();
+  }
+  function renderBadges() {
+    const box = document.getElementById('habitsBadges');
+    if (!box) return;
+    const bl = badgeList();
+    checkBadges(bl);
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-yellow-300">🏅 الإنجازات</h3>
+        <span class="text-[10px] text-gray-400">${bl.filter(b => b.un).length} مفتوحة • نقاط: ${totalPts()}</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2">${bl.map(b => `
+        <div class="rounded-lg border p-2 text-center ${b.un ? 'border-yellow-500/60 bg-yellow-950/20' : 'border-gray-800 opacity-50'}">
+          <div class="text-2xl">${b.un ? b.emoji : '🔒'}</div>
+          <div class="text-[11px] font-bold ${b.un ? 'text-yellow-200' : 'text-gray-400'}">${esc(b.title)}</div>
+          <div class="text-[9px] text-gray-400">${esc(b.desc)}</div>
+          ${b.un ? '' : `<div class="text-[9px] text-amber-400">${b.prog}</div>`}
+        </div>`).join('')}</div>`;
+  }
+
+  let selDay = getTodayKey();
+  let hbTab = 'habits';
+  let viewY = new Date().getFullYear(), viewM = new Date().getMonth();
+
+  const section = document.createElement('section');
+  section.id = 'view-habits';
+  section.className = 'hidden space-y-3';
+  const tabCls = 'py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400';
+  section.innerHTML = `
+    <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
+      <div><h2 class="text-sm font-bold text-amber-400">📊 التراكينج <span class="text-[9px] text-gray-500">v7</span></h2>
+      <p id="habitsDayLabel" class="text-[11px] text-gray-400"></p></div>
+      <button id="hbAddBtn" onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
+    </div>
+    <div class="grid grid-cols-3 gap-1.5">
+      <button id="htab-habits" onclick="hbTabSet('habits')" class="${tabCls}">✅ العادات</button>
+      <button id="htab-blocks" onclick="hbTabSet('blocks')" class="${tabCls}">⏱ تايم بلوكينج</button>
+      <button id="htab-day" onclick="hbTabSet('day')" class="${tabCls}">📅 تراكينج اليوم</button>
+    </div>
+    <div id="habitsMonth" class="card-bg p-3 rounded-xl border border-gray-800"></div>
+    <div id="paneHabits" class="space-y-3">
+      <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
+      <div id="habitsList" class="space-y-2.5"></div>
+      <div id="habitsBadges" class="card-bg p-3 rounded-xl border border-yellow-500/40 space-y-2"></div>
+    </div>
+    <div id="paneBlocks" class="hidden space-y-3">
+      <div id="habitsBlocks" class="card-bg p-3 rounded-xl border border-teal-500/40 space-y-2"></div>
+    </div>
+    <div id="paneDay" class="hidden space-y-3">
+      <div id="habitsSleep" class="card-bg p-3 rounded-xl border border-sky-500/40 space-y-2"></div>
+      <div id="habitsWater" class="card-bg p-3 rounded-xl border border-cyan-500/40 space-y-2"></div>
+      <div id="habitsSide" class="card-bg p-3 rounded-xl border border-yellow-500/40 space-y-2"></div>
+    </div>`;
+  document.querySelector('main').appendChild(section);
+
+  window.renderHabitsView = function () {
+    selDay = getTodayKey(); hbTab = 'habits';
+    viewY = new Date().getFullYear(); viewM = new Date().getMonth();
+    render();
+  };
+  window.setMainTab = n => { hbTab = n; render(); };
+
+  function setTabUI() {
+    [['habits', 'paneHabits'], ['blocks', 'paneBlocks'], ['day', 'paneDay']].forEach(x => {
+      document.getElementById(x[1]).classList.toggle('hidden', x[0] !== hbTab);
+      document.getElementById('htab-' + x[0]).className = 'py-2 rounded-lg border text-[11px] font-bold transition ' +
+        (x[0] === hbTab ? 'bg-amber-950 border-amber-400 text-amber-300' : 'bg-gray-900 border-gray-800 text-gray-400');
+    });
+    document.getElementById('hbAddBtn').classList.toggle('hidden', hbTab !== 'habits');
+  }
+
+  function renderMonth(today) {
+    const list = H().list;
+    const first = new Date(viewY, viewM, 1, 12);
+    const dim = new Date(viewY, viewM + 1, 0).getDate();
+    const offset = (first.getDay() - WEEK_START + 7) % 7;
+    const title = first.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
+    const atNow = viewY === new Date().getFullYear() && viewM === new Date().getMonth();
+    let head = '';
+    for (let i = 0; i < 7; i++) head += `<span>${SHORT[(WEEK_START + i) % 7]}</span>`;
+    let cells = '';
+    for (let i = 0; i < offset; i++) cells += '<div></div>';
+    for (let day = 1; day <= dim; day++) {
+      const k = getFormattedDate(new Date(viewY, viewM, day, 12));
+      const fut = k > today, fri = isFri(k), sel = k === selDay;
+      const n = list.filter(h => isDone(h, k)).length;
+      const sub = fri ? '📝' : (fut ? '·' : n + '/' + list.length);
+      const cls = sel ? 'bg-amber-500 text-black border-amber-400 font-bold'
+        : (fri ? 'bg-indigo-950/50 border-indigo-500/50 text-indigo-300' : 'bg-gray-900 border-gray-800 text-gray-300');
+      cells += `<button ${fut ? 'disabled' : ''} onclick="hbDay('${k}')" class="py-1 rounded-lg border text-center transition ${cls} ${fut ? 'opacity-30' : ''} ${k === today ? 'ring-1 ring-amber-300' : ''}">
+        <div class="text-xs font-bold">${day}</div><div class="text-[9px] ${sel ? '' : 'text-amber-400'}">${sub}</div></button>`;
+    }
+    document.getElementById('habitsMonth').innerHTML = `
+      <div class="flex justify-between items-center mb-2">
+        <button onclick="hbMonth(-1)" class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300">▶ السابق</button>
+        <span class="text-xs font-bold text-amber-300">${title}</span>
+        <button onclick="hbMonth(1)" ${atNow ? 'disabled' : ''} class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300 ${atNow ? 'opacity-30' : ''}">التالي ◀</button>
+      </div>
+      <div class="grid grid-cols-7 gap-1 text-center text-[9px] text-gray-500 mb-1 font-semibold">${head}</div>
+      <div class="grid grid-cols-7 gap-1">${cells}</div>`;
+  }
+
+  function reviewHTML(wk, past) {
+    const list = H().list;
+    const rv = Object.assign({ won: '', change: '' }, H().reviews[wk[0]]);
+    const a = keyToDate(wk[0]), b = keyToDate(wk[6]);
+    const rows = list.map(h => {
+      const c = past.filter(k => isDone(h, k)).length;
+      const p = past.length ? Math.round(c / past.length * 100) : 0;
+      let extra = '';
+      if (h.type === 'time') {
+        let st = 0, me = 0;
+        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
+        extra = `<div class="text-[10px] text-gray-400 mt-0.5">📚 مذاكرة ${fmt(st)} • 📖 حفظ ${fmt(me)}</div>`;
+      }
+      return `<div>
+        <div class="flex justify-between text-xs"><span class="text-gray-200">${esc(h.name)}</span><span class="text-amber-400 font-bold">${c}/${past.length} (${p}%)</span></div>
+        <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-1"><div class="bg-amber-400 h-1.5" style="width:${p}%"></div></div>${extra}</div>`;
+    }).join('');
+    const qs = [].concat((state.routines && state.routines.day1) || [], (state.routines && state.routines.day2) || []);
+    const wrows = qs.map(q => {
+      let t = 0, n = 0;
+      wk.forEach(k => { const r = state.questHistory && state.questHistory[k] ? state.questHistory[k][q.id] : 0; if (r > 0) { t += r; n++; } });
+      return n ? `<div class="flex justify-between text-xs"><span class="text-gray-300">${esc(q.name)}</span><span class="text-cyan-300">${(t / n).toFixed(1)} (في ${n} أيام)</span></div>` : '';
+    }).join('');
+    let wsec = 0;
+    wk.forEach(k => { wsec += (state.workoutTimes && state.workoutTimes[k]) || 0; });
+    return `<div class="card-bg p-3 rounded-xl border border-indigo-500/40 space-y-3">
+      <h3 class="text-sm font-bold text-indigo-300">📝 مراجعة الأسبوع (${a.getDate()}/${a.getMonth() + 1} – ${b.getDate()}/${b.getMonth() + 1})</h3>
+      <div class="space-y-2">${rows || '<p class="text-xs text-gray-500">مفيش عادات</p>'}</div>
+      ${wrows ? `<div class="pt-2 border-t border-gray-800 space-y-1"><p class="text-[11px] text-gray-400">📈 متوسط التمارين${wsec ? ` • إجمالي وقت التمرين: ${fmtDur(Math.round(wsec / 60))}` : ''}</p>${wrows}</div>` : ''}
+      <div class="pt-2 border-t border-gray-800 space-y-2">
+        <label class="text-[11px] text-gray-300">✅ إيه اللي نجح الأسبوع ده؟</label>
+        <textarea rows="3" onchange="hbReview('${wk[0]}','won',this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded p-2 text-gray-200">${esc(rv.won)}</textarea>
+        <label class="text-[11px] text-gray-300">🔧 إيه اللي هغيّره الأسبوع الجاي؟</label>
+        <textarea rows="3" onchange="hbReview('${wk[0]}','change',this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded p-2 text-gray-200">${esc(rv.change)}</textarea>
+      </div></div>`;
+  }
+
+  function render() {
+    const today = getTodayKey();
+    ST = {};
+    H().list.forEach(h => { ST[h.id] = streakOf(h); });
+    setTabUI();
+    renderMonth(today);
+    const sd = keyToDate(selDay), fri = isFri(selDay);
+    document.getElementById('habitsDayLabel').innerText = (hbTab === 'habits' && fri)
+      ? 'الجمعة: مراجعة الأسبوع (معفية من العادات)'
+      : (selDay === today ? 'اليوم' : 'يوم') + ': ' + DAYS[sd.getDay()] + ' ' + sd.getDate();
+    if (hbTab === 'habits') renderHabitsPane(today);
+    else if (hbTab === 'blocks') renderBlocks();
+    else { renderSleep(); renderWater(); renderSide(); }
+  }
+
+  function renderHabitsPane(today) {
+    const box = document.getElementById('habitsList');
+    const list = H().list;
+    const wk = weekKeysOf(selDay);
+    const trk = wk.filter(k => !isFri(k));
+    const past = trk.filter(k => k <= today);
+    const fri = isFri(selDay);
+
+    const wDone = list.reduce((s, h) => s + past.filter(k => isDone(h, k)).length, 0);
+    const wMax = Math.max(1, list.length * past.length);
+    const wPct = Math.round(wDone / wMax * 100);
+    let sum = '';
+    if (!fri) {
+      const dDone = list.filter(h => isDone(h, selDay)).length;
+      const dPct = list.length ? Math.round(dDone / list.length * 100) : 0;
+      sum += `<div class="flex justify-between text-xs"><span class="text-gray-300">اليوم المختار</span><span class="text-amber-400 font-bold">${dDone} / ${list.length} (${dPct}%)</span></div>
+        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-amber-400 h-2 transition-all" style="width:${dPct}%"></div></div>`;
+    }
+    sum += `<div class="flex justify-between text-xs pt-1"><span class="text-gray-300">إجمالي الأسبوع</span><span class="text-cyan-400 font-bold">${wDone} / ${wMax} (${wPct}%)</span></div>
+      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-cyan-400 h-2 transition-all" style="width:${wPct}%"></div></div>`;
+    document.getElementById('habitsSummary').innerHTML = sum;
+
+    if (fri) { box.innerHTML = reviewHTML(wk, past); renderBadges(); return; }
+
+    box.innerHTML = '';
+    list.forEach((h, i) => {
+      const d = isDone(h, selDay);
+      const st = ST[h.id] || { cur: 0, best: 0 };
+      const wCount = past.filter(k => isDone(h, k)).length;
+      const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
+      let middle = '', extra = '';
+      if (h.type === 'time') {
+        const e = entry(h, selDay) || { min: 0, mode: 'study' };
+        middle = `<div class="flex items-center gap-2 mt-2">
+          <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
+          <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
+        let ss = 0, me = 0;
+        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else ss += x.min; } });
+        extra = ` • مذاكرة ${fmt(ss)} • حفظ ${fmt(me)}`;
+      }
+      const mark = h.type === 'time'
+        ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
+        : `<button onclick="hbToggle(${h.id}, event)" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
+      const card = document.createElement('div');
+      card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
+      card.innerHTML = `
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2.5">${mark}
+            <div>
+              <div class="text-xs font-bold text-gray-200">${esc(h.name)}</div>
+              <div class="text-[10px] text-orange-400">🔥 ${st.cur} يوم <span class="text-gray-500">• 🏆 أفضل ${st.best}</span></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1">
+            <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+            <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+            <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+            <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+          </div>
+        </div>${middle}
+        <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
+          <div class="flex gap-1">${dots}</div>
+          <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
+        </div>`;
+      box.appendChild(card);
+    });
+    renderBadges();
+  }
+
+  function renderBlocks() {
+    const box = document.getElementById('habitsBlocks');
+    const tpl = H().blockTpl, txt = H().blockText[selDay] || {};
+    const rows = tpl.map((b, i) => `
+      <div class="bg-gray-900/60 border border-gray-800 rounded-lg p-2 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-teal-200">${esc(b.label)}</span>
+          <div class="flex items-center gap-1">
+            <button onclick="tbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+            <button onclick="tbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+            <button onclick="tbRename(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+            <button onclick="tbDel(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+          </div>
+        </div>
+        <input type="text" value="${esc(txt[b.id] || '')}" placeholder="هتعمل إيه في البلوك ده؟" onchange="tbText(${b.id}, this.value)" class="w-full ${inCls}">
+      </div>`).join('');
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-teal-300">⏱ تايم بلوكينج</h3>
+        <button onclick="tbAdd()" class="text-[10px] bg-teal-950 border border-teal-500 px-2 py-1 rounded text-teal-300 font-bold">+ بلوك جديد</button>
+      </div>
+      <p class="text-[10px] text-gray-400">البلوكات ثابتة لكل الأيام، واللي بتكتبه قدام كل بلوك بيتحفظ لليوم المختار بس.</p>
+      ${tpl.length ? `<div class="space-y-2">${rows}</div>` : '<p class="text-[11px] text-gray-500">مفيش بلوكات. ضيف أول بلوك.</p>'}`;
+  }
+
+  function renderSleep() {
+    const box = document.getElementById('habitsSleep');
+    const today = getTodayKey();
+    const sl = Object.assign({ bed: '', wake: '' }, H().sleep[selDay]);
+    const dur = sl.bed && sl.wake ? durMin(sl.bed, sl.wake) : 0;
+    let n = 0, sumD = 0, sumBed = 0, sumWake = 0;
+    weekKeysOf(selDay).filter(k => k <= today).forEach(k => {
+      const x = H().sleep[k];
+      if (x && x.bed && x.wake) {
+        n++; sumD += durMin(x.bed, x.wake);
+        let b = toMin(x.bed); if (b < 720) b += 1440;
+        sumBed += b; sumWake += toMin(x.wake);
+      }
+    });
+    box.innerHTML = `
+      <h3 class="text-sm font-bold text-sky-300">😴 النوم والاستيقاظ</h3>
+      <p class="text-[10px] text-gray-400">سجّل نمت إمتى امبارح وصحيت إمتى في اليوم المختار</p>
+      <div class="grid grid-cols-2 gap-2">
+        <div><label class="text-[11px] text-gray-300 block mb-1">🌙 وقت النوم</label><input type="time" value="${sl.bed}" onchange="slSet('bed',this.value)" class="w-full ${inCls}"></div>
+        <div><label class="text-[11px] text-gray-300 block mb-1">☀️ وقت الاستيقاظ</label><input type="time" value="${sl.wake}" onchange="slSet('wake',this.value)" class="w-full ${inCls}"></div>
+      </div>
+      ${dur ? `<p class="text-xs text-sky-200">مدة النوم: <strong>${fmtDur(dur)}</strong></p>` : ''}
+      <div class="pt-2 border-t border-gray-800 text-[11px] text-gray-300 space-y-0.5">
+        ${n ? `<div>📊 متوسط الأسبوع (${n} أيام): نوم <strong class="text-sky-300">${fmtDur(Math.round(sumD / n))}</strong></div>
+        <div>🌙 متوسط وقت النوم: <strong class="text-sky-300">${fmt12(minToTime(sumBed / n))}</strong> • ☀️ متوسط الاستيقاظ: <strong class="text-sky-300">${fmt12(minToTime(sumWake / n))}</strong></div>` : '<div class="text-gray-500">لسه مفيش أيام مسجلة الأسبوع ده</div>'}
+      </div>`;
+  }
+
+  function renderWater() {
+    const box = document.getElementById('habitsWater');
+    const goal = H().waterGoal, c = H().water[selDay] || 0;
+    const pct = Math.min(100, Math.round(c / goal * 100));
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-cyan-300">💧 عداد الماء</h3>
+        <button onclick="wtGoal()" class="text-[10px] bg-gray-900 border border-cyan-500/40 px-2 py-1 rounded text-cyan-300">⚙️ الهدف: ${goal} كوب</button>
+      </div>
+      <div class="flex items-end justify-between">
+        <div class="text-2xl font-bold text-cyan-300 font-mono">${c}<span class="text-sm text-gray-400"> / ${goal} كوب</span></div>
+        <div class="text-[11px] text-gray-400">≈ ${(c * 0.25).toFixed(2)} لتر</div>
+      </div>
+      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="${c >= goal ? 'bg-emerald-400' : 'bg-cyan-400'} h-2 transition-all" style="width:${pct}%"></div></div>
+      <div class="flex gap-2">
+        <button onclick="wtAdd(-1, event)" class="flex-1 text-xs py-2 rounded-lg bg-gray-800 text-gray-300">- كوب</button>
+        <button onclick="wtAdd(1, event)" class="flex-[2] text-xs py-2 rounded-lg bg-cyan-600 text-white font-bold">+ كوب 💧</button>
+      </div>`;
+  }
+  window.wtAdd = (d, e) => {
+    const n = Math.max(0, (H().water[selDay] || 0) + d);
+    H().water[selDay] = n;
+    if (d > 0) fx(e, n === H().waterGoal ? '🎉 وصلت الهدف!' : '💧 +1');
+    saveData(); renderWater();
+  };
+  window.wtGoal = () => {
+    const v = parseInt(prompt('هدف الماء باليوم (عدد الأكواب، الكوب 250 مل):', H().waterGoal), 10);
+    if (v > 0) { H().waterGoal = v; saveData(); renderWater(); }
+  };
+
+  function renderSide() {
+    const box = document.getElementById('habitsSide');
+    const arr = sideOf(selDay);
+    const rows = arr.map(q => `
+      <div class="flex items-center justify-between gap-2 bg-gray-900/60 border ${q.done ? 'border-yellow-500/60' : 'border-gray-800'} rounded-lg p-2">
+        <button onclick="sqToggle(${q.id}, event)" class="w-7 h-7 rounded-full text-sm font-bold transition ${q.done ? 'bg-yellow-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>
+        <span class="flex-1 text-xs ${q.done ? 'text-yellow-200 line-through' : 'text-gray-200'}">${esc(q.name)}</span>
+        <span class="text-[10px] text-yellow-400">+${q.pts}</span>
+        <button onclick="sqDel(${q.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+      </div>`).join('');
+    box.innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-yellow-300">⭐ المهام الجانبية</h3>
+        <span class="text-[10px] text-gray-400">نقاط اليوم: <strong class="text-yellow-300">${dayPts(selDay)}</strong> • الإجمالي: <strong class="text-yellow-300">${totalPts()}</strong></span>
+      </div>
+      <div class="flex flex-wrap gap-1.5">${QUICK.map((q, i) => `<button onclick="sqQuick(${i})" class="text-[10px] bg-gray-900 border border-yellow-500/40 px-2 py-1 rounded text-yellow-200">+ ${esc(q[0])}</button>`).join('')}</div>
+      ${arr.length ? `<div class="space-y-1.5">${rows}</div>` : '<p class="text-[11px] text-gray-500">مفيش مهام جانبية لليوم ده.</p>'}
+      <div class="flex gap-1.5 pt-2 border-t border-gray-800">
+        <input id="sqName" type="text" placeholder="مهمة جديدة..." class="flex-1 ${inCls}">
+        <input id="sqPts" type="number" inputmode="numeric" value="10" min="1" class="w-16 text-center ${inCls}">
+        <button onclick="sqAdd()" class="text-xs px-3 py-1 bg-yellow-600 text-white rounded font-bold">إضافة</button>
+      </div>`;
+  }
+
+  window.hbTabSet = n => { hbTab = n; render(); };
+  window.hbDay = k => { selDay = k; render(); };
+  window.hbMonth = dir => {
+    let y = viewY, m = viewM + dir;
+    if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
+    const now = new Date();
+    if (y > now.getFullYear() || (y === now.getFullYear() && m > now.getMonth())) return;
+    viewY = y; viewM = m; render();
+  };
+  window.hbReview = (wk, field, v) => {
+    H().reviews[wk] = Object.assign({ won: '', change: '' }, H().reviews[wk], { [field]: v });
+    saveData();
+  };
+  window.hbToggle = (id, e) => {
+    if (!isDone(find(id), selDay)) fx(e, '✅ تمام');
+    setE(id, selDay, !isDone(find(id), selDay));
+  };
+  window.hbMode = id => {
+    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
+    setE(id, selDay, { min: e.min, mode: e.mode === 'memo' ? 'study' : 'memo' });
+  };
+  window.hbMin = id => {
+    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
+    const v = prompt("عملت كام دقيقة؟", e.min || "");
+    if (v === null) return;
+    setE(id, selDay, { min: Math.max(0, parseInt(v, 10) || 0), mode: e.mode });
+  };
+  window.hbAdd = () => {
+    const n = prompt("اسم العادة:");
+    if (!n || !n.trim()) return;
+    const timed = confirm("العادة دي بالوقت؟\nموافق = بالوقت (دقايق)\nإلغاء = علامة صح");
+    H().list.push({ id: Date.now(), name: n.trim(), type: timed ? 'time' : 'check' });
+    saveData(); render();
+  };
+  window.hbEdit = id => { const h = find(id), n = prompt("تعديل اسم العادة:", h.name); if (n && n.trim()) { h.name = n.trim(); saveData(); render(); } };
+  window.hbDel = id => { if (confirm("تحذف العادة دي؟")) { H().list = H().list.filter(h => h.id !== id); saveData(); render(); } };
+  window.hbMove = (i, dir) => {
+    const l = H().list, t = i + dir;
+    if (t < 0 || t >= l.length) return;
+    [l[i], l[t]] = [l[t], l[i]];
+    saveData(); render();
+  };
+
+  window.tbText = (id, v) => {
+    H().blockText[selDay] = H().blockText[selDay] || {};
+    H().blockText[selDay][id] = v;
+    saveData();
+  };
+  window.tbAdd = () => {
+    const l = prompt("وقت البلوك (مثلاً: 3 – 6 م أو المغرب – العشاء):");
+    if (l && l.trim()) { H().blockTpl.push({ id: Date.now(), label: l.trim() }); saveData(); renderBlocks(); }
+  };
+  window.tbRename = id => {
+    const b = H().blockTpl.find(x => x.id === id);
+    const l = prompt("تعديل وقت البلوك:", b.label);
+    if (l && l.trim()) { b.label = l.trim(); saveData(); renderBlocks(); }
+  };
+  window.tbDel = id => {
+    if (confirm("تحذف البلوك ده؟")) { H().blockTpl = H().blockTpl.filter(b => b.id !== id); saveData(); renderBlocks(); }
+  };
+  window.tbMove = (i, dir) => {
+    const l = H().blockTpl, t = i + dir;
+    if (t < 0 || t >= l.length) return;
+    [l[i], l[t]] = [l[t], l[i]];
+    saveData(); renderBlocks();
+  };
+
+  window.slSet = (field, v) => {
+    H().sleep[selDay] = Object.assign({ bed: '', wake: '' }, H().sleep[selDay], { [field]: v });
+    saveData(); renderSleep();
+  };
+
+  function sqPush(name, pts) {
+    (H().side[selDay] = H().side[selDay] || []).push({ id: Date.now() + Math.floor(Math.random() * 1000), name, pts, done: false });
+    saveData(); renderSide();
+  }
+  window.sqAdd = () => {
+    const n = document.getElementById('sqName').value.trim();
+    const p = Math.max(1, parseInt(document.getElementById('sqPts').value, 10) || 10);
+    if (!n) { alert('اكتب اسم المهمة'); return; }
+    sqPush(n, p);
+  };
+  window.sqQuick = i => sqPush(QUICK[i][0], QUICK[i][1]);
+  window.sqToggle = (id, e) => {
+    const q = sideOf(selDay).find(x => x.id === id);
+    if (!q) return;
+    q.done = !q.done;
+    if (q.done) fx(e, '⭐ +' + q.pts);
+    saveData(); renderSide();
+    checkBadges(badgeList());
+  };
+  window.sqDel = id => {
+    H().side[selDay] = sideOf(selDay).filter(q => q.id !== id);
+    saveData(); renderSide();
+  };
+})();
+
+// ===== كارت النهارده في الرئيسية (المحدث) =====
+window.renderToday = function () {
   const box = document.getElementById('today-card');
   if (!box) return;
-  const k = getTodayKey();
-  const now = new Date();
-  const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+  const k = getTodayKey(), now = new Date();
   const bar = (p, c) => `<div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-2"><div class="${c} h-1.5" style="width:${Math.max(0, Math.min(100, p))}%"></div></div>`;
   const tile = (label, value, pct, done, go, color) => `
     <button onclick="${go}" class="rounded-xl border p-2.5 text-right transition ${done ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-gray-800 bg-gray-900/40'}">
@@ -1566,6 +2117,18 @@ function renderToday() {
       <div class="text-sm font-bold ${done ? 'text-emerald-300' : 'text-gray-100'} mt-0.5">${value}</div>
       ${bar(pct, done ? 'bg-emerald-400' : color)}
     </button>`;
+  
+  const list = (state.habits && state.habits.list) ? state.habits.list : [];
+  let habitsTile;
+  if (now.getDay() === 5) habitsTile = tile('✅ العادات', '📝 مراجعة الجمعة', 0, false, "showView('habits')", 'bg-amber-400');
+  else {
+    const n = list.filter(h => {
+      const e = (state.habits.log[k] || {})[h.id];
+      if (h.type === 'time') return !!(e && e.min > 0);
+      return e === true || (h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true));
+    }).length;
+    habitsTile = tile('✅ العادات', `${n} / ${list.length}`, list.length ? n / list.length * 100 : 0, list.length > 0 && n === list.length, "showView('habits')", 'bg-amber-400');
+  }
 
   const completed = state.history[k] === 'completed' || state.history[k] === true;
   const rest = state.history[k] === 'rest';
@@ -1574,30 +2137,43 @@ function renderToday() {
   let wv, wp = 0, wdone = false;
   if (completed) { wv = '✅ خلصت'; wp = 100; wdone = true; }
   else if (rest) { wv = '🌿 يوم راحة'; wp = 100; wdone = true; }
-  else if (state.penaltyActive) { wv = '⚠️ عقوبة'; }
+  else if (state.penaltyActive) wv = '⚠️ عقوبة';
   else { wv = `${qd} / ${qs.length} تمرين`; wp = qs.length ? qd / qs.length * 100 : 0; }
   const wt = (state.workoutTimes && state.workoutTimes[k]) || 0;
   if (wt) wv += ` • ⏱ ${Math.round(wt / 60)}د`;
   const workoutTile = tile('🏋️ التمرين', wv, wp, wdone, "showView('workouts')", 'bg-cyan-400');
 
-  const az = state.azkar || [];
-  const rem = az.filter(z => z.current > 0).length;
+  const az = state.azkar || [], rem = az.filter(z => z.current > 0).length;
   const azTile = tile('📿 الأذكار', rem ? `باقي ${rem} من ${az.length}` : '✅ خلصتهم', az.length ? (az.length - rem) / az.length * 100 : 0, az.length > 0 && rem === 0, "showView('recovery');recTab('adhkar')", 'bg-emerald-400');
 
-  const du = state.duas || [];
-  const dn = du.filter(d => d.done).length;
+  const du = state.duas || [], dn = du.filter(d => d.done).length;
   const duTile = tile('🤲 الدعاء', `${dn} / ${du.length}`, du.length ? dn / du.length * 100 : 0, du.length > 0 && dn === du.length, "showView('recovery');recTab('duaa')", 'bg-blue-400');
+
+  const goal = (state.habits && state.habits.waterGoal) || 12;
+  const wc = (state.habits && state.habits.water && state.habits.water[k]) || 0;
+  const waterTile = tile('💧 الماء', `${wc} / ${goal} كوب`, wc / goal * 100, wc >= goal, 'openDayTrackerFromHome()', 'bg-cyan-400');
+
+  const sl = state.habits && state.habits.sleep && state.habits.sleep[k];
+  const sleepOk = sl && sl.bed && sl.wake;
+  const durMin = (a, b) => {
+    const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
+    const x = toMin(a), y = toMin(b); if (x == null || y == null) return 0; let d = y - x; if (d < 0) d += 1440; return d;
+  };
+  const fmtDur = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
+  const sleepTile = tile('😴 النوم', sleepOk ? fmtDur(durMin(sl.bed, sl.wake)) : 'سجّل نومك', sleepOk ? 100 : 0, !!sleepOk, 'openDayTrackerFromHome()', 'bg-sky-400');
+
+  const sideArr = (state.habits && state.habits.side && state.habits.side[k]) || [];
+  const pts = sideArr.filter(q => q.done).reduce((s, q) => s + q.pts, 0);
 
   box.innerHTML = `
     <div class="flex justify-between items-center">
       <h3 class="text-sm font-bold text-cyan-300">📍 النهارده</h3>
       <span class="text-[10px] text-gray-400">${DAYS[now.getDay()]} ${now.getDate()}</span>
     </div>
-    <div class="grid grid-cols-2 gap-2">${workoutTile}${azTile}${duTile}</div>
-    <div class="text-[10px] text-gray-400 pt-1">🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
-}
-
-renderToday();
+    <div class="grid grid-cols-2 gap-2">${habitsTile}${workoutTile}${azTile}${duTile}${waterTile}${sleepTile}</div>
+    <div class="text-[10px] text-gray-400 pt-1">⭐ نقاط اليوم: <strong class="text-yellow-300">${pts}</strong> • 🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
+};
+window.renderToday();
 
 // ================= النسخ الاحتياطي على تليجرام =================
 let backupBusy = false;
