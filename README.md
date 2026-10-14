@@ -7,52 +7,52 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background-color: #08090d; color: #e2e8f0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
-    .neon-cyan { border: 1px solid #00e5ff; box-shadow: 0 0 10px rgba(0, 229, 255, 0.25); }
-    .neon-red { border: 1px solid #ff3333; box-shadow: 0 0 12px rgba(255, 51, 51, 0.35); }
+    .neon-cyan { border: 1px solid #00e5ff; box-shadow: 0 0 12px rgba(0, 229, 255, 0.2); }
+    .neon-red { border: 1px solid #ff3333; box-shadow: 0 0 12px rgba(255, 51, 51, 0.3); }
     .card-bg { background-color: #12151f; }
     .glow-cyan { text-shadow: 0 0 8px rgba(0, 229, 255, 0.7); }
     .glow-red { text-shadow: 0 0 8px rgba(255, 51, 51, 0.7); }
-    .wheel-container { position: relative; width: 260px; height: 260px; margin: 0 auto; }
+    .wheel-container { position: relative; width: 240px; height: 240px; margin: 0 auto; }
     .wheel-pointer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 20px solid #ef4444; z-index: 10; }
     @keyframes popfx { 0%{opacity:0;transform:translate(-50%,0) scale(.6)} 20%{opacity:1;transform:translate(-50%,-10px) scale(1.15)} 100%{opacity:0;transform:translate(-50%,-60px) scale(1)} }
     .fx-pop { position: fixed; z-index: 9999; pointer-events: none; font-weight: 700; font-size: 14px; color: #fde047; text-shadow: 0 0 8px rgba(250,204,21,.8); animation: popfx .9s ease-out forwards; }
-    @keyframes toastin { from{opacity:0;transform:translate(-50%,-20px)} to{opacity:1;transform:translate(-50%,0)} }
-    .toast-badge { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 10000; background: #78350f; border: 1px solid #f59e0b; color: #fde68a; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; box-shadow: 0 0 18px rgba(245,158,11,.5); animation: toastin .3s ease-out; text-align: center; }
   </style>
 </head>
-<body class="p-3 pb-20 min-h-screen flex flex-col items-center select-none text-right">
+<body class="p-4 pb-24 min-h-screen flex flex-col items-center select-none text-right max-w-md mx-auto space-y-4">
 
-  <header class="w-full max-w-md flex justify-between items-center p-3 mb-3 card-bg rounded-xl neon-cyan">
-    <div class="flex items-center gap-2 cursor-pointer" onclick="showView('home')">
-      <span class="text-xl">⚡</span>
+  <header class="w-full flex justify-between items-center p-3.5 card-bg rounded-2xl neon-cyan">
+    <div class="flex items-center gap-2.5 cursor-pointer" onclick="showView('home')">
+      <span class="text-2xl">⚡</span>
       <div>
-        <h1 class="text-sm font-bold text-cyan-400 glow-cyan font-mono">HUNTER LIFE SYSTEM</h1>
+        <h1 class="text-xs font-bold text-cyan-400 glow-cyan font-mono">HUNTER LIFE SYSTEM</h1>
         <p class="text-[10px] text-gray-400" id="top-user-name">Mostafa Abdelrahman</p>
       </div>
     </div>
-    <button onclick="showView('home')" class="px-3 py-1 text-xs bg-gray-900 border border-cyan-500/50 hover:bg-cyan-950 rounded text-cyan-400 font-bold transition">🏠 الرئيسية</button>
+    <button onclick="showView('home')" class="px-3 py-1.5 text-xs bg-gray-900 border border-cyan-500/50 hover:bg-cyan-950 rounded-xl text-cyan-400 font-bold transition">🏠 الرئيسية</button>
   </header>
 
-  <main class="w-full max-w-md">
+  <main class="w-full space-y-4">
 
-    <section id="view-home" class="space-y-3">
-      <div class="card-bg p-4 rounded-xl border border-gray-800 text-center relative">
-        <div class="absolute top-2 left-2 flex gap-1.5">
-          <button onclick="toggleHomeOrderMode()" id="home-order-btn" class="text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded">↕ ترتيب</button>
-          <button onclick="toggleHomeEditMode()" id="home-edit-btn" class="text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded">⚙️ تعديل الأسماء</button>
+    <!-- الصفحة الرئيسية -->
+    <section id="view-home" class="space-y-4">
+      <div class="card-bg p-5 rounded-2xl border border-gray-800 text-center relative shadow-lg">
+        <div class="absolute top-3 left-3 flex gap-1.5">
+          <button onclick="toggleHomeOrderMode()" id="home-order-btn" class="text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2.5 py-1 rounded-lg">↕ ترتيب</button>
+          <button onclick="toggleHomeEditMode()" id="home-edit-btn" class="text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2.5 py-1 rounded-lg">⚙️ تعديل</button>
         </div>
         <h2 class="text-base font-bold text-gray-100 mb-1">لوحة قيادة البطل ⚔️</h2>
         <p class="text-xs text-gray-400">اختر البوابة المطلوبة لمواصلة التطوير والتعافي:</p>
       </div>
-      <div id="today-card" class="card-bg p-3 rounded-xl border border-cyan-500/40 space-y-2"></div>
+
+      <div id="today-card" class="card-bg p-4 rounded-2xl border border-cyan-500/40 space-y-3"></div>
       
-      <!-- قائمة الأزرار الرئيسية في الرئيسية -->
-      <div id="home-buttons-container" class="grid grid-cols-1 gap-2.5">
+      <!-- قائمة الأزرار الرئيسية -->
+      <div id="home-buttons-container" class="space-y-3">
         
-        <!-- زر التمارين -->
-        <div data-home-key="workouts" class="p-4 rounded-xl card-bg border border-cyan-500/40 hover:border-cyan-400 text-right flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) showView('workouts')">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/50 hb-icon">⚔️</span>
+        <!-- التمارين -->
+        <div data-home-key="workouts" class="p-4 rounded-2xl card-bg border border-cyan-500/40 hover:border-cyan-400 flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('workouts')">
+          <div class="flex items-center gap-3.5">
+            <span class="text-2xl p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/50 hb-icon">⚔️</span>
             <div>
               <h3 class="text-sm font-bold text-cyan-400 hb-title">نظام تمارين Hunter</h3>
               <p class="text-xs text-gray-400 hb-desc">Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي</p>
@@ -68,10 +68,10 @@
           </div>
         </div>
 
-        <!-- زر تراكينج اليوم -->
-        <div data-home-key="dayTracker" class="p-4 rounded-xl card-bg border border-sky-500/40 hover:border-sky-400 text-right flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) openDayTrackerFromHome()">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-sky-950/60 border border-sky-500/50 hb-icon">📅</span>
+        <!-- تراكينج اليوم -->
+        <div data-home-key="dayTracker" class="p-4 rounded-2xl card-bg border border-sky-500/40 hover:border-sky-400 flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) openDayTrackerFromHome()">
+          <div class="flex items-center gap-3.5">
+            <span class="text-2xl p-2.5 rounded-xl bg-sky-950/60 border border-sky-500/50 hb-icon">📅</span>
             <div>
               <h3 class="text-sm font-bold text-sky-400 hb-title">تراكينج اليوم (نوم ومياه)</h3>
               <p class="text-xs text-gray-400 hb-desc">تسجيل ساعات النوم والاستيقاظ وعداد الماء اليومي</p>
@@ -87,37 +87,31 @@
           </div>
         </div>
 
-        <!-- عداد التعافي والصمود -->
-        <div data-home-key="recoveryCounter" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01]" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
-          <div>
-            <h3 class="text-sm font-bold text-emerald-400 hb-title">🛡️ عداد التعافي والأوسمة</h3>
-            <div class="flex items-center gap-2 mt-1" onclick="event.stopPropagation()">
-              <label class="text-[11px] text-gray-400">البداية:</label>
-              <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded px-1.5 py-0.5 text-gray-200">
+        <!-- عداد التعافي والمقاومة -->
+        <div data-home-key="recoveryCounter" class="p-4 rounded-2xl card-bg border border-orange-500/40 hover:border-orange-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01] shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
+          <div class="flex items-center gap-3.5">
+            <span class="text-2xl p-2.5 rounded-xl bg-orange-950/60 border border-orange-500/50 hb-icon">🔥</span>
+            <div>
+              <h3 class="text-sm font-bold text-orange-400 hb-title">عداد المقاومة والتعافي</h3>
+              <p class="text-xs text-gray-400 hb-desc">دورة الـ 90 يوم، الأوسمة، والدروع والأيام</p>
             </div>
           </div>
-          <div class="text-center flex items-center gap-3">
-            <div>
-              <div class="text-2xl font-bold text-emerald-400 font-mono">
-                <span id="recovery-days-count">0</span> <span class="text-xs text-emerald-300">يوم 🏆</span>
-              </div>
-              <button onclick="event.stopPropagation(); reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-1.5 py-0.5 rounded mt-0.5 hover:bg-red-950">سجلت زلة (-1)</button>
-            </div>
+          <div class="flex items-center gap-2">
             <div class="order-arrows hidden flex gap-1" onclick="event.stopPropagation()">
-              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', -1)">▲</button>
-              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', 1)">▼</button>
+              <button class="px-2 py-1 bg-gray-800 border border-orange-400 text-orange-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-orange-400 text-orange-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', 1)">▼</button>
             </div>
-            <button class="edit-btn hidden text-[10px] bg-emerald-950 border border-emerald-400 text-emerald-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
-            <span class="text-emerald-400 text-sm arrow-icon">◀</span>
+            <button class="edit-btn hidden text-[10px] bg-orange-950 border border-orange-400 text-orange-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
+            <span class="text-orange-400 text-sm arrow-icon">◀</span>
           </div>
         </div>
 
         <!-- ركن التعافي -->
-        <div data-home-key="recovery" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 text-right flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recovery')">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50 hb-icon">🌱</span>
+        <div data-home-key="recovery" class="p-4 rounded-2xl card-bg border border-emerald-500/40 hover:border-emerald-400 flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recovery')">
+          <div class="flex items-center gap-3.5">
+            <span class="text-2xl p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 hb-icon">🌱</span>
             <div>
-              <h3 class="text-sm font-bold text-emerald-400 hb-title">ركن التعافي (أذكار ويوميات)</h3>
+              <h3 class="text-sm font-bold text-emerald-400 hb-title">ركن التعافي</h3>
               <p class="text-xs text-gray-400 hb-desc">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
             </div>
           </div>
@@ -132,12 +126,12 @@
         </div>
 
         <!-- عجلة الطوارئ -->
-        <div data-home-key="wheel" class="p-4 rounded-xl card-bg border border-red-500/50 hover:border-red-400 text-right flex items-center justify-between transition hover:scale-[1.01] bg-red-950/20 relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) showView('wheel')">
-          <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-red-950/80 border border-red-500/70 hb-icon">🎡</span>
+        <div data-home-key="wheel" class="p-4 rounded-2xl card-bg border border-red-500/50 hover:border-red-400 flex items-center justify-between transition hover:scale-[1.01] bg-red-950/10 relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('wheel')">
+          <div class="flex items-center gap-3.5">
+            <span class="text-2xl p-2.5 rounded-xl bg-red-950/80 border border-red-500/70 hb-icon">🎡</span>
             <div>
               <h3 class="text-sm font-bold text-red-400 glow-red hb-title">عجلة الطوارئ (وقت الخطر)</h3>
-              <p class="text-xs text-gray-400 hb-desc">تعديل المهام، إضافة خطط هروب، وكسر الرغبة فوراً</p>
+              <p class="text-xs text-gray-400 hb-desc">تعديل المهام، خطط الهروب، وكسر الرغبة فوراً</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -152,48 +146,80 @@
 
       </div>
 
-      <div class="card-bg p-3 rounded-xl border border-sky-500/40 space-y-2">
+      <div class="card-bg p-4 rounded-2xl border border-sky-500/40 space-y-3">
         <div class="flex items-center justify-between gap-2">
           <div>
             <h3 class="text-sm font-bold text-sky-300">☁️ النسخ الاحتياطي</h3>
             <p id="backup-status" class="text-[11px] text-gray-400">لسه مفيش نسخة احتياطية</p>
           </div>
-          <div class="flex gap-1.5">
-            <button onclick="backupToTelegram(true, event)" class="text-[11px] bg-sky-950 border border-sky-500 px-2.5 py-1 rounded text-sky-300 font-bold">☁️ انسخ الآن</button>
-            <button onclick="document.getElementById('import-file').click()" class="text-[11px] bg-gray-900 border border-gray-700 px-2.5 py-1 rounded text-gray-300">📂 استرجاع</button>
+          <div class="flex gap-2">
+            <button onclick="backupToTelegram(true, event)" class="text-[11px] bg-sky-950 border border-sky-500 px-3 py-1.5 rounded-xl text-sky-300 font-bold">☁️ انسخ الآن</button>
+            <button onclick="document.getElementById('import-file').click()" class="text-[11px] bg-gray-900 border border-gray-700 px-3 py-1.5 rounded-xl text-gray-300">📂 استرجاع</button>
           </div>
         </div>
-        <p class="text-[10px] text-gray-500">بتتبعت لوحدها على تليجرام كل جمعة.</p>
       </div>
     </section>
 
-    <!-- ركن عداد التعافي والأوسمة والدروع -->
-    <section id="view-recoveryCounterView" class="hidden space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-emerald-500/40 flex justify-between items-center">
-        <div>
-          <h2 class="text-sm font-bold text-emerald-400">🛡️ ركن عداد التعافي والأوسمة</h2>
-          <p class="text-[11px] text-gray-400">تابع أيام صمودك وافتح أوسمتك ودروعك</p>
+    <!-- ركن عداد المقاومة وتلوين الـ 90 يوم -->
+    <section id="view-recoveryCounterView" class="hidden space-y-4">
+      <div class="card-bg p-5 rounded-2xl border border-orange-500/40 space-y-4 text-center relative shadow-lg">
+        <div class="flex justify-between items-center">
+          <div class="text-right">
+            <h2 class="text-sm font-bold text-orange-400">🔥 شكل المقاومة (دورة الـ 90 يوم)</h2>
+            <p class="text-[11px] text-gray-400">كل 90 يوم تبدأ دورة تلوين وبناء جديدة</p>
+          </div>
+          <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-2.5 py-1.5 rounded-xl hover:bg-red-950 transition">سجلت زلة (-1)</button>
         </div>
-        <div class="text-center bg-emerald-950/60 border border-emerald-500 px-3 py-1 rounded-lg">
-          <span class="text-[10px] text-emerald-300 block">إجمالي الصمود</span>
-          <span id="badge-total-days" class="text-base font-bold text-emerald-400 font-mono">0</span>
+
+        <!-- عداد الدائرة ودورة الـ 90 يوم -->
+        <div class="relative w-48 h-48 mx-auto flex flex-col items-center justify-center">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" stroke="#1e293b" stroke-width="8" fill="transparent"></circle>
+            <circle id="progress-ring-circle" cx="50" cy="50" r="42" stroke="#ea580c" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" fill="transparent" class="transition-all duration-500"></circle>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <span class="text-3xl font-extrabold text-orange-400 font-mono" id="rc-days-num">0</span>
+            <span class="text-xs text-gray-300 font-bold">يوم مقاومة</span>
+            <span class="text-[10px] text-orange-300 font-mono mt-0.5" id="rc-cycle-text">الدورة 1 (من 90)</span>
+          </div>
+        </div>
+
+        <!-- الساعات والدقايق والثواني -->
+        <div class="grid grid-cols-3 gap-2 bg-black/40 p-3 rounded-xl border border-gray-800 text-center font-mono">
+          <div>
+            <div class="text-base font-bold text-orange-300" id="rc-hours">00</div>
+            <div class="text-[9px] text-gray-400">ساعة</div>
+          </div>
+          <div>
+            <div class="text-base font-bold text-orange-300" id="rc-mins">00</div>
+            <div class="text-[9px] text-gray-400">دقيقة</div>
+          </div>
+          <div>
+            <div class="text-base font-bold text-orange-300" id="rc-secs">00</div>
+            <div class="text-[9px] text-gray-400">ثانية</div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-2 pt-1">
+          <label class="text-xs text-gray-400">تاريخ البداية:</label>
+          <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded-xl px-2.5 py-1 text-gray-200">
         </div>
       </div>
 
       <!-- تبويبات الأوسمة والدروع -->
-      <div class="grid grid-cols-4 gap-1">
-        <button id="btab-badges" onclick="badgeTab('badges')" class="py-2 rounded-lg text-xs font-bold transition border bg-amber-500 text-black border-amber-400">الأوسمة</button>
-        <button id="btab-shields" onclick="badgeTab('shields')" class="py-2 rounded-lg text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الدروع</button>
-        <button id="btab-cups" onclick="badgeTab('cups')" class="py-2 rounded-lg text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الكؤوس</button>
-        <button id="btab-certs" onclick="badgeTab('certs')" class="py-2 rounded-lg text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الشهادات</button>
+      <div class="grid grid-cols-4 gap-1.5">
+        <button id="btab-badges" onclick="badgeTab('badges')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-orange-500 text-black border-orange-400">الأوسمة</button>
+        <button id="btab-shields" onclick="badgeTab('shields')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الدروع</button>
+        <button id="btab-cups" onclick="badgeTab('cups')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الكؤوس</button>
+        <button id="btab-certs" onclick="badgeTab('certs')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الشهادات</button>
       </div>
 
-      <div id="badges-content" class="grid grid-cols-2 gap-2.5"></div>
+      <div id="badges-content" class="grid grid-cols-2 gap-3"></div>
     </section>
 
-    <!-- باقي الأقسام -->
+    <!-- باقي الأقسام الأساسية -->
     <section id="view-workouts" class="hidden space-y-4">
-      <div class="card-bg p-4 rounded-xl neon-cyan">
+      <div class="card-bg p-5 rounded-2xl neon-cyan space-y-3">
         <div class="flex items-center justify-between">
           <div>
             <h2 id="hunter-name" class="text-lg font-bold text-cyan-400 glow-cyan cursor-pointer" onclick="editName()">Mostafa Abdelrahman ✏️</h2>
@@ -204,8 +230,8 @@
             <span id="countdown" class="text-xs font-bold text-cyan-400 font-mono">00:00:00</span>
           </div>
         </div>
-        <div class="mt-3 pt-3 border-t border-gray-800">
-          <div class="flex justify-between text-xs mb-1">
+        <div class="pt-3 border-t border-gray-800 space-y-1.5">
+          <div class="flex justify-between text-xs">
             <span class="text-gray-300">Streak: <strong id="streak-count" class="text-cyan-400">0</strong> Days</span>
             <span id="weekly-status-text" class="text-gray-400">Level Progress</span>
           </div>
@@ -215,134 +241,134 @@
         </div>
       </div>
 
-      <div class="card-bg p-3 rounded-xl border border-orange-500/40 flex items-center justify-between">
+      <div class="card-bg p-4 rounded-2xl border border-orange-500/40 flex items-center justify-between">
         <div>
           <div class="text-[10px] text-gray-400">⏱ وقت التمرين</div>
           <div id="wt-display" class="text-2xl font-bold text-orange-400 font-mono">00:00:00</div>
-          <div id="wt-info" class="text-[10px] text-gray-400"></div>
+          <div id="wt-info" class="text-[10px] text-gray-400 mt-0.5"></div>
         </div>
-        <button id="wt-btn" onclick="toggleWorkoutTimer(event)" class="px-4 py-2 rounded-lg text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white">▶ ابدأ التمرين</button>
+        <button id="wt-btn" onclick="toggleWorkoutTimer(event)" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white transition shadow">▶ ابدأ التمرين</button>
       </div>
 
       <div class="flex justify-between items-center text-xs px-1">
-        <div class="flex gap-1.5">
-          <button onclick="exportData()" class="px-2 py-1 bg-gray-900 border border-gray-700 hover:border-cyan-500 rounded">💾 Export</button>
-          <button onclick="document.getElementById('import-file').click()" class="px-2 py-1 bg-gray-900 border border-gray-700 hover:border-cyan-500 rounded">📂 Import</button>
+        <div class="flex gap-2">
+          <button onclick="exportData()" class="px-2.5 py-1.5 bg-gray-900 border border-gray-700 hover:border-cyan-500 rounded-xl">💾 Export</button>
+          <button onclick="document.getElementById('import-file').click()" class="px-2.5 py-1.5 bg-gray-900 border border-gray-700 hover:border-cyan-500 rounded-xl">📂 Import</button>
           <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
         </div>
-        <button id="rest-toggle-btn" onclick="toggleTodayRest()" class="px-2.5 py-1 bg-gray-900 border border-green-700 text-green-400 rounded font-semibold">🌿 Rest Day</button>
+        <button id="rest-toggle-btn" onclick="toggleTodayRest()" class="px-3 py-1.5 bg-gray-900 border border-green-700 text-green-400 rounded-xl font-semibold">🌿 Rest Day</button>
       </div>
 
-      <div class="card-bg p-3 rounded-xl border border-gray-800">
-        <div class="flex justify-between items-center mb-2 px-1">
+      <div class="card-bg p-4 rounded-2xl border border-gray-800 space-y-2">
+        <div class="flex justify-between items-center px-1">
           <span id="calendar-month-title" class="text-xs font-bold text-cyan-400">📅 MONTH LOG</span>
           <span class="text-[10px] text-gray-400">اضغط لتبديل حالة اليوم</span>
         </div>
-        <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-500 mb-1 font-semibold">
+        <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-500 font-semibold mb-1">
           <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
         </div>
-        <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center"></div>
+        <div id="calendar-days" class="grid grid-cols-7 gap-1.5 text-center"></div>
       </div>
 
-      <div id="rest-day-banner" class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/50 hidden">
+      <div id="rest-day-banner" class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/50 hidden">
         <p class="text-xs text-emerald-300 font-bold">🌿 يوم استشفاء مفعل: أنت معفي اليوم من التمارين والعقوبات.</p>
       </div>
 
-      <div id="penalty-card" class="p-3 rounded-xl bg-red-950/30 border border-red-500 hidden space-y-2">
+      <div id="penalty-card" class="p-4 rounded-2xl bg-red-950/30 border border-red-500 hidden space-y-2.5">
         <div class="flex justify-between items-center">
           <h4 class="text-xs font-bold text-red-400">⚠️ PENALTY QUEST ACTIVE</h4>
-          <button onclick="editPenaltyText()" class="text-[10px] text-red-400 border border-red-500 px-1.5 py-0.5 rounded">تعديل</button>
+          <button onclick="editPenaltyText()" class="text-[10px] text-red-400 border border-red-500 px-2 py-0.5 rounded-lg">تعديل</button>
         </div>
         <p id="penalty-task-text" class="text-xs text-gray-200">1000 استغفار</p>
-        <button onclick="confirmPenaltyDone()" class="w-full py-1.5 rounded bg-red-600 font-bold text-xs">إتمام العقوبة وفتح النظام</button>
+        <button onclick="confirmPenaltyDone()" class="w-full py-2 rounded-xl bg-red-600 font-bold text-xs">إتمام العقوبة وفتح النظام</button>
       </div>
 
       <div class="flex justify-between items-center">
         <div class="flex gap-2">
-          <button id="tab-day1" onclick="switchRoutine('day1')" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-cyan-400 bg-cyan-950 text-cyan-400">⚡ DAY 1</button>
-          <button id="tab-day2" onclick="switchRoutine('day2')" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400">🔥 DAY 2</button>
+          <button id="tab-day1" onclick="switchRoutine('day1')" class="px-3.5 py-2 rounded-xl text-xs font-bold border border-cyan-400 bg-cyan-950 text-cyan-400">⚡ DAY 1</button>
+          <button id="tab-day2" onclick="switchRoutine('day2')" class="px-3.5 py-2 rounded-xl text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400">🔥 DAY 2</button>
         </div>
-        <button onclick="openAddQuestModal()" class="text-xs border border-cyan-500 text-cyan-400 px-2.5 py-1.5 rounded hover:bg-cyan-950">+ إضافة تمرين</button>
+        <button onclick="openAddQuestModal()" class="text-xs border border-cyan-500 text-cyan-400 px-3 py-2 rounded-xl hover:bg-cyan-950 transition">+ إضافة تمرين</button>
       </div>
 
-      <div id="quest-list" class="space-y-2.5"></div>
+      <div id="quest-list" class="space-y-3"></div>
 
-      <button id="complete-day-btn" onclick="completeDay(event)" class="w-full py-3 rounded-lg font-bold text-xs uppercase border border-cyan-500 text-cyan-400 hover:bg-cyan-950 transition">COMPLETE DAY</button>
+      <button id="complete-day-btn" onclick="completeDay(event)" class="w-full py-3.5 rounded-2xl font-bold text-xs uppercase border border-cyan-500 text-cyan-400 hover:bg-cyan-950 transition shadow">COMPLETE DAY</button>
     </section>
 
-    <section id="view-recovery" class="hidden space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-emerald-500/40">
+    <section id="view-recovery" class="hidden space-y-4">
+      <div class="card-bg p-4 rounded-2xl border border-emerald-500/40">
         <h2 class="text-sm font-bold text-emerald-400">🌱 ركن التعافي</h2>
-        <p class="text-[11px] text-gray-400">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
+        <p class="text-[11px] text-gray-400 mt-0.5">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
       </div>
       <div class="grid grid-cols-4 gap-1.5">
-        <button id="rtab-adhkar" onclick="recTab('adhkar')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-emerald-950 border-emerald-400 text-emerald-300">📿 الأذكار</button>
-        <button id="rtab-beliefs" onclick="recTab('beliefs')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🧠 المعتقدات</button>
-        <button id="rtab-duaa" onclick="recTab('duaa')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🤲 الدعاء</button>
-        <button id="rtab-journal" onclick="recTab('journal')" class="py-2 rounded-lg border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🎙️ اليوميات</button>
+        <button id="rtab-adhkar" onclick="recTab('adhkar')" class="py-2.5 rounded-xl border text-[11px] font-bold transition bg-emerald-950 border-emerald-400 text-emerald-300">📿 الأذكار</button>
+        <button id="rtab-beliefs" onclick="recTab('beliefs')" class="py-2.5 rounded-xl border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🧠 المعتقدات</button>
+        <button id="rtab-duaa" onclick="recTab('duaa')" class="py-2.5 rounded-xl border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🤲 الدعاء</button>
+        <button id="rtab-journal" onclick="recTab('journal')" class="py-2.5 rounded-xl border text-[11px] font-bold transition bg-gray-900 border-gray-800 text-gray-400">🎙️ اليوميات</button>
       </div>
 
       <div id="pane-adhkar" class="space-y-3">
-        <div class="card-bg p-3 rounded-xl border border-emerald-500/40 flex justify-between items-center">
+        <div class="card-bg p-4 rounded-2xl border border-emerald-500/40 flex justify-between items-center">
           <div>
             <h2 class="text-sm font-bold text-emerald-400">📿 أذكار المساء والتحصين</h2>
-            <p class="text-[11px] text-gray-400">تعديل، ترتيب، وحفظ أذكارك الخاصة</p>
+            <p class="text-[11px] text-gray-400">تعديل وترتيب أذكارك الخاصة</p>
           </div>
-          <div class="flex gap-1.5">
-            <button onclick="resetAzkarCounters()" class="text-[10px] bg-gray-900 border border-emerald-500/50 px-2 py-1 rounded text-emerald-400">🔄 تصفير</button>
-            <button onclick="openAddZekrPrompt()" class="text-[10px] bg-emerald-950 border border-emerald-500 px-2 py-1 rounded text-emerald-300 font-bold">+ ذكر جديد</button>
+          <div class="flex gap-2">
+            <button onclick="resetAzkarCounters()" class="text-[10px] bg-gray-900 border border-emerald-500/50 px-2.5 py-1.5 rounded-xl text-emerald-400">🔄 تصفير</button>
+            <button onclick="openAddZekrPrompt()" class="text-[10px] bg-emerald-950 border border-emerald-500 px-3 py-1.5 rounded-xl text-emerald-300 font-bold">+ ذكر جديد</button>
           </div>
         </div>
-        <div id="azkarList" class="space-y-2.5"></div>
+        <div id="azkarList" class="space-y-3"></div>
       </div>
 
       <div id="pane-beliefs" class="hidden space-y-3"></div>
 
       <div id="pane-duaa" class="hidden space-y-3">
-        <div class="card-bg p-3 rounded-xl border border-blue-500/40 flex justify-between items-center">
+        <div class="card-bg p-4 rounded-2xl border border-blue-500/40 flex justify-between items-center">
           <div>
             <h2 class="text-sm font-bold text-blue-400">🤲 أدعية الثبات والاستعاذة</h2>
-            <p class="text-[11px] text-gray-400">اضغط ✔ لتسجيل قراءة الدعاء، أو رتب وعدل</p>
+            <p class="text-[11px] text-gray-400">اضغط ✔ لتسجيل قراءة الدعاء</p>
           </div>
-          <div class="flex gap-1.5">
-            <button onclick="resetDuaaChecks()" class="text-[10px] bg-gray-900 border border-blue-500/50 px-2 py-1 rounded text-blue-400">🔄 تصفير الصح</button>
-            <button onclick="openAddDuaaPrompt()" class="text-[10px] bg-blue-950 border border-blue-500 px-2 py-1 rounded text-blue-300 font-bold">+ دعاء جديد</button>
+          <div class="flex gap-2">
+            <button onclick="resetDuaaChecks()" class="text-[10px] bg-gray-900 border border-blue-500/50 px-2.5 py-1.5 rounded-xl text-blue-400">🔄 تصفير</button>
+            <button onclick="openAddDuaaPrompt()" class="text-[10px] bg-blue-950 border border-blue-500 px-3 py-1.5 rounded-xl text-blue-300 font-bold">+ دعاء جديد</button>
           </div>
         </div>
-        <div id="duaaList" class="space-y-2.5"></div>
+        <div id="duaaList" class="space-y-3"></div>
       </div>
 
       <div id="pane-journal" class="hidden space-y-3">
-        <div class="card-bg p-4 rounded-xl border border-purple-500/40 space-y-3">
+        <div class="card-bg p-5 rounded-2xl border border-purple-500/40 space-y-3">
           <div class="flex justify-between items-start">
             <div>
               <h2 class="text-sm font-bold text-purple-400">🎙️ ركن اليوميات الصوتية والتوثيق</h2>
-              <p class="text-[11px] text-gray-400">يتم إرسال الفويس والصور فوراً لمحادثتك على تليجرام</p>
+              <p class="text-[11px] text-gray-400">يتم إرسال الفويس والصور لتليجرام</p>
             </div>
-            <button onclick="setupTelegram()" class="text-[10px] border border-purple-500/50 text-purple-300 px-2 py-1 rounded whitespace-nowrap">⚙️ إعداد تليجرام</button>
+            <button onclick="setupTelegram()" class="text-[10px] border border-purple-500/50 text-purple-300 px-2.5 py-1.5 rounded-xl">⚙️ تليجرام</button>
           </div>
-          <div class="p-3 bg-black/40 rounded-xl border border-gray-800 flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <button id="recBtn" onclick="toggleRecord()" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">بدء التسجيل ⏺</button>
+          <div class="p-3.5 bg-black/40 rounded-xl border border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <button id="recBtn" onclick="toggleRecord()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition">بدء التسجيل ⏺</button>
               <span id="rec-status" class="text-xs text-gray-400">جاهز للتسجيل</span>
             </div>
           </div>
-          <div id="audioList" class="space-y-1.5"></div>
-          <div class="pt-2 border-t border-gray-800">
-            <p class="text-xs text-gray-300 mb-2">📸 توثيق بالصور (إرسال لتليجرام):</p>
-            <label class="w-full block text-center py-2.5 px-3 rounded-lg bg-gray-900 border border-purple-500/60 text-purple-300 hover:bg-purple-950/40 text-xs font-bold cursor-pointer transition">
+          <div id="audioList" class="space-y-2"></div>
+          <div class="pt-3 border-t border-gray-800 space-y-2">
+            <p class="text-xs text-gray-300">📸 توثيق بالصور (إرسال لتليجرام):</p>
+            <label class="w-full block text-center py-3 px-3 rounded-xl bg-gray-900 border border-purple-500/60 text-purple-300 hover:bg-purple-950/40 text-xs font-bold cursor-pointer transition">
               📷 اختيار أو التقاط صورة
               <input type="file" id="photoInput" accept="image/*" class="hidden" onchange="sendPhotoToTelegram(this)">
             </label>
-            <div id="photoStatus" class="text-[11px] text-cyan-400 text-center mt-2"></div>
+            <div id="photoStatus" class="text-[11px] text-cyan-400 text-center mt-1"></div>
           </div>
         </div>
       </div>
     </section>
 
     <section id="view-wheel" class="hidden space-y-4 text-center">
-      <div class="card-bg p-3.5 rounded-xl neon-red">
-        <h2 class="text-sm font-bold text-red-400 glow-red mb-0.5">🚨 عجلة الطوارئ وكسر الرغبة</h2>
+      <div class="card-bg p-4 rounded-2xl neon-red space-y-1">
+        <h2 class="text-sm font-bold text-red-400 glow-red">🚨 عجلة الطوارئ وكسر الرغبة</h2>
         <p class="text-xs text-gray-300">لف العجلة واهرب فوراً لتنفيذ المهمة!</p>
       </div>
       <div class="wheel-container">
@@ -350,14 +376,14 @@
         <canvas id="wheelCanvas" width="500" height="500" class="w-full h-full rounded-full shadow-[0_0_15px_rgba(255,51,51,0.4)]"></canvas>
       </div>
       <div id="spinResult" class="text-xs font-bold text-yellow-300 min-h-[24px]">اضغط على الزر واهرب فوراً</div>
-      <button id="spinBtn" onclick="spinWheel()" class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase shadow-[0_0_12px_rgba(255,51,51,0.5)] transition">🎯 لف العجلة الآن</button>
+      <button id="spinBtn" onclick="spinWheel()" class="w-full py-3.5 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase shadow transition">🎯 لف العجلة الآن</button>
       <div class="text-right">
-        <button onclick="toggleTaskManager()" class="text-xs text-gray-400 hover:text-cyan-400 flex items-center gap-1 border border-gray-800 px-2.5 py-1 rounded bg-gray-900">⚙️ تعديل وإضافة مهام العجلة</button>
-        <div id="taskManager" class="mt-2 card-bg p-3 rounded-xl border border-gray-800 hidden space-y-2">
-          <div id="taskList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1"></div>
-          <div class="flex gap-1.5 pt-2 border-t border-gray-800">
-            <input type="text" id="newTaskInput" placeholder="مهمة هروب جديدة..." class="flex-1 text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200">
-            <button onclick="addTask()" class="text-xs px-3 py-1 bg-cyan-600 text-white rounded font-bold">إضافة</button>
+        <button onclick="toggleTaskManager()" class="text-xs text-gray-400 hover:text-cyan-400 flex items-center gap-1.5 border border-gray-800 px-3 py-2 rounded-xl bg-gray-900">⚙️ تعديل وإضافة مهام العجلة</button>
+        <div id="taskManager" class="mt-2 card-bg p-4 rounded-2xl border border-gray-800 hidden space-y-2.5">
+          <div id="taskList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+          <div class="flex gap-2 pt-2 border-t border-gray-800">
+            <input type="text" id="newTaskInput" placeholder="مهمة هروب جديدة..." class="flex-1 text-xs bg-gray-900 border border-gray-700 rounded-xl px-3 py-2 text-gray-200">
+            <button onclick="addTask()" class="text-xs px-4 py-2 bg-cyan-600 text-white rounded-xl font-bold">إضافة</button>
           </div>
         </div>
       </div>
@@ -370,10 +396,9 @@
 const CONFIG = {
   get TELEGRAM_BOT_TOKEN() { return localStorage.getItem("tg_token") || ""; },
   get TELEGRAM_CHAT_ID() { return localStorage.getItem("tg_chat") || ""; },
-  STORAGE_KEY: "hunter_ultimate_v4",
-  OLD_STORAGE_KEY: "hunter_system_data_v2",
-  RANKS: ["E-Rank", "D-Rank", "C-Rank", "B-Rank", "A-Rank", "S-Rank"],
-  OFF_DAYS: [4, 5]
+  STORAGE_KEY: "hunter_ultimate_v5",
+  OLD_STORAGE_KEY: "hunter_ultimate_v4",
+  RANKS: ["E-Rank", "D-Rank", "C-Rank", "B-Rank", "A-Rank", "S-Rank"]
 };
 
 // ================= STATE =================
@@ -421,7 +446,7 @@ let state = {
   activeRoutine: "day1",
   history: {},
   questHistory: {},
-  recoveryStart: getTodayKey(),
+  recoveryStart: getFormattedDate(new Date()),
   recoveryPenaltyDays: 0,
   routines: {
     day1: [
@@ -452,7 +477,7 @@ function loadData() {
   }
   checkDayTransition();
   recalculateStreakAndLevel();
-  calculateRecoveryDays();
+  calculateRecoveryTime();
   renderAll();
   applyHomeCustom();
   applyHomeOrder();
@@ -461,7 +486,7 @@ function loadData() {
 function saveData() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state)); }
 
 function renderAll() {
-  renderWorkouts(); renderAzkar(); renderDuas(); renderTasks(); drawWheel(); calculateRecoveryDays(); renderBadges();
+  renderWorkouts(); renderAzkar(); renderDuas(); renderTasks(); drawWheel(); calculateRecoveryTime(); renderBadges();
   if (typeof renderToday === 'function') renderToday();
 }
 
@@ -491,7 +516,7 @@ function showView(view) {
   if (view === 'home' && typeof renderToday === 'function') renderToday();
   if (view === 'recovery') { renderAzkar(); renderDuas(); }
   if (view === 'workouts') renderWorkouts();
-  if (view === 'recoveryCounterView') renderBadges();
+  if (view === 'recoveryCounterView') calculateRecoveryTime();
 }
 
 function openDayTrackerFromHome() {
@@ -499,7 +524,7 @@ function openDayTrackerFromHome() {
   if (typeof setMainTab === 'function') setMainTab('day');
 }
 
-// ================= نظام الأوسمة والدروع والكؤوس والشهادات =================
+// ================= الأوسمة ودورة الـ 90 يوم =================
 const badgesData = {
   badges: [
     { title: "وسام الأمل", days: 3, icon: "🔑", desc: "بداية الانطلاقة الحقيقية" },
@@ -543,23 +568,80 @@ function badgeTab(tab) {
     const btn = document.getElementById('btab-' + t);
     if (!btn) return;
     const active = t === tab;
-    btn.className = `py-2 rounded-lg text-xs font-bold transition border ${active ? 'bg-emerald-500 text-black border-emerald-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
+    btn.className = `py-2.5 rounded-xl text-xs font-bold transition border ${active ? 'bg-orange-500 text-black border-orange-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
   });
   renderBadges();
 }
 
-function getRecoveryDaysCount() {
-  if (!state.recoveryStart) state.recoveryStart = getTodayKey();
-  const diff = new Date() - new Date(state.recoveryStart);
-  const days = Math.floor(diff / 86400000) - (state.recoveryPenaltyDays || 0);
-  return days < 0 ? 0 : days;
+function getRecoveryTotalHours() {
+  if (!state.recoveryStart) state.recoveryStart = getFormattedDate(new Date());
+  const start = new Date(state.recoveryStart + 'T00:00:00');
+  const now = new Date();
+  const diffMs = now - start;
+  const totalHours = Math.max(0, diffMs / 3600000) - ((state.recoveryPenaltyDays || 0) * 24);
+  return Math.max(0, totalHours);
+}
+
+function calculateRecoveryTime() {
+  if (!state.recoveryStart) state.recoveryStart = getFormattedDate(new Date());
+  const inputEl = document.getElementById("recovery-start-input");
+  if (inputEl) inputEl.value = state.recoveryStart;
+
+  const totalH = getRecoveryTotalHours();
+  const totalDays = Math.floor(totalH / 24);
+  const hours = Math.floor(totalH % 24);
+  const mins = Math.floor(((totalH * 60) % 60));
+  const secs = Math.floor(((totalH * 3600) % 60));
+
+  const numEl = document.getElementById("rc-days-num");
+  if (numEl) numEl.innerText = totalDays;
+
+  const hEl = document.getElementById("rc-hours");
+  const mEl = document.getElementById("rc-mins");
+  const sEl = document.getElementById("rc-secs");
+  if (hEl) hEl.innerText = String(hours).padStart(2, '0');
+  if (mEl) mEl.innerText = String(mins).padStart(2, '0');
+  if (sEl) sEl.innerText = String(secs).padStart(2, '0');
+
+  // حساب دورة الـ 90 يوم والتلوين التدريجي
+  const cycleDay = (totalDays % 90) || (totalDays > 0 && totalDays % 90 === 0 ? 90 : 0);
+  const cycleNum = Math.floor(totalDays / 90) + 1;
+  const cycleText = document.getElementById("rc-cycle-text");
+  if (cycleText) cycleText.innerText = `الدورة ${cycleNum} (اليوم ${cycleDay} من 90)`;
+
+  const circle = document.getElementById("progress-ring-circle");
+  if (circle) {
+    const circumference = 264; // 2 * PI * 42
+    const progress = Math.min(1, cycleDay / 90);
+    const offset = circumference - (progress * circumference);
+    circle.style.strokeDashoffset = offset;
+  }
+}
+
+function updateRecoveryStart() {
+  const inputEl = document.getElementById("recovery-start-input");
+  if (inputEl) {
+    state.recoveryStart = inputEl.value;
+    state.recoveryPenaltyDays = 0;
+    saveData();
+    calculateRecoveryTime();
+    renderBadges();
+  }
+}
+
+function reportRecoverySlip() {
+  if (confirm("الزلة مش نهاية المطاف، كمل بكل قوتك! نخصم يوم؟")) {
+    state.recoveryPenaltyDays = (state.recoveryPenaltyDays || 0) + 1;
+    saveData();
+    calculateRecoveryTime();
+    renderBadges();
+  }
 }
 
 function renderBadges() {
   const container = document.getElementById('badges-content');
-  const countEl = document.getElementById('badge-total-days');
-  const curDays = getRecoveryDaysCount();
-  if (countEl) countEl.innerText = curDays;
+  const totalH = getRecoveryTotalHours();
+  const curDays = Math.floor(totalH / 24);
   if (!container) return;
 
   container.innerHTML = '';
@@ -568,12 +650,12 @@ function renderBadges() {
   list.forEach(item => {
     const unlocked = curDays >= item.days;
     const card = document.createElement('div');
-    card.className = `p-3 rounded-xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
+    card.className = `p-3.5 rounded-2xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-orange-500/60 shadow-[0_0_10px_rgba(249,115,22,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
     card.innerHTML = `
-      <div class="text-3xl mb-1 p-2 rounded-full ${unlocked ? 'bg-emerald-950/80 border border-emerald-500/50' : 'bg-gray-800'}">${item.icon}</div>
-      <h3 class="text-xs font-bold ${unlocked ? 'text-emerald-300' : 'text-gray-400'}">${item.title}</h3>
+      <div class="text-3xl mb-1.5 p-2 rounded-2xl ${unlocked ? 'bg-orange-950/80 border border-orange-500/50' : 'bg-gray-800'}">${item.icon}</div>
+      <h3 class="text-xs font-bold ${unlocked ? 'text-orange-300' : 'text-gray-400'}">${item.title}</h3>
       <p class="text-[10px] text-gray-400 mt-0.5">${item.desc}</p>
-      <div class="mt-2 text-[10px] px-2 py-0.5 rounded border font-mono ${unlocked ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
+      <div class="mt-2.5 text-[10px] px-2.5 py-0.5 rounded-xl border font-mono ${unlocked ? 'bg-orange-950 text-orange-300 border-orange-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
         ${unlocked ? '✔ تم الفتح' : `متبقي ${item.days - curDays} يوم`}
       </div>
     `;
@@ -589,9 +671,7 @@ function toggleHomeOrderMode() {
   if (isHomeEditing) toggleHomeEditMode();
   isHomeOrdering = !isHomeOrdering;
   const btn = document.getElementById('home-order-btn');
-  btn.innerText = isHomeOrdering ? '✔ تم الترتيب' : '↕ ترتيب';
-  btn.className = isHomeOrdering ? 'text-[10px] bg-cyan-950 border border-cyan-400 text-cyan-300 px-2 py-1 rounded font-bold' : 'text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded';
-
+  btn.innerText = isHomeOrdering ? '✔ تم' : '↕ ترتيب';
   document.querySelectorAll('#home-buttons-container [data-home-key]').forEach(card => {
     const arrows = card.querySelector('.order-arrows');
     if (arrows) arrows.classList.toggle('hidden', !isHomeOrdering);
@@ -602,9 +682,7 @@ function toggleHomeEditMode() {
   if (isHomeOrdering) toggleHomeOrderMode();
   isHomeEditing = !isHomeEditing;
   const btn = document.getElementById('home-edit-btn');
-  btn.innerText = isHomeEditing ? '✔ تم الحفظ' : '⚙️ تعديل الأسماء';
-  btn.className = isHomeEditing ? 'text-[10px] bg-cyan-950 border border-cyan-400 text-cyan-300 px-2 py-1 rounded font-bold' : 'text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded';
-
+  btn.innerText = isHomeEditing ? '✔ تم' : '⚙️ تعديل';
   document.querySelectorAll('#home-buttons-container [data-home-key]').forEach(card => {
     const editBtn = card.querySelector('.edit-btn');
     if (editBtn) editBtn.classList.toggle('hidden', !isHomeEditing);
@@ -616,7 +694,6 @@ function moveHomeItem(key, dir) {
   const idx = state.homeOrder.indexOf(key);
   const targetIdx = idx + dir;
   if (targetIdx < 0 || targetIdx >= state.homeOrder.length) return;
-  
   [state.homeOrder[idx], state.homeOrder[targetIdx]] = [state.homeOrder[targetIdx], state.homeOrder[idx]];
   saveData();
   applyHomeOrder();
@@ -646,11 +723,7 @@ function editHomeItem(key) {
   const newDesc = prompt("أدخل الوصف الجديد:", current.desc || defaultDesc);
   if (newDesc === null) return;
 
-  state.homeCustom[key] = {
-    icon: newIcon.trim(),
-    title: newTitle.trim(),
-    desc: newDesc.trim()
-  };
+  state.homeCustom[key] = { icon: newIcon.trim(), title: newTitle.trim(), desc: newDesc.trim() };
   saveData();
   applyHomeCustom();
 }
@@ -670,36 +743,12 @@ function applyHomeCustom() {
   });
 }
 
-// تبويبات ركن التعافي
 function recTab(name) {
   ['adhkar', 'beliefs', 'duaa', 'journal'].forEach(n => {
     document.getElementById('pane-' + n).classList.toggle('hidden', n !== name);
-    document.getElementById('rtab-' + n).className = 'py-2 rounded-lg border text-[11px] font-bold transition ' +
+    document.getElementById('rtab-' + n).className = 'py-2.5 rounded-xl border text-[11px] font-bold transition ' +
       (n === name ? 'bg-emerald-950 border-emerald-400 text-emerald-300' : 'bg-gray-900 border-gray-800 text-gray-400');
   });
-}
-
-// ================= RECOVERY =================
-function calculateRecoveryDays() {
-  if (!state.recoveryStart) state.recoveryStart = getTodayKey();
-  document.getElementById("recovery-start-input").value = state.recoveryStart;
-  const days = getRecoveryDaysCount();
-  document.getElementById("recovery-days-count").innerText = days;
-}
-function updateRecoveryStart() {
-  state.recoveryStart = document.getElementById("recovery-start-input").value;
-  state.recoveryPenaltyDays = 0;
-  saveData();
-  calculateRecoveryDays();
-  renderBadges();
-}
-function reportRecoverySlip() {
-  if (confirm("الزلة مش نهاية المطاف، كمل بكل قوتك! نخصم يوم؟")) {
-    state.recoveryPenaltyDays = (state.recoveryPenaltyDays || 0) + 1;
-    saveData();
-    calculateRecoveryDays();
-    renderBadges();
-  }
 }
 
 // ================= WORKOUTS =================
@@ -707,8 +756,7 @@ function calculateWeeklyAverage(questId) {
   let totalReps = 0, daysDone = 0;
   const today = new Date();
   for (let i = 0; i < 7; i++) {
-    const d = new Date();
-    d.setDate(today.getDate() - i);
+    const d = new Date(); d.setDate(today.getDate() - i);
     const key = getFormattedDate(d);
     const reps = state.questHistory && state.questHistory[key] ? state.questHistory[key][questId] : 0;
     if (reps > 0) { totalReps += reps; daysDone++; }
@@ -748,14 +796,11 @@ function recalculateStreakAndLevel() {
 }
 
 function isTodayRest() { return state.history[getTodayKey()] === 'rest'; }
-
 function toggleTodayRest() {
   const k = getTodayKey();
   if (state.history[k] === 'rest') delete state.history[k];
   else { state.history[k] = 'rest'; state.penaltyActive = false; }
-  recalculateStreakAndLevel();
-  saveData();
-  renderWorkouts();
+  recalculateStreakAndLevel(); saveData(); renderWorkouts();
 }
 
 function switchRoutine(r) { state.activeRoutine = r; saveData(); renderWorkouts(); }
@@ -767,14 +812,7 @@ function fmtHMS(s) {
 function workoutElapsed() { return state.workoutTimer ? (Date.now() - state.workoutTimer.start) / 1000 : 0; }
 
 function toggleWorkoutTimer(e) { if (state.workoutTimer) stopWorkout(e); else startWorkout(e); }
-
-function startWorkout(e) {
-  state.workoutTimer = { start: Date.now() };
-  fx(e, '▶ يلا!');
-  saveData();
-  renderWorkoutTimer();
-}
-
+function startWorkout(e) { state.workoutTimer = { start: Date.now() }; fx(e, '▶ يلا!'); saveData(); renderWorkoutTimer(); }
 function stopWorkout(e, silent) {
   if (!state.workoutTimer) return 0;
   const sec = Math.round(workoutElapsed());
@@ -783,9 +821,7 @@ function stopWorkout(e, silent) {
   state.workoutTimes[k] = (state.workoutTimes[k] || 0) + sec;
   state.workoutTimer = null;
   if (!silent) fx(e, '⏱ ' + fmtHMS(sec));
-  saveData();
-  renderWorkoutTimer();
-  return sec;
+  saveData(); renderWorkoutTimer(); return sec;
 }
 
 function renderWorkoutTimer() {
@@ -803,12 +839,12 @@ function renderWorkoutTimer() {
     if (v) vals.push(v);
   }
   const avg = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length / 60) : 0;
-  info.innerText = `إجمالي اليوم: ${fmtHMS(todayTotal)} • متوسط آخر 7 أيام: ${avg} دقيقة`;
+  info.innerText = `إجمالي اليوم: ${fmtHMS(todayTotal)} • متوسط 7 أيام: ${avg} دقيقة`;
   if (running) {
-    btn.className = "px-4 py-2 rounded-lg text-xs font-bold bg-red-600 hover:bg-red-500 text-white animate-pulse";
+    btn.className = "px-4 py-2.5 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-500 text-white animate-pulse";
     btn.innerText = "⏹ إنهاء التمرين";
   } else {
-    btn.className = "px-4 py-2 rounded-lg text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white";
+    btn.className = "px-4 py-2.5 rounded-xl text-xs font-bold bg-orange-600 hover:bg-orange-500 text-white";
     btn.innerText = "▶ ابدأ التمرين";
   }
 }
@@ -826,21 +862,20 @@ function setsHTML(q, dis) {
     <div class="${cols} text-xs">
       <span class="text-gray-400 text-center">${i + 1}</span>
       <span class="text-gray-500 text-center">${prev[i] != null ? prev[i] + ' reps' : '—'}</span>
-      <input type="number" inputmode="numeric" min="0" value="${s.reps}" ${dis} onchange="setReps(${q.id}, ${i}, this.value)" class="w-full text-center bg-gray-800 border border-gray-700 rounded py-1 text-gray-100 disabled:opacity-40">
-      <button onclick="toggleSet(${q.id}, ${i}, event)" ${dis} class="py-1 rounded transition ${s.done ? 'bg-cyan-500 text-black font-bold' : 'bg-gray-800 text-gray-400 border border-gray-700'} disabled:opacity-40">✔</button>
+      <input type="number" inputmode="numeric" min="0" value="${s.reps}" ${dis} onchange="setReps(${q.id}, ${i}, this.value)" class="w-full text-center bg-gray-800 border border-gray-700 rounded-xl py-1 text-gray-100 disabled:opacity-40">
+      <button onclick="toggleSet(${q.id}, ${i}, event)" ${dis} class="py-1 rounded-xl transition ${s.done ? 'bg-cyan-500 text-black font-bold' : 'bg-gray-800 text-gray-400 border border-gray-700'} disabled:opacity-40">✔</button>
       <button onclick="delSet(${q.id}, ${i})" ${dis} class="text-gray-600 hover:text-red-400 text-xs disabled:opacity-40">✕</button>
     </div>`).join('');
   return `
-    <div class="mt-2 pt-2 border-t border-gray-800/80 space-y-1.5">
-      <div class="${cols} text-[10px] text-gray-500 text-center"><span>SET</span><span>PREVIOUS</span><span>REPS</span><span>✔</span><span></span></div>
+    <div class="mt-2.5 pt-2.5 border-t border-gray-800 space-y-2">
+      <div class="${cols} text-[10px] text-gray-500 text-center"><span>SET</span><span>PREV</span><span>REPS</span><span>✔</span><span></span></div>
       ${rows}
-      <button onclick="addSet(${q.id})" ${dis} class="w-full text-xs text-cyan-400 py-1 disabled:opacity-40">+ ADD SET</button>
+      <button onclick="addSet(${q.id})" ${dis} class="w-full text-xs text-cyan-400 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 disabled:opacity-40">+ ADD SET</button>
     </div>`;
 }
 
 function addSet(id) {
-  const q = findQuest(id);
-  if (!q) return;
+  const q = findQuest(id); if (!q) return;
   if (!q.sets) q.sets = [];
   const prev = (state.lastSets && state.lastSets[id]) || [];
   const i = q.sets.length;
@@ -850,32 +885,26 @@ function addSet(id) {
 }
 
 function setReps(id, i, v) {
-  const q = findQuest(id);
-  if (!q || !q.sets || !q.sets[i]) return;
+  const q = findQuest(id); if (!q || !q.sets || !q.sets[i]) return;
   const s = q.sets[i];
   const n = Math.max(0, parseInt(v, 10) || 0);
   if (s.done) q.current = Math.max(0, q.current + n - s.reps);
-  s.reps = n;
-  saveData(); renderWorkouts();
+  s.reps = n; saveData(); renderWorkouts();
 }
 
 function toggleSet(id, i, e) {
   if (state.penaltyActive || isTodayRest()) return;
-  const q = findQuest(id);
-  if (!q || !q.sets || !q.sets[i]) return;
-  const s = q.sets[i];
-  s.done = !s.done;
+  const q = findQuest(id); if (!q || !q.sets || !q.sets[i]) return;
+  const s = q.sets[i]; s.done = !s.done;
   if (s.done) { fx(e, '💪 +' + s.reps); q.current += s.reps; }
   else q.current = Math.max(0, q.current - s.reps);
   saveData(); renderWorkouts();
 }
 
 function delSet(id, i) {
-  const q = findQuest(id);
-  if (!q || !q.sets || !q.sets[i]) return;
+  const q = findQuest(id); if (!q || !q.sets || !q.sets[i]) return;
   if (q.sets[i].done) q.current = Math.max(0, q.current - q.sets[i].reps);
-  q.sets.splice(i, 1);
-  saveData(); renderWorkouts();
+  q.sets.splice(i, 1); saveData(); renderWorkouts();
 }
 
 function renderWorkouts() {
@@ -897,16 +926,16 @@ function renderWorkouts() {
   const restBtn = document.getElementById("rest-toggle-btn");
   if (restActive) {
     restBanner.classList.remove("hidden");
-    restBtn.className = "px-2.5 py-1 bg-green-950 border border-green-400 text-green-300 rounded font-semibold text-xs";
+    restBtn.className = "px-3 py-1.5 bg-green-950 border border-green-400 text-green-300 rounded-xl font-semibold text-xs";
     restBtn.innerText = "🌿 Rest Active";
   } else {
     restBanner.classList.add("hidden");
-    restBtn.className = "px-2.5 py-1 bg-gray-900 border border-green-700 hover:border-green-400 text-green-400 rounded transition font-semibold text-xs";
+    restBtn.className = "px-3 py-1.5 bg-gray-900 border border-green-700 text-green-400 rounded-xl font-semibold text-xs";
     restBtn.innerText = "🌿 Rest Day";
   }
 
-  const on = "px-3 py-1.5 rounded-lg text-xs font-bold border border-cyan-400 bg-cyan-950 text-cyan-400";
-  const off = "px-3 py-1.5 rounded-lg text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400";
+  const on = "px-3.5 py-2 rounded-xl text-xs font-bold border border-cyan-400 bg-cyan-950 text-cyan-400";
+  const off = "px-3.5 py-2 rounded-xl text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400";
   document.getElementById("tab-day1").className = state.activeRoutine === 'day1' ? on : off;
   document.getElementById("tab-day2").className = state.activeRoutine === 'day1' ? off : on;
 
@@ -915,8 +944,7 @@ function renderWorkouts() {
   if (state.penaltyActive && !restActive) penaltyEl.classList.remove("hidden");
   else penaltyEl.classList.add("hidden");
 
-  renderCalendar();
-  renderWorkoutTimer();
+  renderCalendar(); renderWorkoutTimer();
 
   const listEl = document.getElementById("quest-list");
   listEl.innerHTML = "";
@@ -929,32 +957,32 @@ function renderWorkouts() {
     const pct = Math.min(100, Math.floor((q.current / q.target) * 100));
     const wa = calculateWeeklyAverage(q.id);
     const card = document.createElement("div");
-    card.className = `card-bg p-3 rounded-lg border transition ${pct >= 100 ? "border-cyan-500/70" : "border-gray-800"}`;
+    card.className = `card-bg p-4 rounded-2xl border transition ${pct >= 100 ? "border-cyan-500/70" : "border-gray-800"}`;
     card.innerHTML = `
-      <div class="flex justify-between items-center mb-1">
-        <div class="flex items-center gap-1.5">
+      <div class="flex justify-between items-center mb-1.5">
+        <div class="flex items-center gap-2">
           <span class="font-bold text-xs text-gray-200">${q.name}</span>
           <button onclick="editQuestName(${q.id})" class="text-[10px] text-gray-400 hover:text-cyan-400">✏️</button>
         </div>
-        <div class="flex items-center gap-1">
-          <button onclick="moveQuest(${index}, -1)" class="text-xs px-1 bg-gray-800 text-gray-400 rounded">▲</button>
-          <button onclick="moveQuest(${index}, 1)" class="text-xs px-1 bg-gray-800 text-gray-400 rounded">▼</button>
+        <div class="flex items-center gap-1.5">
+          <button onclick="moveQuest(${index}, -1)" class="text-xs px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded-lg">▲</button>
+          <button onclick="moveQuest(${index}, 1)" class="text-xs px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded-lg">▼</button>
           <button onclick="deleteQuest(${q.id})" class="text-xs text-gray-500 hover:text-red-400 px-1">✕</button>
         </div>
       </div>
-      <div class="flex justify-between items-center text-xs text-gray-400 mb-1">
+      <div class="flex justify-between items-center text-xs text-gray-400 mb-1.5">
         <span>Progress: ${q.current} / <strong onclick="editTarget(${q.id})" class="text-cyan-400 underline cursor-pointer">${q.target}</strong></span>
         <span class="text-cyan-400 font-semibold">${pct}%</span>
       </div>
-      <div class="text-[10px] text-gray-400 mb-1.5 flex justify-between">
-        <span class="text-cyan-300 font-mono">📈 متوسط أسبوعي: <strong>${wa.avg}</strong> عَدّة (في ${wa.days} أيام)</span>
+      <div class="text-[10px] text-gray-400 mb-2 flex justify-between">
+        <span class="text-cyan-300 font-mono">📈 متوسط أسبوعي: <strong>${wa.avg}</strong> (في ${wa.days} أيام)</span>
       </div>
-      <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-2">
-        <div class="bg-cyan-400 h-1.5 transition-all duration-200" style="width: ${pct}%"></div>
+      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-2.5">
+        <div class="bg-cyan-400 h-2 transition-all duration-200" style="width: ${pct}%"></div>
       </div>
-      <div class="flex justify-end gap-1.5 text-xs">
-        <button onclick="updateQuest(${q.id}, -1)" ${dis} class="px-2 py-0.5 bg-gray-800 rounded hover:bg-gray-700 text-gray-300 disabled:opacity-30">-1</button>
-        <button onclick="updateQuest(${q.id}, 1)" ${dis} class="px-2.5 py-0.5 bg-gray-800 rounded hover:bg-cyan-900 text-cyan-400 disabled:opacity-30">+1</button>
+      <div class="flex justify-end gap-2 text-xs">
+        <button onclick="updateQuest(${q.id}, -1)" ${dis} class="px-3 py-1 bg-gray-800 rounded-xl hover:bg-gray-700 text-gray-300 disabled:opacity-30">-1</button>
+        <button onclick="updateQuest(${q.id}, 1)" ${dis} class="px-3.5 py-1 bg-gray-800 rounded-xl hover:bg-cyan-900 text-cyan-400 disabled:opacity-30">+1</button>
       </div>
       ${setsHTML(q, dis)}
     `;
@@ -963,16 +991,16 @@ function renderWorkouts() {
 
   const btn = document.getElementById("complete-day-btn");
   if (restActive) {
-    btn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-green-500 bg-green-950/40 text-green-400 cursor-not-allowed";
+    btn.className = "w-full py-4 rounded-2xl font-bold text-xs uppercase border border-green-500 bg-green-950/40 text-green-400 cursor-not-allowed";
     btn.innerText = "🌿 REST DAY ACTIVE (PROTECTED)";
   } else if (doneToday) {
-    btn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-cyan-700 bg-cyan-950/40 text-cyan-400 cursor-not-allowed opacity-80";
+    btn.className = "w-full py-4 rounded-2xl font-bold text-xs uppercase border border-cyan-700 bg-cyan-950/40 text-cyan-400 cursor-not-allowed opacity-80";
     btn.innerText = "✅ TODAY ALREADY COMPLETED";
   } else if (state.penaltyActive) {
-    btn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-red-900 bg-red-950/30 text-red-400 cursor-not-allowed";
+    btn.className = "w-full py-4 rounded-2xl font-bold text-xs uppercase border border-red-900 bg-red-950/30 text-red-400 cursor-not-allowed";
     btn.innerText = "LOCKED (PENALTY ACTIVE)";
   } else {
-    btn.className = "w-full py-3.5 rounded-lg font-bold text-xs uppercase border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition shadow-[0_0_12px_rgba(0,229,255,0.3)] cursor-pointer";
+    btn.className = "w-full py-4 rounded-2xl font-bold text-xs uppercase border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition shadow cursor-pointer";
     btn.innerText = "COMPLETE DAY";
   }
 }
@@ -997,8 +1025,8 @@ function renderCalendar() {
     if (status === 'rest') { borderClass = "border-green-600/70 bg-green-950/40 text-green-400"; icon = "🌿"; }
     else if (status === 'completed' || status === true) { borderClass = "border-cyan-500 bg-cyan-950/50 text-cyan-400"; icon = "✔"; }
     if (key === getTodayKey()) borderClass += " ring-1 ring-cyan-400";
-    box.className = `p-1.5 rounded cursor-pointer border transition flex flex-col items-center justify-center ${borderClass}`;
-    box.innerHTML = `<span class="text-[10px] font-bold">${day}</span><span class="text-[9px]">${icon}</span>`;
+    box.className = `p-2 rounded-xl cursor-pointer border transition flex flex-col items-center justify-center ${borderClass}`;
+    box.innerHTML = `<span class="text-[10px] font-bold">${day}</span><span class="text-[9px] mt-0.5">${icon}</span>`;
     calEl.appendChild(box);
   }
 }
@@ -1007,35 +1035,25 @@ function toggleDayStatus(k) {
   if (!state.history[k]) state.history[k] = 'completed';
   else if (state.history[k] === 'completed' || state.history[k] === true) state.history[k] = 'rest';
   else delete state.history[k];
-  recalculateStreakAndLevel();
-  saveData();
-  renderWorkouts();
+  recalculateStreakAndLevel(); saveData(); renderWorkouts();
 }
 
 function findQuest(id) { return state.routines[state.activeRoutine].find(x => x.id === id); }
-
 function updateQuest(id, amt) {
   if (state.penaltyActive || isTodayRest()) return;
-  const q = findQuest(id);
-  if (!q) return;
-  q.current = Math.max(0, q.current + amt);
-  saveData(); renderWorkouts();
+  const q = findQuest(id); if (!q) return;
+  q.current = Math.max(0, q.current + amt); saveData(); renderWorkouts();
 }
-
 function editTarget(id) {
-  const q = findQuest(id);
-  if (!q) return;
+  const q = findQuest(id); if (!q) return;
   const t = prompt("Target:", q.target);
   if (t && parseInt(t) > 0) { q.target = parseInt(t); saveData(); renderWorkouts(); }
 }
-
 function editQuestName(id) {
-  const q = findQuest(id);
-  if (!q) return;
+  const q = findQuest(id); if (!q) return;
   const n = prompt("Quest Name:", q.name);
   if (n && n.trim()) { q.name = n.trim(); saveData(); renderWorkouts(); }
 }
-
 function moveQuest(index, dir) {
   const list = state.routines[state.activeRoutine];
   const t = index + dir;
@@ -1043,7 +1061,6 @@ function moveQuest(index, dir) {
   [list[index], list[t]] = [list[t], list[index]];
   saveData(); renderWorkouts();
 }
-
 function openAddQuestModal() {
   const n = prompt(`Enter Quest Name for ${state.activeRoutine.toUpperCase()}:`);
   if (!n) return;
@@ -1051,14 +1068,12 @@ function openAddQuestModal() {
   state.routines[state.activeRoutine].push({ id: Date.now(), name: n.trim(), current: 0, target: t, sets: [] });
   saveData(); renderWorkouts();
 }
-
 function deleteQuest(id) {
   if (confirm("Delete this quest?")) {
     state.routines[state.activeRoutine] = state.routines[state.activeRoutine].filter(x => x.id !== id);
     saveData(); renderWorkouts();
   }
 }
-
 function completeDay(e) {
   const todayKey = getTodayKey();
   if (state.history[todayKey] === 'completed') { alert("You already completed your quests for today!"); return; }
@@ -1079,8 +1094,7 @@ function completeDay(e) {
 
   state.history[todayKey] = 'completed';
   const prevLevel = state.level;
-  recalculateStreakAndLevel();
-  saveData(); renderWorkouts();
+  recalculateStreakAndLevel(); saveData(); renderWorkouts();
 
   const wt = (state.workoutTimes && state.workoutTimes[todayKey]) || 0;
   const timeMsg = wt ? `\n⏱ مدة التمرين: ${fmtHMS(wt)}` : '';
@@ -1108,18 +1122,18 @@ function renderAzkar() {
   state.azkar.forEach((item, index) => {
     const isDone = item.current <= 0;
     const div = document.createElement("div");
-    div.className = `card-bg p-3 rounded-xl border transition ${isDone ? 'border-emerald-500/70 bg-emerald-950/20' : 'border-gray-800'}`;
+    div.className = `card-bg p-4 rounded-2xl border transition ${isDone ? 'border-emerald-500/70 bg-emerald-950/25' : 'border-gray-800'}`;
     div.innerHTML = `
-      <div class="text-xs text-gray-200 leading-relaxed mb-2">${item.text}</div>
-      <div class="flex justify-between items-center pt-2 border-t border-gray-800/80">
-        <button onclick="decrementZekr(${index})" class="px-3 py-1 rounded text-xs font-bold transition ${isDone ? 'bg-emerald-500 text-black' : 'bg-emerald-950 border border-emerald-500/60 text-emerald-400'}">
+      <div class="text-xs text-gray-200 leading-relaxed mb-3">${item.text}</div>
+      <div class="flex justify-between items-center pt-2.5 border-t border-gray-800">
+        <button onclick="decrementZekr(${index})" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${isDone ? 'bg-emerald-500 text-black' : 'bg-emerald-950 border border-emerald-500/60 text-emerald-400'}">
           ${isDone ? 'تم الاكتفاء ✔️' : `متبقي: ${item.current} /${item.total}`}
         </button>
-        <div class="flex items-center gap-1">
-          <button onclick="moveZekr(${index}, -1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-          <button onclick="moveZekr(${index}, 1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-          <button onclick="editZekr(${index})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-          <button onclick="deleteZekr(${index})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+        <div class="flex items-center gap-1.5">
+          <button onclick="moveZekr(${index}, -1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▲</button>
+          <button onclick="moveZekr(${index}, 1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▼</button>
+          <button onclick="editZekr(${index})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-xl text-xs">✏️</button>
+          <button onclick="deleteZekr(${index})" class="px-2 py-1 bg-gray-800 text-red-400 rounded-xl text-xs">✕</button>
         </div>
       </div>
     `;
@@ -1167,18 +1181,18 @@ function renderDuas() {
   container.innerHTML = "";
   state.duas.forEach((d, index) => {
     const div = document.createElement("div");
-    div.className = `card-bg p-3 rounded-xl border transition ${d.done ? 'border-blue-500/80 bg-blue-950/20' : 'border-gray-800'}`;
+    div.className = `card-bg p-4 rounded-2xl border transition ${d.done ? 'border-blue-500/80 bg-blue-950/25' : 'border-gray-800'}`;
     div.innerHTML = `
-      <div class="text-xs text-blue-100 leading-relaxed mb-2">${d.text}</div>
-      <div class="flex justify-between items-center pt-2 border-t border-gray-800/80">
-        <button onclick="toggleDuaCheck(${index})" class="px-3 py-1 rounded text-xs font-bold transition ${d.done ? 'bg-blue-500 text-black' : 'bg-gray-800 text-blue-300 border border-blue-500/40'}">
+      <div class="text-xs text-blue-100 leading-relaxed mb-3">${d.text}</div>
+      <div class="flex justify-between items-center pt-2.5 border-t border-gray-800">
+        <button onclick="toggleDuaCheck(${index})" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${d.done ? 'bg-blue-500 text-black' : 'bg-gray-800 text-blue-300 border border-blue-500/40'}">
           ${d.done ? '✔ تم الدعاء' : 'وضع علامة صح ✔'}
         </button>
-        <div class="flex items-center gap-1">
-          <button onclick="moveDua(${index}, -1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-          <button onclick="moveDua(${index}, 1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-          <button onclick="editDua(${index})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-          <button onclick="deleteDua(${index})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+        <div class="flex items-center gap-1.5">
+          <button onclick="moveDua(${index}, -1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▲</button>
+          <button onclick="moveDua(${index}, 1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▼</button>
+          <button onclick="editDua(${index})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-xl text-xs">✏️</button>
+          <button onclick="deleteDua(${index})" class="px-2 py-1 bg-gray-800 text-red-400 rounded-xl text-xs">✕</button>
         </div>
       </div>
     `;
@@ -1229,8 +1243,7 @@ function drawWheel() {
     ctx.moveTo(250, 250);
     ctx.arc(250, 250, 240, start, start + seg);
     ctx.fillStyle = wheelColors[i % wheelColors.length];
-    ctx.fill();
-    ctx.stroke();
+    ctx.fill(); ctx.stroke();
 
     ctx.save();
     ctx.translate(250, 250);
@@ -1246,10 +1259,7 @@ function drawWheel() {
   ctx.beginPath();
   ctx.arc(250, 250, 25, 0, 2 * Math.PI);
   ctx.fillStyle = "#0f172a";
-  ctx.fill();
-  ctx.strokeStyle = "#fff";
-  ctx.lineWidth = 3;
-  ctx.stroke();
+  ctx.fill(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.stroke();
 }
 
 function spinWheel() {
@@ -1293,12 +1303,12 @@ function renderTasks() {
   list.innerHTML = "";
   state.wheelPlans.forEach((task, idx) => {
     const div = document.createElement("div");
-    div.className = "flex justify-between items-center bg-gray-900 border border-gray-800 p-2 rounded text-xs";
+    div.className = "flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl text-xs";
     div.innerHTML = `
       <span class="text-gray-200">${task}</span>
-      <div class="flex gap-1">
-        <button onclick="editTask(${idx})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded">✏️</button>
-        <button onclick="removeTask(${idx})" class="px-1.5 py-0.5 bg-red-950 text-red-400 rounded">✕</button>
+      <div class="flex gap-1.5">
+        <button onclick="editTask(${idx})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-lg">✏️</button>
+        <button onclick="removeTask(${idx})" class="px-2 py-1 bg-red-950 text-red-400 rounded-lg">✕</button>
       </div>
     `;
     list.appendChild(div);
@@ -1315,8 +1325,7 @@ function editTask(idx) {
 }
 function removeTask(idx) {
   if (state.wheelPlans.length <= 2) { alert("يجب بقاء خيارين على الأقل في العجلة!"); return; }
-  state.wheelPlans.splice(idx, 1);
-  saveData(); renderTasks(); drawWheel();
+  state.wheelPlans.splice(idx, 1); saveData(); renderTasks(); drawWheel();
 }
 
 // ================= TELEGRAM =================
@@ -1368,13 +1377,13 @@ async function toggleRecord() {
         await sendAudioToTelegram(blob, mime);
         status.innerText = "جاهز للتسجيل";
         btn.innerText = "بدء التسجيل ⏺";
-        btn.className = "px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition";
+        btn.className = "px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition";
       };
 
       mediaRecorder.start();
       isRecording = true;
       btn.innerText = "⏹ إيقاف وإرسال";
-      btn.className = "px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition animate-pulse";
+      btn.className = "px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition animate-pulse";
       status.innerText = "جارِ تسجيل صوتك...";
     } catch (err) {
       alert("يرجى منح إذن المايكروفون من إعدادات المتصفح أو تطبيق الموبايل.");
@@ -1456,11 +1465,12 @@ function importData(e) {
 // ================= TIMER + START =================
 function updateTimer() {
   const now = new Date();
-  const midnight = new Date(now);
-  midnight.setHours(24, 0, 0, 0);
+  const midnight = new Date(now); midnight.setHours(24, 0, 0, 0);
   const diff = midnight - now;
   checkDayTransition();
   if (typeof tickWorkoutTimer === 'function') tickWorkoutTimer();
+  if (typeof calculateRecoveryTime === 'function') calculateRecoveryTime();
+
   const h = String(Math.floor((diff / 3600000) % 24)).padStart(2, '0');
   const m = String(Math.floor((diff / 60000) % 60)).padStart(2, '0');
   const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
@@ -1491,13 +1501,13 @@ loadData();
   const old = document.getElementById('beliefsBox'); if (old) old.remove();
   const box = document.createElement('div');
   box.id = 'beliefsBox';
-  box.className = 'card-bg p-3 rounded-xl border border-indigo-500/40 space-y-2';
+  box.className = 'card-bg p-4 rounded-2xl border border-indigo-500/40 space-y-2.5';
   box.innerHTML = `
     <div class="flex justify-between items-center">
       <h2 class="text-sm font-bold text-indigo-300">🧠 معتقداتي</h2>
-      <button onclick="blAdd()" class="text-[10px] bg-indigo-950 border border-indigo-500 px-2 py-1 rounded text-indigo-300 font-bold">+ معتقد جديد</button>
+      <button onclick="blAdd()" class="text-[10px] bg-indigo-950 border border-indigo-500 px-3 py-1.5 rounded-xl text-indigo-300 font-bold">+ معتقد جديد</button>
     </div>
-    <div id="beliefsList" class="space-y-1.5"></div>`;
+    <div id="beliefsList" class="space-y-2"></div>`;
   document.getElementById('pane-beliefs').appendChild(box);
 
   function render() {
@@ -1505,14 +1515,14 @@ loadData();
     list.innerHTML = '';
     state.beliefs.forEach((b, i) => {
       const row = document.createElement('div');
-      row.className = 'flex justify-between items-center gap-2 bg-gray-900/60 border border-gray-800 rounded-lg p-2';
+      row.className = 'flex justify-between items-center gap-2 bg-gray-900/60 border border-gray-800 rounded-xl p-3';
       row.innerHTML = `
         <span class="text-xs text-indigo-100 leading-relaxed flex-1">${esc(b.text)}</span>
-        <div class="flex items-center gap-1 shrink-0">
-          <button onclick="blMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-          <button onclick="blMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-          <button onclick="blEdit(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-          <button onclick="blDel(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+        <div class="flex items-center gap-1.5 shrink-0">
+          <button onclick="blMove(${i},-1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▲</button>
+          <button onclick="blMove(${i},1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▼</button>
+          <button onclick="blEdit(${b.id})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-xl text-xs">✏️</button>
+          <button onclick="blDel(${b.id})" class="px-2 py-1 bg-gray-800 text-red-400 rounded-xl text-xs">✕</button>
         </div>`;
       list.appendChild(row);
     });
@@ -1546,11 +1556,11 @@ function renderToday() {
   const k = getTodayKey();
   const now = new Date();
   const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  const bar = (p, c) => `<div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden mt-1.5"><div class="${c} h-1" style="width:${Math.max(0, Math.min(100, p))}%"></div></div>`;
+  const bar = (p, c) => `<div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-2"><div class="${c} h-1.5" style="width:${Math.max(0, Math.min(100, p))}%"></div></div>`;
   const tile = (label, value, pct, done, go, color) => `
-    <button onclick="${go}" class="rounded-lg border p-2 text-right transition ${done ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-gray-800 bg-gray-900/40'}">
+    <button onclick="${go}" class="rounded-xl border p-2.5 text-right transition ${done ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-gray-800 bg-gray-900/40'}">
       <div class="text-[10px] text-gray-400">${label}</div>
-      <div class="text-sm font-bold ${done ? 'text-emerald-300' : 'text-gray-100'}">${value}</div>
+      <div class="text-sm font-bold ${done ? 'text-emerald-300' : 'text-gray-100'} mt-0.5">${value}</div>
       ${bar(pct, done ? 'bg-emerald-400' : color)}
     </button>`;
 
@@ -1581,14 +1591,13 @@ function renderToday() {
       <span class="text-[10px] text-gray-400">${DAYS[now.getDay()]} ${now.getDate()}</span>
     </div>
     <div class="grid grid-cols-2 gap-2">${workoutTile}${azTile}${duTile}</div>
-    <div class="text-[10px] text-gray-400">🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
+    <div class="text-[10px] text-gray-400 pt-1">🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
 }
 
 renderToday();
 
 // ================= النسخ الاحتياطي على تليجرام =================
 let backupBusy = false;
-
 function renderBackupStatus() {
   const el = document.getElementById('backup-status');
   if (!el) return;
@@ -1599,7 +1608,7 @@ function renderBackupStatus() {
 async function backupToTelegram(manual, e) {
   if (backupBusy) return false;
   if (!(CONFIG.TELEGRAM_BOT_TOKEN && CONFIG.TELEGRAM_CHAT_ID)) {
-    if (manual) alert('اضغط ⚙️ إعداد تليجرام (ركن التعافي ← اليوميات) وحط التوكن والـ chat id الأول.');
+    if (manual) alert('اضغط ⚙️ إعداد تليجرام في ركن اليوميات الأول.');
     return false;
   }
   backupBusy = true;
