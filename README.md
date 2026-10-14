@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -163,45 +163,55 @@
       </div>
     </section>
 
-    <!-- واجهة شكل المقاومة -->
+    <!-- واجهة شكل المقاومة (عداد التعافي) -->
     <section id="view-recoveryCounterView" class="hidden space-y-4">
-      <div class="card-bg p-5 rounded-2xl border border-orange-500/40 space-y-4 text-center relative shadow-lg">
+      <div class="p-4 rounded-3xl space-y-3 text-center" style="background:#edf6f6;color:#0b2530">
 
         <div class="flex justify-between items-center">
-          <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-2.5 py-1.5 rounded-xl hover:bg-red-950 transition">سجلت زلة (-1)</button>
-          <div class="text-left bg-black/40 px-3 py-1.5 rounded-xl border border-gray-800">
-            <span class="text-[9px] text-gray-400 block">البداية</span>
-            <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-transparent text-orange-400 font-bold outline-none cursor-pointer">
+          <div class="flex items-center gap-2 rounded-2xl px-3 py-2" style="background:#f3f4f6">
+            <div class="text-right">
+              <span class="text-[10px] block" style="color:#6b7280">البداية</span>
+              <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-transparent font-bold outline-none cursor-pointer" style="color:#0b2530">
+            </div>
+            <div id="rc-mini-fist"></div>
+          </div>
+          <div class="rounded-2xl px-3 py-1.5 text-center" style="background:#fff">
+            <div class="text-lg leading-none">🔥</div>
+            <div id="rc-slips" class="text-sm font-bold">0</div>
           </div>
         </div>
 
-        <div class="py-2 flex flex-col items-center justify-center">
-          <div class="w-32 h-32 rounded-3xl bg-orange-950/40 border border-orange-500/50 flex items-center justify-center text-6xl shadow-[0_0_20px_rgba(249,115,22,0.25)] relative">
-            ✊🔥
-          </div>
+        <svg viewBox="0 0 200 200" class="mx-auto" style="width:230px;height:230px">
+          <defs>
+            <clipPath id="rc-clip"><rect id="rc-plant-clip" x="0" y="200" width="200" height="0"/></clipPath>
+            <g id="rc-plant">
+              <path d="M100 150 L100 105 L106 105 L106 150Z"/>
+              <path d="M103 100 C78 72 88 30 132 4 C144 42 132 82 103 100Z"/>
+              <path d="M100 108 C74 102 54 90 38 68 C70 68 92 80 100 108Z"/>
+              <path d="M106 118 C120 96 146 90 168 92 C152 116 130 124 106 118Z"/>
+              <path d="M22 196 C30 168 60 158 100 150 C130 152 142 166 150 172 C168 168 180 182 184 196Z"/>
+            </g>
+          </defs>
+          <use href="#rc-plant" fill="#c4ebee"/>
+          <g clip-path="url(#rc-clip)"><use href="#rc-plant" fill="#1dc4cf"/></g>
+        </svg>
+
+        <div class="flex items-center gap-3">
+          <div class="flex-1 h-0.5" style="background:#bfe6ea"></div>
+          <span class="text-sm font-bold" style="color:#1dc4cf">يوم</span>
+          <div class="flex-1 h-0.5" style="background:#bfe6ea"></div>
         </div>
 
-        <div class="space-y-1">
-          <div class="text-[11px] text-gray-400">يوم</div>
-          <div class="text-4xl font-extrabold text-orange-400 font-mono tracking-wider" id="rc-days-fraction">0/90</div>
-          <div class="text-[10px] text-orange-300 font-mono" id="rc-cycle-text">الدورة 1</div>
+        <div class="text-6xl font-extrabold font-mono" style="color:#1dc4cf" id="rc-days-fraction">0/90</div>
+        <div class="text-[11px]" style="color:#4b7a82" id="rc-cycle-text">الدورة 1</div>
+
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="rounded-2xl py-3" style="background:#dcf0f2"><div class="text-2xl font-bold" id="rc-hours">00</div><div class="text-xs" style="color:#4b7a82">ساعة</div></div>
+          <div class="rounded-2xl py-3" style="background:#dcf0f2"><div class="text-2xl font-bold" id="rc-mins">00</div><div class="text-xs" style="color:#4b7a82">دقيقة</div></div>
+          <div class="rounded-2xl py-3" style="background:#dcf0f2"><div class="text-2xl font-bold" id="rc-secs">00</div><div class="text-xs" style="color:#4b7a82">ثانية</div></div>
         </div>
 
-        <div class="grid grid-cols-3 gap-2.5 pt-2">
-          <div class="bg-black/50 p-3 rounded-2xl border border-gray-800 text-center font-mono">
-            <div class="text-lg font-bold text-orange-300" id="rc-hours">00</div>
-            <div class="text-[10px] text-gray-400">ساعة</div>
-          </div>
-          <div class="bg-black/50 p-3 rounded-2xl border border-gray-800 text-center font-mono">
-            <div class="text-lg font-bold text-orange-300" id="rc-mins">00</div>
-            <div class="text-[10px] text-gray-400">دقيقة</div>
-          </div>
-          <div class="bg-black/50 p-3 rounded-2xl border border-gray-800 text-center font-mono">
-            <div class="text-lg font-bold text-orange-300" id="rc-secs">00</div>
-            <div class="text-[10px] text-gray-400">ثانية</div>
-          </div>
-        </div>
-
+        <button onclick="reportRecoverySlip()" class="w-full py-3.5 rounded-full text-sm font-bold text-white" style="background:#1dc4cf">سجلت زلة (-1 يوم)</button>
       </div>
 
       <div class="grid grid-cols-4 gap-1.5">
@@ -597,6 +607,43 @@ function getRecoveryTotalHours() {
   return Math.max(0, totalHours);
 }
 
+// ===== ألوان وأيقونة القبضة حسب الأيام =====
+const RC_STAGES = [
+  { d: 0, c: '#9ca3af' }, { d: 3, c: '#eab308' }, { d: 7, c: '#f97316' },
+  { d: 14, c: '#ef4444' }, { d: 30, c: '#a855f7' }, { d: 60, c: '#3b82f6' },
+  { d: 90, c: '#14b8a6' }, { d: 180, c: '#facc15' }
+];
+function rcStageColor(days) {
+  let c = RC_STAGES[0].c;
+  RC_STAGES.forEach(s => { if (days >= s.d) c = s.c; });
+  return c;
+}
+function fistSVG(c, s) {
+  return `<svg width="${s}" height="${Math.round(s * 1.2)}" viewBox="0 0 100 120">
+    <path d="M50 4 C56 26 86 36 86 72 C86 97 70 114 50 114 C30 114 14 97 14 72 C14 50 30 40 35 22 C40 30 46 28 50 4Z" fill="${c}"/>
+    <g fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round">
+      <rect x="32" y="52" width="36" height="32" rx="6"/>
+      <rect x="32" y="42" width="9" height="16" rx="4.5"/>
+      <rect x="41" y="40" width="9" height="18" rx="4.5"/>
+      <rect x="50" y="40" width="9" height="18" rx="4.5"/>
+      <rect x="59" y="42" width="9" height="16" rx="4.5"/>
+      <rect x="36" y="84" width="28" height="18" rx="2"/>
+    </g></svg>`;
+}
+let rcFistKey = '';
+function renderFists(color) {
+  if (rcFistKey === color) return;
+  rcFistKey = color;
+  const mini = document.getElementById('rc-mini-fist');
+  if (mini) mini.innerHTML = fistSVG(color, 30);
+  const home = document.querySelector('[data-home-key="recoveryCounter"] .hb-icon');
+  if (home) {
+    home.innerHTML = fistSVG(color, 34);
+    home.style.borderColor = color;
+    home.style.boxShadow = `0 0 12px ${color}55`;
+  }
+}
+
 function calculateRecoveryTime() {
   if (!state.recoveryStart) state.recoveryStart = getFormattedDate(new Date());
   const inputEl = document.getElementById("recovery-start-input");
@@ -612,19 +659,23 @@ function calculateRecoveryTime() {
 
   const cycleDay = (totalDays % 90) || (totalDays > 0 ? 90 : 0);
   const cycleNum = totalDays > 0 ? Math.floor((totalDays - 1) / 90) + 1 : 1;
+  const frac = (totalH % 24) / 24;
+  const pct = cycleDay === 90 ? 1 : Math.min(1, (cycleDay + frac) / 90);
 
-  const fracEl = document.getElementById("rc-days-fraction");
-  if (fracEl) fracEl.innerText = `${cycleDay}/90`;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
+  set("rc-days-fraction", `${cycleDay}/90`);
+  set("rc-cycle-text", `الدورة ${cycleNum} (إجمالي الأيام: ${totalDays})`);
+  set("rc-hours", String(hours).padStart(2, '0'));
+  set("rc-mins", String(mins).padStart(2, '0'));
+  set("rc-secs", String(secs).padStart(2, '0'));
+  set("rc-slips", state.recoveryPenaltyDays || 0);
 
-  const cycleText = document.getElementById("rc-cycle-text");
-  if (cycleText) cycleText.innerText = `الدورة ${cycleNum} (إجمالي الأيام: ${totalDays})`;
-
-  const hEl = document.getElementById("rc-hours");
-  const mEl = document.getElementById("rc-mins");
-  const sEl = document.getElementById("rc-secs");
-  if (hEl) hEl.innerText = String(hours).padStart(2, '0');
-  if (mEl) mEl.innerText = String(mins).padStart(2, '0');
-  if (sEl) sEl.innerText = String(secs).padStart(2, '0');
+  const clip = document.getElementById('rc-plant-clip');
+  if (clip) {
+    clip.setAttribute('y', String(200 - 200 * pct));
+    clip.setAttribute('height', String(200 * pct));
+  }
+  renderFists(rcStageColor(totalDays));
 }
 
 function updateRecoveryStart() {
@@ -746,7 +797,7 @@ function applyHomeCustom() {
     const iconEl = card.querySelector('.hb-icon');
     const titleEl = card.querySelector('.hb-title');
     const descEl = card.querySelector('.hb-desc');
-    if (iconEl && c.icon) iconEl.innerText = c.icon;
+    if (iconEl && c.icon && key !== 'recoveryCounter') iconEl.innerText = c.icon;
     if (titleEl && c.title) titleEl.innerText = c.title;
     if (descEl && c.desc) descEl.innerText = c.desc;
   });
