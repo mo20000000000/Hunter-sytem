@@ -53,6 +53,17 @@
           <span class="text-cyan-400 text-sm">◀</span>
         </button>
 
+        <button onclick="openDayTrackerFromHome()" class="p-4 rounded-xl card-bg border border-sky-500/40 hover:border-sky-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl p-2 rounded-lg bg-sky-950/60 border border-sky-500/50">📅</span>
+            <div>
+              <h3 class="text-sm font-bold text-sky-400">تراكينج اليوم (نوم ومياه)</h3>
+              <p class="text-xs text-gray-400">تسجيل ساعات النوم والاستيقاظ وعداد الماء اليومي</p>
+            </div>
+          </div>
+          <span class="text-sky-400 text-sm">◀</span>
+        </button>
+
         <div class="p-4 rounded-xl card-bg border border-emerald-500/40 flex justify-between items-center">
           <div>
             <h3 class="text-sm font-bold text-emerald-400">🛡️ عداد التعافي والصمود</h3>
@@ -398,7 +409,7 @@ function showToast(text) {
 
 // ===== التنقل =====
 function showView(view) {
-  ['home', 'workouts', 'recovery', 'wheel'].forEach(v => {
+  ['home', 'workouts', 'recovery', 'wheel', 'habits'].forEach(v => {
     const el = document.getElementById(`view-${v}`);
     if (el) el.classList.add('hidden');
   });
@@ -408,6 +419,11 @@ function showView(view) {
   if (view === 'home' && typeof renderToday === 'function') renderToday();
   if (view === 'recovery') { renderAzkar(); renderDuas(); }
   if (view === 'workouts') renderWorkouts();
+}
+
+function openDayTrackerFromHome() {
+  showView('habits');
+  if (typeof setMainTab === 'function') setMainTab('day');
 }
 
 // تبويبات ركن التعافي
@@ -1328,7 +1344,6 @@ loadData();
       document.getElementById('view-home').classList.add('hidden');
       document.getElementById('view-habits').classList.remove('hidden');
       selDay = getTodayKey();
-      mainTab = 'habits';
       viewY = new Date().getFullYear(); viewM = new Date().getMonth();
       render();
     } else _showView(v);
@@ -1644,7 +1659,7 @@ loadData();
 // ================= HOME ORDER =================
 (function () {
   const grid = document.querySelector('#view-home .grid');
-  const base = ['workouts', 'recovery', 'wheel'];
+  const base = ['workouts', 'dayTracker', 'recovery', 'wheel'];
   if (state.homeOrder) {
     let placed = false;
     state.homeOrder = state.homeOrder.reduce((a, k) => {
