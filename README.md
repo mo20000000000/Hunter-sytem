@@ -87,22 +87,22 @@
           </div>
         </div>
 
-        <!-- عداد التعافي والمقاومة -->
-        <div data-home-key="recoveryCounter" class="p-4 rounded-2xl card-bg border border-orange-500/40 hover:border-orange-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01] shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
+        <!-- عداد التعافي (شكل المقاومة) -->
+        <div data-home-key="recoveryCounter" class="p-4 rounded-2xl card-bg border border-amber-500/40 hover:border-amber-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01] shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
           <div class="flex items-center gap-3.5">
-            <span class="text-2xl p-2.5 rounded-xl bg-orange-950/60 border border-orange-500/50 hb-icon">🔥</span>
+            <div class="w-12 h-12 rounded-xl bg-amber-950/60 border border-amber-500/50 flex items-center justify-center text-2xl hb-icon">✊🔥</div>
             <div>
-              <h3 class="text-sm font-bold text-orange-400 hb-title">عداد المقاومة والتعافي</h3>
+              <h3 class="text-sm font-bold text-amber-400 hb-title">شكل المقاومة (عداد التعافي)</h3>
               <p class="text-xs text-gray-400 hb-desc">دورة الـ 90 يوم، الأوسمة، والدروع والأيام</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <div class="order-arrows hidden flex gap-1" onclick="event.stopPropagation()">
-              <button class="px-2 py-1 bg-gray-800 border border-orange-400 text-orange-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', -1)">▲</button>
-              <button class="px-2 py-1 bg-gray-800 border border-orange-400 text-orange-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', 1)">▼</button>
+              <button class="px-2 py-1 bg-gray-800 border border-amber-400 text-amber-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-amber-400 text-amber-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', 1)">▼</button>
             </div>
-            <button class="edit-btn hidden text-[10px] bg-orange-950 border border-orange-400 text-orange-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
-            <span class="text-orange-400 text-sm arrow-icon">◀</span>
+            <button class="edit-btn hidden text-[10px] bg-amber-950 border border-amber-400 text-amber-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
+            <span class="text-amber-400 text-sm arrow-icon">◀</span>
           </div>
         </div>
 
@@ -160,55 +160,58 @@
       </div>
     </section>
 
-    <!-- ركن عداد المقاومة وتلوين الـ 90 يوم -->
+    <!-- ركن عداد شكل المقاومة وتلوين الـ 90 يوم -->
     <section id="view-recoveryCounterView" class="hidden space-y-4">
-      <div class="card-bg p-5 rounded-2xl border border-orange-500/40 space-y-4 text-center relative shadow-lg">
+      <div class="card-bg p-5 rounded-2xl border border-amber-500/40 space-y-4 text-center relative shadow-lg">
         <div class="flex justify-between items-center">
-          <div class="text-right">
-            <h2 class="text-sm font-bold text-orange-400">🔥 شكل المقاومة (دورة الـ 90 يوم)</h2>
-            <p class="text-[11px] text-gray-400">كل 90 يوم تبدأ دورة تلوين وبناء جديدة</p>
+          <div class="flex items-center gap-2">
+            <span class="text-xl">✊🔥</span>
+            <div class="text-right">
+              <h2 class="text-sm font-bold text-amber-400">شكل المقاومة (دورة الـ 90 يوم)</h2>
+              <p class="text-[11px] text-gray-400">كل 90 يوم تبدأ دورة تلوين وبناء جديدة</p>
+            </div>
           </div>
           <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-2.5 py-1.5 rounded-xl hover:bg-red-950 transition">سجلت زلة (-1)</button>
         </div>
 
         <!-- عداد الدائرة ودورة الـ 90 يوم -->
-        <div class="relative w-48 h-48 mx-auto flex flex-col items-center justify-center">
+        <div class="relative w-52 h-52 mx-auto flex flex-col items-center justify-center">
           <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="42" stroke="#1e293b" stroke-width="8" fill="transparent"></circle>
-            <circle id="progress-ring-circle" cx="50" cy="50" r="42" stroke="#ea580c" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" fill="transparent" class="transition-all duration-500"></circle>
+            <circle id="progress-ring-circle" cx="50" cy="50" r="42" stroke="#f59e0b" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" fill="transparent" class="transition-all duration-500"></circle>
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <span class="text-3xl font-extrabold text-orange-400 font-mono" id="rc-days-num">0</span>
+            <span class="text-3xl font-extrabold text-amber-400 font-mono" id="rc-days-num">0</span>
             <span class="text-xs text-gray-300 font-bold">يوم مقاومة</span>
-            <span class="text-[10px] text-orange-300 font-mono mt-0.5" id="rc-cycle-text">الدورة 1 (من 90)</span>
+            <span class="text-[10px] text-amber-300 font-mono mt-0.5" id="rc-cycle-text">الدورة 1 (من 90)</span>
           </div>
         </div>
 
-        <!-- الساعات والدقايق والثواني -->
-        <div class="grid grid-cols-3 gap-2 bg-black/40 p-3 rounded-xl border border-gray-800 text-center font-mono">
+        <!-- الساعات والدقايق والثواني بالتفصيل -->
+        <div class="grid grid-cols-3 gap-2 bg-black/50 p-3.5 rounded-2xl border border-gray-800 text-center font-mono">
           <div>
-            <div class="text-base font-bold text-orange-300" id="rc-hours">00</div>
-            <div class="text-[9px] text-gray-400">ساعة</div>
+            <div class="text-lg font-bold text-amber-300" id="rc-hours">00</div>
+            <div class="text-[10px] text-gray-400">ساعة</div>
           </div>
           <div>
-            <div class="text-base font-bold text-orange-300" id="rc-mins">00</div>
-            <div class="text-[9px] text-gray-400">دقيقة</div>
+            <div class="text-lg font-bold text-amber-300" id="rc-mins">00</div>
+            <div class="text-[10px] text-gray-400">دقيقة</div>
           </div>
           <div>
-            <div class="text-base font-bold text-orange-300" id="rc-secs">00</div>
-            <div class="text-[9px] text-gray-400">ثانية</div>
+            <div class="text-lg font-bold text-amber-300" id="rc-secs">00</div>
+            <div class="text-[10px] text-gray-400">ثانية</div>
           </div>
         </div>
 
         <div class="flex items-center justify-center gap-2 pt-1">
           <label class="text-xs text-gray-400">تاريخ البداية:</label>
-          <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded-xl px-2.5 py-1 text-gray-200">
+          <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded-xl px-3 py-1.5 text-gray-200">
         </div>
       </div>
 
       <!-- تبويبات الأوسمة والدروع -->
       <div class="grid grid-cols-4 gap-1.5">
-        <button id="btab-badges" onclick="badgeTab('badges')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-orange-500 text-black border-orange-400">الأوسمة</button>
+        <button id="btab-badges" onclick="badgeTab('badges')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-amber-500 text-black border-amber-400">الأوسمة</button>
         <button id="btab-shields" onclick="badgeTab('shields')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الدروع</button>
         <button id="btab-cups" onclick="badgeTab('cups')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الكؤوس</button>
         <button id="btab-certs" onclick="badgeTab('certs')" class="py-2.5 rounded-xl text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الشهادات</button>
@@ -396,8 +399,8 @@
 const CONFIG = {
   get TELEGRAM_BOT_TOKEN() { return localStorage.getItem("tg_token") || ""; },
   get TELEGRAM_CHAT_ID() { return localStorage.getItem("tg_chat") || ""; },
-  STORAGE_KEY: "hunter_ultimate_v5",
-  OLD_STORAGE_KEY: "hunter_ultimate_v4",
+  STORAGE_KEY: "hunter_ultimate_v6",
+  OLD_STORAGE_KEY: "hunter_ultimate_v5",
   RANKS: ["E-Rank", "D-Rank", "C-Rank", "B-Rank", "A-Rank", "S-Rank"]
 };
 
@@ -568,7 +571,7 @@ function badgeTab(tab) {
     const btn = document.getElementById('btab-' + t);
     if (!btn) return;
     const active = t === tab;
-    btn.className = `py-2.5 rounded-xl text-xs font-bold transition border ${active ? 'bg-orange-500 text-black border-orange-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
+    btn.className = `py-2.5 rounded-xl text-xs font-bold transition border ${active ? 'bg-amber-500 text-black border-amber-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
   });
   renderBadges();
 }
@@ -650,12 +653,12 @@ function renderBadges() {
   list.forEach(item => {
     const unlocked = curDays >= item.days;
     const card = document.createElement('div');
-    card.className = `p-3.5 rounded-2xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-orange-500/60 shadow-[0_0_10px_rgba(249,115,22,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
+    card.className = `p-3.5 rounded-2xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
     card.innerHTML = `
-      <div class="text-3xl mb-1.5 p-2 rounded-2xl ${unlocked ? 'bg-orange-950/80 border border-orange-500/50' : 'bg-gray-800'}">${item.icon}</div>
-      <h3 class="text-xs font-bold ${unlocked ? 'text-orange-300' : 'text-gray-400'}">${item.title}</h3>
+      <div class="text-3xl mb-1.5 p-2 rounded-2xl ${unlocked ? 'bg-amber-950/80 border border-amber-500/50' : 'bg-gray-800'}">${item.icon}</div>
+      <h3 class="text-xs font-bold ${unlocked ? 'text-amber-300' : 'text-gray-400'}">${item.title}</h3>
       <p class="text-[10px] text-gray-400 mt-0.5">${item.desc}</p>
-      <div class="mt-2.5 text-[10px] px-2.5 py-0.5 rounded-xl border font-mono ${unlocked ? 'bg-orange-950 text-orange-300 border-orange-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
+      <div class="mt-2.5 text-[10px] px-2.5 py-0.5 rounded-xl border font-mono ${unlocked ? 'bg-amber-950 text-amber-300 border-amber-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
         ${unlocked ? '✔ تم الفتح' : `متبقي ${item.days - curDays} يوم`}
       </div>
     `;
