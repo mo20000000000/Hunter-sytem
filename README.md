@@ -87,27 +87,28 @@
           </div>
         </div>
 
-        <!-- عداد التعافي والأوسمة -->
-        <div data-home-key="recoveryCounter" class="p-4 rounded-xl card-bg border border-emerald-500/40 flex justify-between items-center relative">
+        <!-- عداد التعافي والصمود -->
+        <div data-home-key="recoveryCounter" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01]" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
           <div>
             <h3 class="text-sm font-bold text-emerald-400 hb-title">🛡️ عداد التعافي والأوسمة</h3>
-            <div class="flex items-center gap-2 mt-1">
+            <div class="flex items-center gap-2 mt-1" onclick="event.stopPropagation()">
               <label class="text-[11px] text-gray-400">البداية:</label>
               <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded px-1.5 py-0.5 text-gray-200">
             </div>
           </div>
           <div class="text-center flex items-center gap-3">
             <div>
-              <div class="text-2xl font-bold text-emerald-400 font-mono cursor-pointer underline" onclick="showView('badges')" title="اضغط لعرض الأوسمة والدروش والكؤوس">
+              <div class="text-2xl font-bold text-emerald-400 font-mono">
                 <span id="recovery-days-count">0</span> <span class="text-xs text-emerald-300">يوم 🏆</span>
               </div>
-              <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-1.5 py-0.5 rounded mt-0.5 hover:bg-red-950">سجلت زلة (-1)</button>
+              <button onclick="event.stopPropagation(); reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-1.5 py-0.5 rounded mt-0.5 hover:bg-red-950">سجلت زلة (-1)</button>
             </div>
-            <div class="order-arrows hidden flex gap-1">
-              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('recoveryCounter', -1)">▲</button>
-              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('recoveryCounter', 1)">▼</button>
+            <div class="order-arrows hidden flex gap-1" onclick="event.stopPropagation()">
+              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="moveHomeItem('recoveryCounter', 1)">▼</button>
             </div>
             <button class="edit-btn hidden text-[10px] bg-emerald-950 border border-emerald-400 text-emerald-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
+            <span class="text-emerald-400 text-sm arrow-icon">◀</span>
           </div>
         </div>
 
@@ -116,7 +117,7 @@
           <div class="flex items-center gap-3">
             <span class="text-2xl p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50 hb-icon">🌱</span>
             <div>
-              <h3 class="text-sm font-bold text-emerald-400 hb-title">ركن التعافي</h3>
+              <h3 class="text-sm font-bold text-emerald-400 hb-title">ركن التعافي (أذكار ويوميات)</h3>
               <p class="text-xs text-gray-400 hb-desc">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
             </div>
           </div>
@@ -166,20 +167,20 @@
       </div>
     </section>
 
-    <!-- قسم الأوسمة والدروع والكؤوس والشهادات -->
-    <section id="view-badges" class="hidden space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
+    <!-- ركن عداد التعافي والأوسمة والدروع -->
+    <section id="view-recoveryCounterView" class="hidden space-y-3">
+      <div class="card-bg p-3 rounded-xl border border-emerald-500/40 flex justify-between items-center">
         <div>
-          <h2 class="text-sm font-bold text-amber-400">🏆 أوسمة ودروع الإنجازات</h2>
-          <p class="text-[11px] text-gray-400">تفتح تلقائياً حسب عدد أيام تعافيك الصافية</p>
+          <h2 class="text-sm font-bold text-emerald-400">🛡️ ركن عداد التعافي والأوسمة</h2>
+          <p class="text-[11px] text-gray-400">تابع أيام صمودك وافتح أوسمتك ودروعك</p>
         </div>
-        <div class="text-center bg-amber-950/60 border border-amber-500 px-3 py-1 rounded-lg">
-          <span class="text-[10px] text-amber-300 block">رصيد الأيام</span>
-          <span id="badge-total-days" class="text-base font-bold text-amber-400 font-mono">0</span>
+        <div class="text-center bg-emerald-950/60 border border-emerald-500 px-3 py-1 rounded-lg">
+          <span class="text-[10px] text-emerald-300 block">إجمالي الصمود</span>
+          <span id="badge-total-days" class="text-base font-bold text-emerald-400 font-mono">0</span>
         </div>
       </div>
 
-      <!-- تبويبات الأوسمة -->
+      <!-- تبويبات الأوسمة والدروع -->
       <div class="grid grid-cols-4 gap-1">
         <button id="btab-badges" onclick="badgeTab('badges')" class="py-2 rounded-lg text-xs font-bold transition border bg-amber-500 text-black border-amber-400">الأوسمة</button>
         <button id="btab-shields" onclick="badgeTab('shields')" class="py-2 rounded-lg text-xs font-bold transition border bg-gray-900 text-gray-300 border-gray-800">الدروع</button>
@@ -480,7 +481,7 @@ function fx(e, text) {
 
 // ================= التنقل =================
 function showView(view) {
-  ['home', 'workouts', 'recovery', 'wheel', 'habits', 'badges'].forEach(v => {
+  ['home', 'workouts', 'recovery', 'wheel', 'habits', 'recoveryCounterView'].forEach(v => {
     const el = document.getElementById(`view-${v}`);
     if (el) el.classList.add('hidden');
   });
@@ -490,7 +491,7 @@ function showView(view) {
   if (view === 'home' && typeof renderToday === 'function') renderToday();
   if (view === 'recovery') { renderAzkar(); renderDuas(); }
   if (view === 'workouts') renderWorkouts();
-  if (view === 'badges') renderBadges();
+  if (view === 'recoveryCounterView') renderBadges();
 }
 
 function openDayTrackerFromHome() {
@@ -498,7 +499,7 @@ function openDayTrackerFromHome() {
   if (typeof setMainTab === 'function') setMainTab('day');
 }
 
-// ================= النظام الجديد: الأوسمة والدروع والكؤوس والشهادات =================
+// ================= نظام الأوسمة والدروع والكؤوس والشهادات =================
 const badgesData = {
   badges: [
     { title: "وسام الأمل", days: 3, icon: "🔑", desc: "بداية الانطلاقة الحقيقية" },
@@ -542,7 +543,7 @@ function badgeTab(tab) {
     const btn = document.getElementById('btab-' + t);
     if (!btn) return;
     const active = t === tab;
-    btn.className = `py-2 rounded-lg text-xs font-bold transition border ${active ? 'bg-amber-500 text-black border-amber-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
+    btn.className = `py-2 rounded-lg text-xs font-bold transition border ${active ? 'bg-emerald-500 text-black border-emerald-400' : 'bg-gray-900 text-gray-300 border-gray-800'}`;
   });
   renderBadges();
 }
@@ -567,12 +568,12 @@ function renderBadges() {
   list.forEach(item => {
     const unlocked = curDays >= item.days;
     const card = document.createElement('div');
-    card.className = `p-3 rounded-xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-amber-500/60 shadow-[0_0_10px_rgba(245,158,11,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
+    card.className = `p-3 rounded-xl border flex flex-col items-center text-center transition ${unlocked ? 'card-bg border-emerald-500/60 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-gray-900/30 border-gray-800 opacity-50 grayscale'}`;
     card.innerHTML = `
-      <div class="text-3xl mb-1 p-2 rounded-full ${unlocked ? 'bg-amber-950/80 border border-amber-500/50' : 'bg-gray-800'}">${item.icon}</div>
-      <h3 class="text-xs font-bold ${unlocked ? 'text-amber-300' : 'text-gray-400'}">${item.title}</h3>
+      <div class="text-3xl mb-1 p-2 rounded-full ${unlocked ? 'bg-emerald-950/80 border border-emerald-500/50' : 'bg-gray-800'}">${item.icon}</div>
+      <h3 class="text-xs font-bold ${unlocked ? 'text-emerald-300' : 'text-gray-400'}">${item.title}</h3>
       <p class="text-[10px] text-gray-400 mt-0.5">${item.desc}</p>
-      <div class="mt-2 text-[10px] px-2 py-0.5 rounded border font-mono ${unlocked ? 'bg-amber-950 text-amber-300 border-amber-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
+      <div class="mt-2 text-[10px] px-2 py-0.5 rounded border font-mono ${unlocked ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40' : 'bg-gray-800 text-gray-500 border-gray-700'}">
         ${unlocked ? '✔ تم الفتح' : `متبقي ${item.days - curDays} يوم`}
       </div>
     `;
