@@ -36,69 +36,117 @@
   <main class="w-full max-w-md">
 
     <section id="view-home" class="space-y-3">
-      <div class="card-bg p-4 rounded-xl border border-gray-800 text-center">
+      <div class="card-bg p-4 rounded-xl border border-gray-800 text-center relative">
+        <div class="absolute top-2 left-2 flex gap-1.5">
+          <button onclick="toggleHomeOrderMode()" id="home-order-btn" class="text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded">↕ ترتيب</button>
+          <button onclick="toggleHomeEditMode()" id="home-edit-btn" class="text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded">⚙️ تعديل الأسماء</button>
+        </div>
         <h2 class="text-base font-bold text-gray-100 mb-1">لوحة قيادة البطل ⚔️</h2>
         <p class="text-xs text-gray-400">اختر البوابة المطلوبة لمواصلة التطوير والتعافي:</p>
       </div>
       <div id="today-card" class="card-bg p-3 rounded-xl border border-cyan-500/40 space-y-2"></div>
-      <div class="grid grid-cols-1 gap-2.5">
-        <button onclick="showView('workouts')" class="p-4 rounded-xl card-bg border border-cyan-500/40 hover:border-cyan-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
+      
+      <!-- قائمة الأزرار الرئيسية في الرئيسية -->
+      <div id="home-buttons-container" class="grid grid-cols-1 gap-2.5">
+        
+        <!-- زر التمارين -->
+        <div data-home-key="workouts" class="p-4 rounded-xl card-bg border border-cyan-500/40 hover:border-cyan-400 text-right flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) showView('workouts')">
           <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/50">⚔️</span>
+            <span class="text-2xl p-2 rounded-lg bg-cyan-950/60 border border-cyan-500/50 hb-icon">⚔️</span>
             <div>
-              <h3 class="text-sm font-bold text-cyan-400">نظام تمارين Hunter</h3>
-              <p class="text-xs text-gray-400">Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي</p>
+              <h3 class="text-sm font-bold text-cyan-400 hb-title">نظام تمارين Hunter</h3>
+              <p class="text-xs text-gray-400 hb-desc">Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي</p>
             </div>
           </div>
-          <span class="text-cyan-400 text-sm">◀</span>
-        </button>
+          <div class="flex items-center gap-2">
+            <div class="order-arrows hidden flex gap-1">
+              <button class="px-2 py-1 bg-gray-800 border border-cyan-400 text-cyan-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('workouts', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-cyan-400 text-cyan-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('workouts', 1)">▼</button>
+            </div>
+            <button class="edit-btn hidden text-[10px] bg-cyan-950 border border-cyan-400 text-cyan-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('workouts')">تعديل</button>
+            <span class="text-cyan-400 text-sm arrow-icon">◀</span>
+          </div>
+        </div>
 
-        <button onclick="openDayTrackerFromHome()" class="p-4 rounded-xl card-bg border border-sky-500/40 hover:border-sky-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
+        <!-- زر تراكينج اليوم -->
+        <div data-home-key="dayTracker" class="p-4 rounded-xl card-bg border border-sky-500/40 hover:border-sky-400 text-right flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) openDayTrackerFromHome()">
           <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-sky-950/60 border border-sky-500/50">📅</span>
+            <span class="text-2xl p-2 rounded-lg bg-sky-950/60 border border-sky-500/50 hb-icon">📅</span>
             <div>
-              <h3 class="text-sm font-bold text-sky-400">تراكينج اليوم (نوم ومياه)</h3>
-              <p class="text-xs text-gray-400">تسجيل ساعات النوم والاستيقاظ وعداد الماء اليومي</p>
+              <h3 class="text-sm font-bold text-sky-400 hb-title">تراكينج اليوم (نوم ومياه)</h3>
+              <p class="text-xs text-gray-400 hb-desc">تسجيل ساعات النوم والاستيقاظ وعداد الماء اليومي</p>
             </div>
           </div>
-          <span class="text-sky-400 text-sm">◀</span>
-        </button>
+          <div class="flex items-center gap-2">
+            <div class="order-arrows hidden flex gap-1">
+              <button class="px-2 py-1 bg-gray-800 border border-sky-400 text-sky-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('dayTracker', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-sky-400 text-sky-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('dayTracker', 1)">▼</button>
+            </div>
+            <button class="edit-btn hidden text-[10px] bg-sky-950 border border-sky-400 text-sky-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('dayTracker')">تعديل</button>
+            <span class="text-sky-400 text-sm arrow-icon">◀</span>
+          </div>
+        </div>
 
-        <div class="p-4 rounded-xl card-bg border border-emerald-500/40 flex justify-between items-center">
+        <!-- عداد التعافي والصمود -->
+        <div data-home-key="recoveryCounter" class="p-4 rounded-xl card-bg border border-emerald-500/40 flex justify-between items-center relative">
           <div>
-            <h3 class="text-sm font-bold text-emerald-400">🛡️ عداد التعافي والصمود</h3>
+            <h3 class="text-sm font-bold text-emerald-400 hb-title">🛡️ عداد التعافي والصمود</h3>
             <div class="flex items-center gap-2 mt-1">
               <label class="text-[11px] text-gray-400">البداية:</label>
               <input type="date" id="recovery-start-input" onchange="updateRecoveryStart()" class="text-xs bg-gray-900 border border-gray-700 rounded px-1.5 py-0.5 text-gray-200">
             </div>
           </div>
-          <div class="text-center">
-            <div class="text-2xl font-bold text-emerald-400 font-mono" id="recovery-days-count">0</div>
-            <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-1.5 py-0.5 rounded mt-0.5 hover:bg-red-950">سجلت زلة (-1)</button>
+          <div class="text-center flex items-center gap-3">
+            <div>
+              <div class="text-2xl font-bold text-emerald-400 font-mono" id="recovery-days-count">0</div>
+              <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-1.5 py-0.5 rounded mt-0.5 hover:bg-red-950">سجلت زلة (-1)</button>
+            </div>
+            <div class="order-arrows hidden flex gap-1">
+              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('recoveryCounter', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('recoveryCounter', 1)">▼</button>
+            </div>
+            <button class="edit-btn hidden text-[10px] bg-emerald-950 border border-emerald-400 text-emerald-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recoveryCounter')">تعديل</button>
           </div>
         </div>
 
-        <button onclick="showView('recovery')" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 text-right flex items-center justify-between transition hover:scale-[1.01]">
+        <!-- ركن التعافي -->
+        <div data-home-key="recovery" class="p-4 rounded-xl card-bg border border-emerald-500/40 hover:border-emerald-400 text-right flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recovery')">
           <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50">🌱</span>
+            <span class="text-2xl p-2 rounded-lg bg-emerald-950/60 border border-emerald-500/50 hb-icon">🌱</span>
             <div>
-              <h3 class="text-sm font-bold text-emerald-400">ركن التعافي</h3>
-              <p class="text-xs text-gray-400">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
+              <h3 class="text-sm font-bold text-emerald-400 hb-title">ركن التعافي</h3>
+              <p class="text-xs text-gray-400 hb-desc">الأذكار، المعتقدات، الدعاء والتثبيت، واليوميات</p>
             </div>
           </div>
-          <span class="text-emerald-400 text-sm">◀</span>
-        </button>
+          <div class="flex items-center gap-2">
+            <div class="order-arrows hidden flex gap-1">
+              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('recovery', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-emerald-400 text-emerald-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('recovery', 1)">▼</button>
+            </div>
+            <button class="edit-btn hidden text-[10px] bg-emerald-950 border border-emerald-400 text-emerald-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('recovery')">تعديل</button>
+            <span class="text-emerald-400 text-sm arrow-icon">◀</span>
+          </div>
+        </div>
 
-        <button onclick="showView('wheel')" class="p-4 rounded-xl card-bg border border-red-500/50 hover:border-red-400 text-right flex items-center justify-between transition hover:scale-[1.01] bg-red-950/20">
+        <!-- عجلة الطوارئ -->
+        <div data-home-key="wheel" class="p-4 rounded-xl card-bg border border-red-500/50 hover:border-red-400 text-right flex items-center justify-between transition hover:scale-[1.01] bg-red-950/20 relative cursor-pointer" onclick="if(!isHomeEditing && !isHomeOrdering) showView('wheel')">
           <div class="flex items-center gap-3">
-            <span class="text-2xl p-2 rounded-lg bg-red-950/80 border border-red-500/70">🎡</span>
+            <span class="text-2xl p-2 rounded-lg bg-red-950/80 border border-red-500/70 hb-icon">🎡</span>
             <div>
-              <h3 class="text-sm font-bold text-red-400 glow-red">عجلة الطوارئ (وقت الخطر)</h3>
-              <p class="text-xs text-gray-400">تعديل المهام، إضافة خطط هروب، وكسر الرغبة فوراً</p>
+              <h3 class="text-sm font-bold text-red-400 glow-red hb-title">عجلة الطوارئ (وقت الخطر)</h3>
+              <p class="text-xs text-gray-400 hb-desc">تعديل المهام، إضافة خطط هروب، وكسر الرغبة فوراً</p>
             </div>
           </div>
-          <span class="text-red-400 text-sm">◀</span>
-        </button>
+          <div class="flex items-center gap-2">
+            <div class="order-arrows hidden flex gap-1">
+              <button class="px-2 py-1 bg-gray-800 border border-red-400 text-red-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('wheel', -1)">▲</button>
+              <button class="px-2 py-1 bg-gray-800 border border-red-400 text-red-300 rounded text-xs" onclick="event.stopPropagation(); moveHomeItem('wheel', 1)">▼</button>
+            </div>
+            <button class="edit-btn hidden text-[10px] bg-red-950 border border-red-400 text-red-300 px-2 py-1 rounded z-10" onclick="event.stopPropagation(); editHomeItem('wheel')">تعديل</button>
+            <span class="text-red-400 text-sm arrow-icon">◀</span>
+          </div>
+        </div>
+
       </div>
 
       <div class="card-bg p-3 rounded-xl border border-sky-500/40 space-y-2">
@@ -112,10 +160,11 @@
             <button onclick="document.getElementById('import-file').click()" class="text-[11px] bg-gray-900 border border-gray-700 px-2.5 py-1 rounded text-gray-300">📂 استرجاع</button>
           </div>
         </div>
-        <p class="text-[10px] text-gray-500">بتتبعت لوحدها على تليجرام كل جمعة (أو لو عدّى 7 أيام على آخر نسخة).</p>
+        <p class="text-[10px] text-gray-500">بتتبعت لوحدها على تليجرام كل جمعة.</p>
       </div>
     </section>
 
+    <!-- باقي الأقسام -->
     <section id="view-workouts" class="hidden space-y-4">
       <div class="card-bg p-4 rounded-xl neon-cyan">
         <div class="flex items-center justify-between">
@@ -361,7 +410,9 @@ let state = {
   },
   azkar: defaultAzkar,
   duas: defaultDuas,
-  wheelPlans: defaultWheelPlans
+  wheelPlans: defaultWheelPlans,
+  homeOrder: ['workouts', 'dayTracker', 'recoveryCounter', 'recovery', 'wheel'],
+  homeCustom: {}
 };
 
 function loadData() {
@@ -376,6 +427,8 @@ function loadData() {
   recalculateStreakAndLevel();
   calculateRecoveryDays();
   renderAll();
+  applyHomeCustom();
+  applyHomeOrder();
 }
 
 function saveData() { localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state)); }
@@ -385,7 +438,7 @@ function renderAll() {
   if (typeof renderToday === 'function') renderToday();
 }
 
-// ===== تأثيرات التفاعل (اهتزاز + نص طاير) =====
+// ===== تأثيرات التفاعل =====
 function fx(e, text) {
   if (navigator.vibrate) navigator.vibrate(30);
   const t = e && e.target ? e.target : null;
@@ -397,14 +450,6 @@ function fx(e, text) {
   el.style.top = r.top + 'px';
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 950);
-}
-
-function showToast(text) {
-  const el = document.createElement('div');
-  el.className = 'toast-badge';
-  el.textContent = text;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3200);
 }
 
 // ===== التنقل =====
@@ -424,6 +469,95 @@ function showView(view) {
 function openDayTrackerFromHome() {
   showView('habits');
   if (typeof setMainTab === 'function') setMainTab('day');
+}
+
+// ===== ترتيب وتعديل الرئيسية =====
+let isHomeOrdering = false;
+let isHomeEditing = false;
+
+function toggleHomeOrderMode() {
+  if (isHomeEditing) toggleHomeEditMode();
+  isHomeOrdering = !isHomeOrdering;
+  const btn = document.getElementById('home-order-btn');
+  btn.innerText = isHomeOrdering ? '✔ تم الترتيب' : '↕ ترتيب';
+  btn.className = isHomeOrdering ? 'text-[10px] bg-cyan-950 border border-cyan-400 text-cyan-300 px-2 py-1 rounded font-bold' : 'text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded';
+
+  document.querySelectorAll('#home-buttons-container [data-home-key]').forEach(card => {
+    const arrows = card.querySelector('.order-arrows');
+    if (arrows) arrows.classList.toggle('hidden', !isHomeOrdering);
+  });
+}
+
+function toggleHomeEditMode() {
+  if (isHomeOrdering) toggleHomeOrderMode();
+  isHomeEditing = !isHomeEditing;
+  const btn = document.getElementById('home-edit-btn');
+  btn.innerText = isHomeEditing ? '✔ تم الحفظ' : '⚙️ تعديل الأسماء';
+  btn.className = isHomeEditing ? 'text-[10px] bg-cyan-950 border border-cyan-400 text-cyan-300 px-2 py-1 rounded font-bold' : 'text-[10px] bg-gray-900 border border-gray-700 hover:border-cyan-500 text-cyan-400 px-2 py-1 rounded';
+
+  document.querySelectorAll('#home-buttons-container [data-home-key]').forEach(card => {
+    const editBtn = card.querySelector('.edit-btn');
+    if (editBtn) editBtn.classList.toggle('hidden', !isHomeEditing);
+  });
+}
+
+function moveHomeItem(key, dir) {
+  if (!state.homeOrder) state.homeOrder = ['workouts', 'dayTracker', 'recoveryCounter', 'recovery', 'wheel'];
+  const idx = state.homeOrder.indexOf(key);
+  const targetIdx = idx + dir;
+  if (targetIdx < 0 || targetIdx >= state.homeOrder.length) return;
+  
+  [state.homeOrder[idx], state.homeOrder[targetIdx]] = [state.homeOrder[targetIdx], state.homeOrder[idx]];
+  saveData();
+  applyHomeOrder();
+}
+
+function applyHomeOrder() {
+  const container = document.getElementById('home-buttons-container');
+  if (!container || !state.homeOrder) return;
+  state.homeOrder.forEach(key => {
+    const card = container.querySelector(`[data-home-key="${key}"]`);
+    if (card) container.appendChild(card);
+  });
+}
+
+function editHomeItem(key) {
+  if (!state.homeCustom) state.homeCustom = {};
+  const current = state.homeCustom[key] || {};
+  const card = document.querySelector(`[data-home-key="${key}"]`);
+  const defaultTitle = card.querySelector('.hb-title').innerText;
+  const defaultDesc = card.querySelector('.hb-desc') ? card.querySelector('.hb-desc').innerText : '';
+  const defaultIcon = card.querySelector('.hb-icon') ? card.querySelector('.hb-icon').innerText : '';
+
+  const newIcon = prompt("أدخل الأيقونة (إيموجي):", current.icon || defaultIcon);
+  if (newIcon === null) return;
+  const newTitle = prompt("أدخل العنوان الجديد:", current.title || defaultTitle);
+  if (newTitle === null) return;
+  const newDesc = prompt("أدخل الوصف الجديد:", current.desc || defaultDesc);
+  if (newDesc === null) return;
+
+  state.homeCustom[key] = {
+    icon: newIcon.trim(),
+    title: newTitle.trim(),
+    desc: newDesc.trim()
+  };
+  saveData();
+  applyHomeCustom();
+}
+
+function applyHomeCustom() {
+  if (!state.homeCustom) return;
+  Object.keys(state.homeCustom).forEach(key => {
+    const card = document.querySelector(`[data-home-key="${key}"]`);
+    if (!card) return;
+    const c = state.homeCustom[key];
+    const iconEl = card.querySelector('.hb-icon');
+    const titleEl = card.querySelector('.hb-title');
+    const descEl = card.querySelector('.hb-desc');
+    if (iconEl && c.icon) iconEl.innerText = c.icon;
+    if (titleEl && c.title) titleEl.innerText = c.title;
+    if (descEl && c.desc) descEl.innerText = c.desc;
+  });
 }
 
 // تبويبات ركن التعافي
@@ -1200,7 +1334,7 @@ function importData(e) {
   reader.onload = ev => {
     try {
       state = Object.assign(state, JSON.parse(ev.target.result));
-      saveData(); recalculateStreakAndLevel(); renderAll();
+      saveData(); recalculateStreakAndLevel(); renderAll(); applyHomeCustom(); applyHomeOrder();
       alert("✅ تم استيراد كل بياناتك بنجاح!");
     } catch (err) { alert("خطأ في قراءة ملف النسخة الاحتياطية."); }
   };
@@ -1227,488 +1361,6 @@ if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
 setInterval(updateTimer, 1000);
 updateTimer();
 loadData();
-
-// ===== التراكينج الأصلي: 3 تبويبات (العادات / تايم بلوكينج / تراكينج اليوم) =====
-(function () {
-  const WEEK_START = 6;
-  const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  const SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
-  const FIXED_SLOTS = [
-    { id: 's1', label: 'من 7 إلى 10 صباحاً', defaultTitle: 'صباح الخير / البلوك الأول' },
-    { id: 's2', label: 'من 10 صباحاً إلى الظهر', defaultTitle: 'البلوك الصباحي الثاني' },
-    { id: 's3', label: 'من الظهر الي العصر', defaultTitle: 'بلوك ما بعد الظهر' },
-    { id: 's4', label: 'من العصر الي المغرب', defaultTitle: 'بلوك العصر' },
-    { id: 's5', label: 'من العشاء ال12', defaultTitle: 'بلوك المساء' },
-    { id: 's6', label: 'ومن 12-3', defaultTitle: 'بلوك سهر الليل' }
-  ];
-
-  let dirty = false;
-  if (!state.habits) {
-    state.habits = {
-      list: [
-        { id: 1, name: "الفجر", type: "check" },
-        { id: 2, name: "المذاكرة / الحفظ", type: "time" },
-        { id: 3, name: "ورد المراجعة", type: "check" },
-        { id: 4, name: "التمرين", type: "check", auto: "workout" },
-        { id: 5, name: "التعافي (اليوميات والأذكار)", type: "check" },
-        { id: 6, name: "قيام الليل", type: "check" }
-      ],
-      log: {}
-    };
-    dirty = true;
-  }
-  if (!state.habits.reviews) { state.habits.reviews = {}; dirty = true; }
-  if (!state.habits.blocks) { state.habits.blocks = {}; dirty = true; }
-  if (!state.habits.sleep) { state.habits.sleep = {}; dirty = true; }
-  if (!state.habits.water) { state.habits.water = {}; dirty = true; }
-  if (dirty) saveData();
-
-  const oldSec = document.getElementById('view-habits'); if (oldSec) oldSec.remove();
-  document.querySelectorAll('#view-home .grid > button').forEach(b => { if (b.textContent.includes('متتبع العادات اليومية')) b.remove(); });
-
-  const H = () => state.habits;
-  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const fmt = m => m >= 60 ? `${Math.floor(m / 60)}س ${m % 60}د` : `${m}د`;
-  const keyToDate = k => new Date(k + 'T12:00:00');
-  const isFri = k => keyToDate(k).getDay() === 5;
-  const weekKeysOf = k => {
-    const d = keyToDate(k);
-    d.setDate(d.getDate() - ((d.getDay() - WEEK_START + 7) % 7));
-    return Array.from({ length: 7 }, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return getFormattedDate(x); });
-  };
-  const entry = (h, k) => (H().log[k] || {})[h.id];
-  const isDone = (h, k) => {
-    const e = entry(h, k);
-    if (h.type === 'time') return !!(e && e.min > 0);
-    if (e === true) return true;
-    if (e === false) return false;
-    return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
-  };
-  const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); };
-  const find = id => H().list.find(h => h.id === id);
-
-  function habitStreak(h) {
-    const tk = getTodayKey();
-    const d = new Date(); d.setHours(12);
-    let s = 0;
-    for (let i = 0; i < 400; i++) {
-      const k = getFormattedDate(d);
-      if (!isFri(k)) {
-        if (isDone(h, k)) s++;
-        else if (k !== tk) break;
-      }
-      d.setDate(d.getDate() - 1);
-    }
-    return s;
-  }
-
-  let selDay = getTodayKey();
-  let mainTab = 'habits'; // 'habits', 'blocks', 'day'
-  let viewY = new Date().getFullYear(), viewM = new Date().getMonth();
-
-  const section = document.createElement('section');
-  section.id = 'view-habits';
-  section.className = 'hidden space-y-3';
-  section.innerHTML = `
-    <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
-      <div><h2 class="text-sm font-bold text-amber-400">✅ متتبع العادات اليومية</h2>
-      <p id="habitsDayLabel" class="text-[11px] text-gray-400"></p></div>
-      <button id="hbAddBtn" onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
-    </div>
-    <div class="grid grid-cols-3 gap-1.5">
-      <button id="htab-habits" onclick="setMainTab('habits')" class="py-2 rounded-lg text-xs font-bold transition border">✅ العادات</button>
-      <button id="htab-blocks" onclick="setMainTab('blocks')" class="py-2 rounded-lg text-xs font-bold transition border">⏱ تايم بلوكينج</button>
-      <button id="htab-day" onclick="setMainTab('day')" class="py-2 rounded-lg text-xs font-bold transition border">📅 تراكينج اليوم</button>
-    </div>
-    <div id="habitsMonth" class="card-bg p-3 rounded-xl border border-gray-800"></div>
-    <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
-    <div id="habitsContent" class="space-y-2.5"></div>`;
-  document.querySelector('main').appendChild(section);
-
-  const homeBtn = document.createElement('button');
-  homeBtn.dataset.key = 'habits';
-  homeBtn.onclick = () => showView('habits');
-  homeBtn.className = 'p-4 rounded-xl card-bg border border-amber-500/40 hover:border-amber-400 text-right flex items-center justify-between transition hover:scale-[1.01]';
-  homeBtn.innerHTML = `<div class="flex items-center gap-3">
-    <span class="text-2xl p-2 rounded-lg bg-amber-950/60 border border-amber-500/50">✅</span>
-    <div><h3 class="text-sm font-bold text-amber-400">متتبع العادات اليومية</h3>
-    <p class="text-xs text-gray-400">العادات، التايم بلوكينج المحدد، وتراكينج اليوم</p></div></div>
-    <span class="text-amber-400 text-sm">◀</span>`;
-  document.querySelector('#view-home .grid').prepend(homeBtn);
-
-  const _showView = window.showView;
-  window.showView = function (v) {
-    document.getElementById('view-habits').classList.add('hidden');
-    if (v === 'habits') {
-      _showView('home');
-      document.getElementById('view-home').classList.add('hidden');
-      document.getElementById('view-habits').classList.remove('hidden');
-      selDay = getTodayKey();
-      viewY = new Date().getFullYear(); viewM = new Date().getMonth();
-      render();
-    } else _showView(v);
-  };
-
-  function setMainTabUI() {
-    const tabs = [
-      { id: 'habits', label: '✅ العادات', activeColor: 'bg-amber-500 text-black border-amber-400' },
-      { id: 'blocks', label: '⏱ تايم بلوكينج', activeColor: 'bg-teal-500 text-black border-teal-400' },
-      { id: 'day', label: '📅 تراكينج اليوم', activeColor: 'bg-sky-500 text-black border-sky-400' }
-    ];
-    tabs.forEach(t => {
-      const btn = document.getElementById('htab-' + t.id);
-      if (!btn) return;
-      const active = mainTab === t.id;
-      btn.className = `py-2 rounded-lg text-xs font-bold transition border ${active ? t.activeColor : 'bg-gray-900 text-gray-300 border-gray-800'}`;
-    });
-    const addBtn = document.getElementById('hbAddBtn');
-    if (addBtn) addBtn.classList.toggle('hidden', mainTab !== 'habits');
-  }
-
-  function renderMonth(today) {
-    const list = H().list;
-    const first = new Date(viewY, viewM, 1, 12);
-    const dim = new Date(viewY, viewM + 1, 0).getDate();
-    const offset = (first.getDay() - WEEK_START + 7) % 7;
-    const title = first.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
-    const atNow = viewY === new Date().getFullYear() && viewM === new Date().getMonth();
-    let head = '';
-    for (let i = 0; i < 7; i++) head += `<span>${SHORT[(WEEK_START + i) % 7]}</span>`;
-    let cells = '';
-    for (let i = 0; i < offset; i++) cells += '<div></div>';
-    for (let day = 1; day <= dim; day++) {
-      const k = getFormattedDate(new Date(viewY, viewM, day, 12));
-      const fut = k > today, fri = isFri(k), sel = k === selDay;
-      const n = list.filter(h => isDone(h, k)).length;
-      const sub = fri ? '📝' : (fut ? '·' : n + '/' + list.length);
-      const cls = sel ? 'bg-amber-500 text-black border-amber-400 font-bold'
-        : (fri ? 'bg-indigo-950/50 border-indigo-500/50 text-indigo-300' : 'bg-gray-900 border-gray-800 text-gray-300');
-      cells += `<button ${fut ? 'disabled' : ''} onclick="hbDay('${k}')" class="py-1 rounded-lg border text-center transition ${cls} ${fut ? 'opacity-30' : ''} ${k === today ? 'ring-1 ring-amber-300' : ''}">
-        <div class="text-xs font-bold">${day}</div><div class="text-[9px] ${sel ? '' : 'text-amber-400'}">${sub}</div></button>`;
-    }
-    document.getElementById('habitsMonth').innerHTML = `
-      <div class="flex justify-between items-center mb-2">
-        <button onclick="hbMonth(-1)" class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300">▶ السابق</button>
-        <span class="text-xs font-bold text-amber-300">${title}</span>
-        <button onclick="hbMonth(1)" ${atNow ? 'disabled' : ''} class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300 ${atNow ? 'opacity-30' : ''}">التالي ◀</button>
-      </div>
-      <div class="grid grid-cols-7 gap-1 text-center text-[9px] text-gray-500 mb-1 font-semibold">${head}</div>
-      <div class="grid grid-cols-7 gap-1">${cells}</div>`;
-  }
-
-  function reviewHTML(wk, past) {
-    const list = H().list;
-    const rv = Object.assign({ won: '', change: '' }, H().reviews[wk[0]]);
-    const a = keyToDate(wk[0]), b = keyToDate(wk[6]);
-    const rows = list.map(h => {
-      const c = past.filter(k => isDone(h, k)).length;
-      const p = past.length ? Math.round(c / past.length * 100) : 0;
-      let extra = '';
-      if (h.type === 'time') {
-        let st = 0, me = 0;
-        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
-        extra = `<div class="text-[10px] text-gray-400 mt-0.5">📚 مذاكرة ${fmt(st)} • 📖 حفظ ${fmt(me)}</div>`;
-      }
-      return `<div>
-        <div class="flex justify-between text-xs"><span class="text-gray-200">${esc(h.name)}</span><span class="text-amber-400 font-bold">${c}/${past.length} (${p}%)</span></div>
-        <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-1"><div class="bg-amber-400 h-1.5" style="width:${p}%"></div></div>${extra}</div>`;
-    }).join('');
-    return `<div class="card-bg p-3 rounded-xl border border-indigo-500/40 space-y-3">
-      <h3 class="text-sm font-bold text-indigo-300">📝 مراجعة الأسبوع (${a.getDate()}/${a.getMonth() + 1} – ${b.getDate()}/${b.getMonth() + 1})</h3>
-      <div class="space-y-2">${rows || '<p class="text-xs text-gray-500">مفيش عادات</p>'}</div>
-      <div class="pt-2 border-t border-gray-800 space-y-2">
-        <label class="text-[11px] text-gray-300">✅ إيه اللي نجح الأسبوع ده؟</label>
-        <textarea rows="3" onchange="hbReview('${wk[0]}','won',this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded p-2 text-gray-200">${esc(rv.won)}</textarea>
-        <label class="text-[11px] text-gray-300">🔧 إيه اللي هغيّره الأسبوع الجاي؟</label>
-        <textarea rows="3" onchange="hbReview('${wk[0]}','change',this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded p-2 text-gray-200">${esc(rv.change)}</textarea>
-      </div></div>`;
-  }
-
-  function render() {
-    const box = document.getElementById('habitsContent');
-    if (!box) return;
-    const today = getTodayKey(), list = H().list;
-    const wk = weekKeysOf(selDay);
-    const trk = wk.filter(k => !isFri(k));
-    const past = trk.filter(k => k <= today);
-    const fri = isFri(selDay);
-    renderMonth(today);
-    setMainTabUI();
-
-    const sd = keyToDate(selDay);
-    document.getElementById('habitsDayLabel').innerText = fri
-      ? 'الجمعة: مراجعة الأسبوع (معفية من العادات)'
-      : (selDay === today ? 'تسجيل اليوم' : 'تسجيل يوم') + ': ' + DAYS[sd.getDay()] + ' ' + sd.getDate();
-
-    const wDone = list.reduce((s, h) => s + past.filter(k => isDone(h, k)).length, 0);
-    const wMax = Math.max(1, list.length * past.length);
-    const wPct = Math.round(wDone / wMax * 100);
-    let sum = '';
-    if (!fri) {
-      const dDone = list.filter(h => isDone(h, selDay)).length;
-      const dPct = list.length ? Math.round(dDone / list.length * 100) : 0;
-      sum += `<div class="flex justify-between text-xs"><span class="text-gray-300">اليوم المختار</span><span class="text-amber-400 font-bold">${dDone} / ${list.length} (${dPct}%)</span></div>
-        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-amber-400 h-2 transition-all" style="width:${dPct}%"></div></div>`;
-    }
-    sum += `<div class="flex justify-between text-xs pt-1"><span class="text-gray-300">إجمالي الأسبوع</span><span class="text-cyan-400 font-bold">${wDone} / ${wMax} (${wPct}%)</span></div>
-      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-cyan-400 h-2 transition-all" style="width:${wPct}%"></div></div>`;
-    document.getElementById('habitsSummary').innerHTML = sum;
-
-    if (fri) { box.innerHTML = reviewHTML(wk, past); return; }
-
-    box.innerHTML = '';
-    if (mainTab === 'blocks') { box.innerHTML = renderBlocksHTML(); return; }
-    if (mainTab === 'day') { box.innerHTML = renderDayTrackerHTML(); return; }
-
-    let html = '';
-    list.forEach((h, i) => {
-      const d = isDone(h, selDay);
-      const wCount = past.filter(k => isDone(h, k)).length;
-      const hStr = habitStreak(h);
-      const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
-      let middle = '', extra = '';
-      if (h.type === 'time') {
-        const e = entry(h, selDay) || { min: 0, mode: 'study' };
-        middle = `<div class="flex items-center gap-2 mt-2">
-          <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
-          <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
-        let st = 0, me = 0;
-        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
-        extra = ` • مذاكرة ${fmt(st)} • حفظ ${fmt(me)}`;
-      }
-      const mark = h.type === 'time'
-        ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
-        : `<button onclick="hbToggle(${h.id}, this)" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
-
-      html += `
-        <div class="card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2.5">
-              ${mark}
-              <div>
-                <span class="text-xs font-bold text-gray-200">${esc(h.name)}</span>
-                <span class="text-[10px] bg-orange-950/60 border border-orange-500/40 text-orange-400 px-1.5 py-0.5 rounded-md mr-2 font-mono">🔥 ${hStr} يوم</span>
-              </div>
-            </div>
-            <div class="flex items-center gap-1">
-              <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-              <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-              <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-              <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
-            </div>
-          </div>${middle}
-          <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
-            <div class="flex gap-1">${dots}</div>
-            <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
-          </div>
-        </div>`;
-    });
-    box.innerHTML = html;
-  }
-
-  function renderBlocksHTML() {
-    const dayBlocks = H().blocks[selDay] || {};
-    const slotsHTML = FIXED_SLOTS.map(slot => {
-      const val = dayBlocks[slot.id] || '';
-      return `<div class="card-bg p-3 rounded-xl border border-gray-800 space-y-1.5">
-        <span class="text-xs font-bold text-teal-300">📌 ${slot.label}</span>
-        <input type="text" placeholder="${slot.defaultTitle}" value="${esc(val)}" onchange="tbSetSlot('${slot.id}', this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded px-2.5 py-1.5 text-gray-200">
-      </div>`;
-    }).join('');
-
-    return `<div class="space-y-3">
-      <div class="card-bg p-3 rounded-xl border border-teal-500/40 flex justify-between items-center">
-        <div>
-          <h3 class="text-sm font-bold text-teal-300">⏱ جدول اليوم (Time Blocks)</h3>
-          <p class="text-[11px] text-gray-400">اكتب قدام كل فترة عملت فيها إيه</p>
-        </div>
-        <button onclick="tbCopy()" class="text-[10px] bg-gray-900 border border-teal-500/50 px-2 py-1 rounded text-teal-300">📋 نسخ من الأمس</button>
-      </div>
-      <div class="space-y-2">${slotsHTML}</div>
-    </div>`;
-  }
-
-  function renderDayTrackerHTML() {
-    const inCls = 'text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200';
-    const sl = Object.assign({ bed: '', wake: '' }, H().sleep[selDay]);
-    const water = H().water[selDay] || 0;
-    const durMin = (a, b) => {
-      const x = toMin(a), y = toMin(b);
-      if (x == null || y == null) return 0;
-      let d = y - x; if (d < 0) d += 1440; return d;
-    };
-    const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
-    const minToTime = m => { m = Math.round(m) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
-    const fmt12 = t => { if (!t) return '--'; const p = t.split(':'), h = +p[0]; return `${h % 12 || 12}:${p[1]} ${h >= 12 ? 'م' : 'ص'}`; };
-    const dur = sl.bed && sl.wake ? durMin(sl.bed, sl.wake) : 0;
-    
-    let n = 0, sumD = 0, sumBed = 0, sumWake = 0;
-    weekKeysOf(selDay).filter(k => k <= getTodayKey()).forEach(k => {
-      const x = H().sleep[k];
-      if (x && x.bed && x.wake) {
-        n++; sumD += durMin(x.bed, x.wake);
-        let b = toMin(x.bed); if (b < 720) b += 1440;
-        sumBed += b; sumWake += toMin(x.wake);
-      }
-    });
-
-    return `<div class="space-y-3">
-      <div class="card-bg p-4 rounded-xl border border-sky-500/40 space-y-3">
-        <h3 class="text-sm font-bold text-sky-300">😴 تراكينج النوم والاستيقاظ</h3>
-        <p class="text-[11px] text-gray-400">سجّل نمت إمتى وصحيت إمتى في اليوم المختار</p>
-        <div class="grid grid-cols-2 gap-2">
-          <div><label class="text-[11px] text-gray-300 block mb-1">🌙 وقت النوم</label><input type="time" value="${sl.bed}" onchange="slSet('bed',this.value)" class="w-full ${inCls}"></div>
-          <div><label class="text-[11px] text-gray-300 block mb-1">☀️ وقت الاستيقاظ</label><input type="time" value="${sl.wake}" onchange="slSet('wake',this.value)" class="w-full ${inCls}"></div>
-        </div>
-        ${dur ? `<p class="text-xs text-sky-200">مدة النوم: <strong>${fmt(dur)}</strong></p>` : ''}
-        <div class="pt-2 border-t border-gray-800 text-[11px] text-gray-300 space-y-1">
-          ${n ? `<div>📊 متوسط الأسبوع (${n} أيام): نوم <strong class="text-sky-300">${fmt(Math.round(sumD / n))}</strong></div>
-          <div>🌙 متوسط النوم: <strong class="text-sky-300">${fmt12(minToTime(sumBed / n))}</strong> • ☀️ متوسط الاستيقاظ: <strong class="text-sky-300">${fmt12(minToTime(sumWake / n))}</strong></div>` : '<div class="text-gray-500">لسه مفيش أيام مسجلة الأسبوع ده</div>'}
-        </div>
-      </div>
-
-      <div class="card-bg p-4 rounded-xl border border-blue-500/40 space-y-3">
-        <h3 class="text-sm font-bold text-blue-300">💧 متتبع الماء</h3>
-        <div class="flex items-center justify-between">
-          <span class="text-xs text-gray-300">أكواب الماء (250 مل): <strong class="text-blue-400 text-sm font-mono">${water}</strong> كوب (${water * 0.25} لتر)</span>
-          <div class="flex gap-1.5">
-            <button onclick="waterAdd(-1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded text-xs">-</button>
-            <button onclick="waterAdd(1)" class="px-3 py-1 bg-blue-600 text-white font-bold rounded text-xs">+ كوب</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }
-
-  window.tbSetSlot = (slotId, text) => {
-    H().blocks[selDay] = H().blocks[selDay] || {};
-    H().blocks[selDay][slotId] = text.trim();
-    saveData();
-  };
-
-  window.tbCopy = () => {
-    const d = keyToDate(selDay);
-    let src = null;
-    for (let i = 0; i < 60; i++) {
-      d.setDate(d.getDate() - 1);
-      const k = getFormattedDate(d);
-      if (H().blocks[k] && Object.keys(H().blocks[k]).length) { src = k; break; }
-    }
-    if (!src) { alert('مفيش يوم قبل كده فيه بلوكات مسجلة'); return; }
-    H().blocks[selDay] = Object.assign({}, H().blocks[src]);
-    saveData(); render();
-    alert('✅ تم نسخ بلوكات الأمس بنجاح!');
-  };
-
-  window.slSet = (field, v) => {
-    H().sleep[selDay] = Object.assign({ bed: '', wake: '' }, H().sleep[selDay], { [field]: v });
-    saveData(); render();
-  };
-
-  window.waterAdd = delta => {
-    H().water[selDay] = Math.max(0, (H().water[selDay] || 0) + delta);
-    saveData(); render();
-  };
-
-  window.setMainTab = t => { mainTab = t; render(); };
-  window.hbDay = k => { selDay = k; render(); };
-  window.hbMonth = dir => {
-    let y = viewY, m = viewM + dir;
-    if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
-    const now = new Date();
-    if (y > now.getFullYear() || (y === now.getFullYear() && m > now.getMonth())) return;
-    viewY = y; viewM = m; render();
-  };
-  window.hbReview = (wk, field, v) => {
-    H().reviews[wk] = Object.assign({ won: '', change: '' }, H().reviews[wk], { [field]: v });
-    saveData();
-  };
-  window.hbToggle = (id, btn) => {
-    btn.classList.add('pop-anim');
-    setTimeout(() => btn.classList.remove('pop-anim'), 300);
-    if (navigator.vibrate) navigator.vibrate(40);
-    setE(id, selDay, !isDone(find(id), selDay));
-  };
-  window.hbMode = id => {
-    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
-    setE(id, selDay, { min: e.min, mode: e.mode === 'memo' ? 'study' : 'memo' });
-  };
-  window.hbMin = id => {
-    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
-    const v = prompt("عملت كام دقيقة؟", e.min || "");
-    if (v === null) return;
-    setE(id, selDay, { min: Math.max(0, parseInt(v, 10) || 0), mode: e.mode });
-  };
-  window.hbAdd = () => {
-    const n = prompt("اسم العادة:");
-    if (!n || !n.trim()) return;
-    const timed = confirm("العادة دي بالوقت؟\nموافق = بالوقت (دقايق)\nإلغاء = علامة صح");
-    H().list.push({ id: Date.now(), name: n.trim(), type: timed ? 'time' : 'check' });
-    saveData(); render();
-  };
-  window.hbEdit = id => { const h = find(id), n = prompt("تعديل اسم العادة:", h.name); if (n && n.trim()) { h.name = n.trim(); saveData(); render(); } };
-  window.hbDel = id => { if (confirm("تحذف العادة دي؟")) { H().list = H().list.filter(h => h.id !== id); saveData(); render(); } };
-  window.hbMove = (i, dir) => {
-    const l = H().list, t = i + dir;
-    if (t < 0 || t >= l.length) return;
-    [l[i], l[t]] = [l[t], l[i]];
-    saveData(); render();
-  };
-})();
-
-// ================= HOME ORDER =================
-(function () {
-  const grid = document.querySelector('#view-home .grid');
-  const base = ['workouts', 'dayTracker', 'recovery', 'wheel'];
-  if (state.homeOrder) {
-    let placed = false;
-    state.homeOrder = state.homeOrder.reduce((a, k) => {
-      if (['adhkar', 'duaa', 'journal'].includes(k)) { if (!placed) { a.push('recovery'); placed = true; } }
-      else a.push(k);
-      return a;
-    }, []);
-  }
-  [...grid.children].filter(c => !c.dataset.key).forEach((c, i) => c.dataset.key = base[i]);
-  let edit = false;
-
-  function apply() {
-    const order = state.homeOrder || [];
-    const rank = c => { const i = order.indexOf(c.dataset.key); return i < 0 ? 999 : i; };
-    const kids = [...grid.children];
-    kids.forEach(c => { c.querySelectorAll('.ho-arrows').forEach(e => e.remove()); c.classList.remove('relative'); });
-    kids.sort((a, b) => rank(a) - rank(b)).forEach(c => grid.appendChild(c));
-    if (!edit) return;
-    [...grid.children].forEach(c => {
-      c.classList.add('relative');
-      const w = document.createElement('div');
-      w.className = 'ho-arrows absolute top-1 left-1 flex gap-1 z-10';
-      const cls = 'px-2 py-0.5 bg-gray-800 border border-gray-600 text-gray-200 rounded text-xs cursor-pointer';
-      w.innerHTML = `<span data-d="-1" class="${cls}">▲</span><span data-d="1" class="${cls}">▼</span>`;
-      c.appendChild(w);
-    });
-  }
-
-  grid.addEventListener('click', e => {
-    if (!edit) return;
-    e.stopPropagation(); e.preventDefault();
-    const a = e.target.closest('.ho-arrows span');
-    if (!a) return;
-    const keys = [...grid.children].map(c => c.dataset.key);
-    const k = a.closest('[data-key]').dataset.key, i = keys.indexOf(k), t = i + parseInt(a.dataset.d, 10);
-    if (t < 0 || t >= keys.length) return;
-    [keys[i], keys[t]] = [keys[t], keys[i]];
-    state.homeOrder = keys;
-    saveData(); apply();
-  }, true);
-
-  const head = document.querySelector('#view-home > div');
-  const btn = document.createElement('button');
-  btn.className = 'mt-2 text-[10px] border border-gray-600 text-gray-300 px-2 py-1 rounded';
-  btn.innerText = '↕ ترتيب المهام';
-  btn.onclick = () => { edit = !edit; btn.innerText = edit ? '✔ تم الترتيب' : '↕ ترتيب المهام'; apply(); };
-  head.appendChild(btn);
-  apply();
-})();
 
 // ===== المعتقدات =====
 (function () {
@@ -1783,7 +1435,6 @@ function renderToday() {
   const k = getTodayKey();
   const now = new Date();
   const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  const isFri = now.getDay() === 5;
   const bar = (p, c) => `<div class="w-full bg-gray-800 h-1 rounded-full overflow-hidden mt-1.5"><div class="${c} h-1" style="width:${Math.max(0, Math.min(100, p))}%"></div></div>`;
   const tile = (label, value, pct, done, go, color) => `
     <button onclick="${go}" class="rounded-lg border p-2 text-right transition ${done ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-gray-800 bg-gray-900/40'}">
@@ -1791,22 +1442,6 @@ function renderToday() {
       <div class="text-sm font-bold ${done ? 'text-emerald-300' : 'text-gray-100'}">${value}</div>
       ${bar(pct, done ? 'bg-emerald-400' : color)}
     </button>`;
-
-  const hb = state.habits;
-  const habitDone = h => {
-    const e = ((hb.log || {})[k] || {})[h.id];
-    if (h.type === 'time') return !!(e && e.min > 0);
-    if (e === true) return true;
-    if (e === false) return false;
-    return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
-  };
-  let habitsTile;
-  if (!hb) habitsTile = tile('✅ العادات', '—', 0, false, "showView('habits')", 'bg-amber-400');
-  else if (isFri) habitsTile = tile('✅ العادات', '📝 مراجعة الجمعة', 0, false, "showView('habits')", 'bg-amber-400');
-  else {
-    const n = hb.list.filter(habitDone).length;
-    habitsTile = tile('✅ العادات', `${n} / ${hb.list.length}`, hb.list.length ? n / hb.list.length * 100 : 0, hb.list.length > 0 && n === hb.list.length, "showView('habits')", 'bg-amber-400');
-  }
 
   const completed = state.history[k] === 'completed' || state.history[k] === true;
   const rest = state.history[k] === 'rest';
@@ -1834,7 +1469,7 @@ function renderToday() {
       <h3 class="text-sm font-bold text-cyan-300">📍 النهارده</h3>
       <span class="text-[10px] text-gray-400">${DAYS[now.getDay()]} ${now.getDate()}</span>
     </div>
-    <div class="grid grid-cols-2 gap-2">${habitsTile}${workoutTile}${azTile}${duTile}</div>
+    <div class="grid grid-cols-2 gap-2">${workoutTile}${azTile}${duTile}</div>
     <div class="text-[10px] text-gray-400">🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
 }
 
