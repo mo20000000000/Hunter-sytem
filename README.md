@@ -1021,6 +1021,7 @@ function renderWorkouts() {
     btn.className = "w-full py-4 rounded-2xl font-bold text-xs uppercase border border-cyan-400 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition shadow cursor-pointer";
     btn.innerText = "COMPLETE DAY";
   }
+  if (typeof renderToday === 'function') renderToday();
 }
 
 function renderCalendar() {
@@ -1167,6 +1168,7 @@ function renderAzkar() {
     `;
     container.appendChild(div);
   });
+  if (typeof renderToday === 'function') renderToday();
 }
 function decrementZekr(i) {
   if (state.azkar[i].current > 0) {
@@ -1226,6 +1228,7 @@ function renderDuas() {
     `;
     container.appendChild(div);
   });
+  if (typeof renderToday === 'function') renderToday();
 }
 function toggleDuaCheck(i) {
   state.duas[i].done = !state.duas[i].done;
@@ -1631,7 +1634,7 @@ loadData();
     if (e === false) return false;
     return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
   };
-  const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); };
+  const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); if(typeof renderToday === 'function') renderToday(); };
   const find = id => H().list.find(h => h.id === id);
 
   const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
@@ -1843,6 +1846,7 @@ loadData();
     else if (hbTab === 'blocks') renderBlocks();
     else if (hbTab === 'day') renderSleep();
     else if (hbTab === 'cals') renderCalories();
+    if (typeof renderToday === 'function') renderToday();
   }
 
   function renderHabitsPane(today) {
@@ -2021,12 +2025,14 @@ loadData();
     H().calories[selDay] = H().calories[selDay] || [];
     H().calories[selDay].push({ name, cal, pro, fat, carb });
     saveData(); renderCalories();
+    if(typeof renderToday === 'function') renderToday();
   };
 
   window.calDel = idx => {
     if (confirm('حذف هذه الوجبة؟')) {
       H().calories[selDay].splice(idx, 1);
       saveData(); renderCalories();
+      if(typeof renderToday === 'function') renderToday();
     }
   };
 
@@ -2100,6 +2106,7 @@ loadData();
   window.slSet = (field, v) => {
     H().sleep[selDay] = Object.assign({ bed: '', wake: '' }, H().sleep[selDay], { [field]: v });
     saveData(); renderSleep();
+    if(typeof renderToday === 'function') renderToday();
   };
 })();
 
@@ -2149,12 +2156,12 @@ window.renderToday = function () {
 
   const sl = state.habits && state.habits.sleep && state.habits.sleep[k];
   const sleepOk = sl && sl.bed && sl.wake;
-  const durMin = (a, b) => {
+  const durMinCalc = (a, b) => {
     const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
     const x = toMin(a), y = toMin(b); if (x == null || y == null) return 0; let d = y - x; if (d < 0) d += 1440; return d;
   };
-  const fmtDur = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
-  const sleepTile = tile('😴 النوم', sleepOk ? fmtDur(durMin(sl.bed, sl.wake)) : 'سجّل نومك', sleepOk ? 100 : 0, !!sleepOk, 'openDayTrackerFromHome()', 'bg-sky-400');
+  const fmtDurCalc = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
+  const sleepTile = tile('😴 النوم', sleepOk ? fmtDurCalc(durMinCalc(sl.bed, sl.wake)) : 'سجّل نومك', sleepOk ? 100 : 0, !!sleepOk, 'openDayTrackerFromHome()', 'bg-sky-400');
 
   const meals = (state.habits && state.habits.calories && state.habits.calories[k]) || [];
   const totCals = meals.reduce((s, m) => s + (Number(m.cal) || 0), 0);
