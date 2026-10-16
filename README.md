@@ -45,11 +45,9 @@
       </div>
 
       <div id="today-card" class="card-bg p-4 rounded-2xl border border-cyan-500/40 space-y-3"></div>
-      
-      <!-- قائمة الأزرار الرئيسية -->
+
       <div id="home-buttons-container" class="space-y-3">
-        
-        <!-- التمارين -->
+
         <div data-home-key="workouts" class="p-4 rounded-2xl card-bg border border-cyan-500/40 hover:border-cyan-400 flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('workouts')">
           <div class="flex items-center gap-3.5">
             <span class="text-2xl p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/50 hb-icon">⚔️</span>
@@ -68,7 +66,6 @@
           </div>
         </div>
 
-        <!-- تراكينج اليوم -->
         <div data-home-key="dayTracker" class="p-4 rounded-2xl card-bg border border-sky-500/40 hover:border-sky-400 flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) openDayTrackerFromHome()">
           <div class="flex items-center gap-3.5">
             <span class="text-2xl p-2.5 rounded-xl bg-sky-950/60 border border-sky-500/50 hb-icon">📅</span>
@@ -87,7 +84,6 @@
           </div>
         </div>
 
-        <!-- شكل المقاومة (عداد التعافي) -->
         <div data-home-key="recoveryCounter" class="p-4 rounded-2xl card-bg border border-orange-500/40 hover:border-orange-400 flex justify-between items-center relative cursor-pointer transition hover:scale-[1.01] shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recoveryCounterView')">
           <div class="flex items-center gap-3.5">
             <div class="w-12 h-12 rounded-xl bg-orange-950/60 border border-orange-500/50 flex items-center justify-center text-2xl hb-icon">✊🔥</div>
@@ -106,7 +102,6 @@
           </div>
         </div>
 
-        <!-- ركن التعافي -->
         <div data-home-key="recovery" class="p-4 rounded-2xl card-bg border border-emerald-500/40 hover:border-emerald-400 flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('recovery')">
           <div class="flex items-center gap-3.5">
             <span class="text-2xl p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-500/50 hb-icon">🌱</span>
@@ -125,7 +120,6 @@
           </div>
         </div>
 
-        <!-- عجلة الطوارئ -->
         <div data-home-key="wheel" class="p-4 rounded-2xl card-bg border border-red-500/50 hover:border-red-400 flex items-center justify-between transition hover:scale-[1.01] bg-red-950/10 relative cursor-pointer shadow" onclick="if(!isHomeEditing && !isHomeOrdering) showView('wheel')">
           <div class="flex items-center gap-3.5">
             <span class="text-2xl p-2.5 rounded-xl bg-red-950/80 border border-red-500/70 hb-icon">🎡</span>
@@ -163,7 +157,7 @@
     <!-- واجهة شكل المقاومة -->
     <section id="view-recoveryCounterView" class="hidden space-y-4">
       <div class="card-bg p-5 rounded-2xl border border-orange-500/40 space-y-4 text-center relative shadow-lg">
-        
+
         <div class="flex justify-between items-center">
           <button onclick="reportRecoverySlip()" class="text-[10px] text-red-400 border border-red-500/40 px-2.5 py-1.5 rounded-xl hover:bg-red-950 transition">سجلت زلة (-1)</button>
           <div class="text-left bg-black/40 px-3 py-1.5 rounded-xl border border-gray-800">
@@ -402,6 +396,8 @@ function getFormattedDate(d) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 function getTodayKey() { return getFormattedDate(new Date()); }
+
+const escH = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 const defaultAzkar = [
   { id: 1, text: "آية الكرسي: ﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...﴾", total: 1, current: 1 },
@@ -748,7 +744,6 @@ function recTab(name) {
       (n === name ? 'bg-emerald-950 border-emerald-400 text-emerald-300' : 'bg-gray-900 border-gray-800 text-gray-400');
   });
 }
-
 // ================= WORKOUTS =================
 function calculateWeeklyAverage(questId) {
   let totalReps = 0, daysDone = 0;
@@ -764,19 +759,20 @@ function calculateWeeklyAverage(questId) {
 
 function checkDayTransition() {
   const today = getTodayKey();
-  if (!state.lastActiveDate) { state.lastActiveDate = today; saveData(); return; }
-  if (state.lastActiveDate !== today) {
-    const status = state.history[state.lastActiveDate];
-    const wasDone = status === 'completed' || status === 'rest' || status === true;
-    if (!wasDone && !state.penaltyActive) { state.penaltyActive = true; state.streak = 0; }
-    if (state.routines) {
-      Object.keys(state.routines).forEach(r => state.routines[r].forEach(q => { q.current = 0; q.sets = []; }));
-    }
-    if (state.azkar) state.azkar.forEach(z => z.current = z.total);
-    if (state.duas) state.duas.forEach(d => d.done = false);
-    state.lastActiveDate = today;
-    saveData();
+  if (!state.lastActiveDate) { state.lastActiveDate = today; saveData(); return false; }
+  if (state.lastActiveDate === today) return false;
+  const d = new Date(state.lastActiveDate + 'T12:00:00');
+  const end = new Date(today + 'T12:00:00');
+  for (; d < end; d.setDate(d.getDate() + 1)) {
+    const s = state.history[getFormattedDate(d)];
+    if (!(s === 'completed' || s === 'rest' || s === true)) { state.penaltyActive = true; state.streak = 0; break; }
   }
+  Object.values(state.routines || {}).forEach(r => r.forEach(q => { q.current = 0; q.sets = []; }));
+  (state.azkar || []).forEach(z => z.current = z.total);
+  (state.duas || []).forEach(x => x.done = false);
+  state.lastActiveDate = today;
+  saveData();
+  return true;
 }
 
 function recalculateStreakAndLevel() {
@@ -796,14 +792,14 @@ function recalculateStreakAndLevel() {
 function isTodayRest() { return state.history[getTodayKey()] === 'rest'; }
 function toggleTodayRest() {
   const k = getTodayKey();
-  if (state.history[k] === 'rest') delete state.history[k];
-  else {
+  if (!state.questHistory) state.questHistory = {};
+  if (state.history[k] === 'rest') {
+    delete state.history[k];
+    delete state.questHistory[k];
+    Object.values(state.routines).forEach(r => r.forEach(q => { q.current = 0; q.sets = []; }));
+  } else {
     state.history[k] = 'rest';
     state.penaltyActive = false;
-    const todayRoutine = state.routines[state.activeRoutine] || [];
-    if (!state.questHistory) state.questHistory = {};
-    state.questHistory[k] = {};
-    todayRoutine.forEach(q => { state.questHistory[k][q.id] = q.target; q.current = q.target; });
   }
   recalculateStreakAndLevel(); saveData(); renderWorkouts();
 }
@@ -883,12 +879,10 @@ function setsHTML(q, dis) {
 }
 
 function getPreviousQuestSets(questId) {
-  const keys = Object.keys(state.questHistory || {}).sort().reverse();
-  for (let k of keys) {
-    if (state.lastSetsRecord && state.lastSetsRecord[k] && state.lastSetsRecord[k][questId]) {
-      return state.lastSetsRecord[k][questId];
-    }
-  }
+  const today = getTodayKey();
+  const rec = state.lastSetsRecord || {};
+  const keys = Object.keys(rec).filter(k => k < today).sort().reverse();
+  for (const k of keys) if (rec[k][questId]) return rec[k][questId];
   return (state.lastSets && state.lastSets[questId]) || [];
 }
 
@@ -979,7 +973,7 @@ function renderWorkouts() {
     card.innerHTML = `
       <div class="flex justify-between items-center mb-1.5">
         <div class="flex items-center gap-2">
-          <span class="font-bold text-xs text-gray-200">${q.name}</span>
+          <span class="font-bold text-xs text-gray-200">${escH(q.name)}</span>
           <button onclick="editQuestName(${q.id})" class="text-[10px] text-gray-400 hover:text-cyan-400">✏️</button>
         </div>
         <div class="flex items-center gap-1.5">
@@ -1051,12 +1045,10 @@ function renderCalendar() {
 }
 
 function toggleDayStatus(k) {
+  if (k > getTodayKey()) return;
+  if (!state.questHistory) state.questHistory = {};
   if (!state.history[k]) {
     state.history[k] = 'completed';
-    const todayRoutine = state.routines[state.activeRoutine] || [];
-    if (!state.questHistory) state.questHistory = {};
-    state.questHistory[k] = {};
-    todayRoutine.forEach(q => { state.questHistory[k][q.id] = q.target; if(k === getTodayKey()) q.current = q.target; });
   } else if (state.history[k] === 'completed' || state.history[k] === true) {
     state.history[k] = 'rest';
   } else {
@@ -1153,7 +1145,7 @@ function renderAzkar() {
     const div = document.createElement("div");
     div.className = `card-bg p-4 rounded-2xl border transition ${isDone ? 'border-emerald-500/70 bg-emerald-950/25' : 'border-gray-800'}`;
     div.innerHTML = `
-      <div class="text-xs text-gray-200 leading-relaxed mb-3">${item.text}</div>
+      <div class="text-xs text-gray-200 leading-relaxed mb-3">${escH(item.text)}</div>
       <div class="flex justify-between items-center pt-2.5 border-t border-gray-800">
         <button onclick="decrementZekr(${index})" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${isDone ? 'bg-emerald-500 text-black' : 'bg-emerald-950 border border-emerald-500/60 text-emerald-400'}">
           ${isDone ? 'تم الاكتفاء ✔️' : `متبقي: ${item.current} /${item.total}`}
@@ -1213,7 +1205,7 @@ function renderDuas() {
     const div = document.createElement("div");
     div.className = `card-bg p-4 rounded-2xl border transition ${d.done ? 'border-blue-500/80 bg-blue-950/25' : 'border-gray-800'}`;
     div.innerHTML = `
-      <div class="text-xs text-blue-100 leading-relaxed mb-3">${d.text}</div>
+      <div class="text-xs text-blue-100 leading-relaxed mb-3">${escH(d.text)}</div>
       <div class="flex justify-between items-center pt-2.5 border-t border-gray-800">
         <button onclick="toggleDuaCheck(${index})" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${d.done ? 'bg-blue-500 text-black' : 'bg-gray-800 text-blue-300 border border-blue-500/40'}">
           ${d.done ? '✔ تم الدعاء' : 'وضع علامة صح ✔'}
@@ -1267,6 +1259,7 @@ function drawWheel() {
   if (n === 0) return;
   const seg = (2 * Math.PI) / n;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.lineWidth = 1; ctx.strokeStyle = "#0f172a";
 
   for (let i = 0; i < n; i++) {
     const start = i * seg + currentWheelAngle;
@@ -1336,7 +1329,7 @@ function renderTasks() {
     const div = document.createElement("div");
     div.className = "flex justify-between items-center bg-gray-900 border border-gray-800 p-2.5 rounded-xl text-xs";
     div.innerHTML = `
-      <span class="text-gray-200">${task}</span>
+      <span class="text-gray-200">${escH(task)}</span>
       <div class="flex gap-1.5">
         <button onclick="editTask(${idx})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-lg">✏️</button>
         <button onclick="removeTask(${idx})" class="px-2 py-1 bg-red-950 text-red-400 rounded-lg">✕</button>
@@ -1358,878 +1351,3 @@ function removeTask(idx) {
   if (state.wheelPlans.length <= 2) { alert("يجب بقاء خيارين على الأقل في العجلة!"); return; }
   state.wheelPlans.splice(idx, 1); saveData(); renderTasks(); drawWheel();
 }
-
-// ================= TELEGRAM =================
-let mediaRecorder = null;
-let audioChunks = [];
-let isRecording = false;
-
-const TG_API = () => `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}`;
-
-function setupTelegram() {
-  const t = prompt("Bot Token:", CONFIG.TELEGRAM_BOT_TOKEN);
-  if (t === null) return;
-  const c = prompt("Chat ID:", CONFIG.TELEGRAM_CHAT_ID);
-  if (c === null) return;
-  localStorage.setItem("tg_token", t.trim());
-  localStorage.setItem("tg_chat", c.trim());
-  alert("✅ تم الحفظ على جهازك");
-}
-
-function hasTelegramConfig() {
-  if (CONFIG.TELEGRAM_BOT_TOKEN && CONFIG.TELEGRAM_CHAT_ID) return true;
-  alert("اضغط ⚙️ إعداد تليجرام الأول وحط التوكن والـ chat id.");
-  return false;
-}
-
-async function toggleRecord() {
-  const btn = document.getElementById('recBtn');
-  const status = document.getElementById('rec-status');
-
-  if (!isRecording) {
-    if (!hasTelegramConfig()) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      audioChunks = [];
-      mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(t => t.stop());
-        const mime = mediaRecorder.mimeType || 'audio/webm';
-        const blob = new Blob(audioChunks, { type: mime });
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        audio.src = URL.createObjectURL(blob);
-        audio.className = "w-full h-8 mt-1";
-        document.getElementById('audioList').prepend(audio);
-
-        status.innerText = "⏳ جاري الإرسال لتليجرام...";
-        await sendAudioToTelegram(blob, mime);
-        status.innerText = "جاهز للتسجيل";
-        btn.innerText = "بدء التسجيل ⏺";
-        btn.className = "px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition";
-      };
-
-      mediaRecorder.start();
-      isRecording = true;
-      btn.innerText = "⏹ إيقاف وإرسال";
-      btn.className = "px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs transition animate-pulse";
-      status.innerText = "جارِ تسجيل صوتك...";
-    } catch (err) {
-      alert("يرجى منح إذن المايكروفون من إعدادات المتصفح أو تطبيق الموبايل.");
-    }
-  } else {
-    mediaRecorder.stop();
-    isRecording = false;
-  }
-}
-
-async function sendAudioToTelegram(blob, mime) {
-  let method, field, filename;
-  if (mime.includes("ogg")) { method = "sendVoice"; field = "voice"; filename = "journal.ogg"; }
-  else if (mime.includes("mp4")) { method = "sendAudio"; field = "audio"; filename = "journal.m4a"; }
-  else { method = "sendDocument"; field = "document"; filename = "journal.webm"; }
-
-  const fd = new FormData();
-  fd.append("chat_id", CONFIG.TELEGRAM_CHAT_ID);
-  fd.append(field, blob, filename);
-  fd.append("caption", "🎙️ يوميات صوتية جديدة: " + new Date().toLocaleDateString('ar-EG'));
-  try {
-    const res = await fetch(`${TG_API()}/${method}`, { method: "POST", body: fd });
-    const data = await res.json();
-    if (data.ok) alert("🚀 تم إرسال التسجيل لتليجرام بنجاح!");
-    else alert("خطأ تليجرام: " + data.description);
-  } catch (e) {
-    alert("تعذر الاتصال بتليجرام، تأكد من اتصال الإنترنت.");
-  }
-}
-
-async function sendPhotoToTelegram(fileInput) {
-  const file = fileInput.files[0];
-  if (!file) return;
-  if (!hasTelegramConfig()) { fileInput.value = ""; return; }
-  const status = document.getElementById('photoStatus');
-  status.innerText = "⏳ جاري رفع وإرسال الصورة لتليجرام...";
-
-  const fd = new FormData();
-  fd.append("chat_id", CONFIG.TELEGRAM_CHAT_ID);
-  fd.append("photo", file);
-  fd.append("caption", "📸 توثيق وإنجاز جديد: " + new Date().toLocaleDateString('ar-EG'));
-  try {
-    const res = await fetch(`${TG_API()}/sendPhoto`, { method: "POST", body: fd });
-    const data = await res.json();
-    if (data.ok) {
-      status.innerText = "✔️ تم إرسال الصورة بنجاح لتليجرام!";
-      setTimeout(() => { status.innerText = ""; }, 4000);
-    } else {
-      status.innerText = "❌ خطأ تليجرام: " + data.description;
-    }
-  } catch (err) {
-    status.innerText = "❌ تعذر الاتصال بالإنترنت.";
-  }
-  fileInput.value = "";
-}
-
-// ================= EXPORT / IMPORT =================
-function exportData() {
-  const a = document.createElement('a');
-  a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
-  a.download = `hunter_ultimate_backup_${getTodayKey()}.json`;
-  a.click();
-}
-function importData(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      state = Object.assign(state, JSON.parse(ev.target.result));
-      saveData(); recalculateStreakAndLevel(); renderAll(); applyHomeCustom(); applyHomeOrder();
-      alert("✅ تم استيراد كل بياناتك بنجاح!");
-    } catch (err) { alert("خطأ في قراءة ملف النسخة الاحتياطية."); }
-  };
-  reader.readAsText(file);
-  e.target.value = "";
-}
-
-// ================= TIMER + START =================
-function updateTimer() {
-  const now = new Date();
-  const midnight = new Date(now); midnight.setHours(24, 0, 0, 0);
-  const diff = midnight - now;
-  checkDayTransition();
-  if (typeof tickWorkoutTimer === 'function') tickWorkoutTimer();
-  if (typeof calculateRecoveryTime === 'function') calculateRecoveryTime();
-
-  const h = String(Math.floor((diff / 3600000) % 24)).padStart(2, '0');
-  const m = String(Math.floor((diff / 60000) % 60)).padStart(2, '0');
-  const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
-  const el = document.getElementById("countdown");
-  if (el) el.innerText = `${h}:${m}:${s}`;
-}
-
-if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
-setInterval(updateTimer, 1000);
-updateTimer();
-loadData();
-
-// ===== المعتقدات =====
-(function () {
-  if (!state.beliefs) {
-    state.beliefs = [
-      { id: 1, text: "مهمتك 24 ساعة بس" },
-      { id: 2, text: "أنت بتبطّل عشان ربنا، مش عشان أي حاجة تانية" },
-      { id: 3, text: "الله يراني، الله مطّلع عليّ" },
-      { id: 4, text: "الالتزام = التعافي" },
-      { id: 5, text: "عدم الالتزام = عدم التعافي" },
-      { id: 6, text: "زلّة ساعة = تدمير 4 أيام" }
-    ];
-    saveData();
-  }
-  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-  const old = document.getElementById('beliefsBox'); if (old) old.remove();
-  const box = document.createElement('div');
-  box.id = 'beliefsBox';
-  box.className = 'card-bg p-4 rounded-2xl border border-indigo-500/40 space-y-2.5';
-  box.innerHTML = `
-    <div class="flex justify-between items-center">
-      <h2 class="text-sm font-bold text-indigo-300">🧠 معتقداتي</h2>
-      <button onclick="blAdd()" class="text-[10px] bg-indigo-950 border border-indigo-500 px-3 py-1.5 rounded-xl text-indigo-300 font-bold">+ معتقد جديد</button>
-    </div>
-    <div id="beliefsList" class="space-y-2"></div>`;
-  document.getElementById('pane-beliefs').appendChild(box);
-
-  function render() {
-    const list = document.getElementById('beliefsList');
-    list.innerHTML = '';
-    state.beliefs.forEach((b, i) => {
-      const row = document.createElement('div');
-      row.className = 'flex justify-between items-center gap-2 bg-gray-900/60 border border-gray-800 rounded-xl p-3';
-      row.innerHTML = `
-        <span class="text-xs text-indigo-100 leading-relaxed flex-1">${esc(b.text)}</span>
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button onclick="blMove(${i},-1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▲</button>
-          <button onclick="blMove(${i},1)" class="px-2 py-1 bg-gray-800 text-gray-300 rounded-xl text-xs">▼</button>
-          <button onclick="blEdit(${b.id})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-xl text-xs">✏️</button>
-          <button onclick="blDel(${b.id})" class="px-2 py-1 bg-gray-800 text-red-400 rounded-xl text-xs">✕</button>
-        </div>`;
-      list.appendChild(row);
-    });
-  }
-
-  window.blAdd = () => {
-    const t = prompt("اكتب المعتقد الجديد:");
-    if (t && t.trim()) { state.beliefs.push({ id: Date.now(), text: t.trim() }); saveData(); render(); }
-  };
-  window.blEdit = id => {
-    const b = state.beliefs.find(x => x.id === id);
-    const t = prompt("تعديل المعتقد:", b.text);
-    if (t && t.trim()) { b.text = t.trim(); saveData(); render(); }
-  };
-  window.blDel = id => {
-    if (confirm("هل تريد حذف هذا المعتقد؟")) { state.beliefs = state.beliefs.filter(x => x.id !== id); saveData(); render(); }
-  };
-  window.blMove = (i, dir) => {
-    const t = i + dir;
-    if (t < 0 || t >= state.beliefs.length) return;
-    [state.beliefs[i], state.beliefs[t]] = [state.beliefs[t], state.beliefs[i]];
-    saveData(); render();
-  };
-  render();
-})();
-
-// ===== وحدة التراكينج (العادات / تايم بلوكينج / تراكينج النوم / السعرات) =====
-(function () {
-  const WEEK_START = 6;
-  const DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
-  const SHORT = ['أحد', 'اثنين', 'ثلاثاء', 'أربعاء', 'خميس', 'جمعة', 'سبت'];
-  const BADGE_NAMES = { 1: ['صقر الفجر', '🦅'], 2: ['عقل الصقر', '🧠'], 3: ['حارس الورد', '📖'], 4: ['الحديد', '🏋️'], 5: ['درع التعافي', '🛡️'], 6: ['فارس الليل', '🌙'] };
-  const TIERS = [7, 14, 30];
-  const DEFAULT_BLOCKS = [
-    { id: 1, label: '7 – 10 صباحًا' }, { id: 2, label: '10 صباحًا – الظهر' }, { id: 3, label: 'الظهر – العصر' },
-    { id: 4, label: 'العصر – المغرب' }, { id: 5, label: 'العشاء – 12' }, { id: 6, label: '12 – 3' }
-  ];
-
-  let dirty = false;
-  if (!state.habits) {
-    state.habits = {
-      list: [
-        { id: 1, name: "الفجر", type: "check" },
-        { id: 2, name: "المذاكرة / الحفظ", type: "time" },
-        { id: 3, name: "ورد المراجعة", type: "check" },
-        { id: 4, name: "التمرين", type: "check", auto: "workout" },
-        { id: 5, name: "التعافي (اليوميات والأذكار)", type: "check" },
-        { id: 6, name: "قيام الليل", type: "check" }
-      ],
-      log: {}
-    };
-    dirty = true;
-  }
-  if (!state.habits.reviews) { state.habits.reviews = {}; dirty = true; }
-  if (!state.habits.blockTpl) { state.habits.blockTpl = DEFAULT_BLOCKS.map(b => Object.assign({}, b)); dirty = true; }
-  if (!state.habits.blockText) { state.habits.blockText = {}; dirty = true; }
-  if (!state.habits.sleep) { state.habits.sleep = {}; dirty = true; }
-  if (!state.habits.calories) { state.habits.calories = {}; dirty = true; }
-  if (dirty) saveData();
-
-  const oldSec = document.getElementById('view-habits'); if (oldSec) oldSec.remove();
-
-  const H = () => state.habits;
-  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const fmt = m => m >= 60 ? `${Math.floor(m / 60)}س ${m % 60}د` : `${m}د`;
-  const keyToDate = k => new Date(k + 'T12:00:00');
-  const isFri = k => keyToDate(k).getDay() === 5;
-  const weekKeysOf = k => {
-    const d = keyToDate(k);
-    d.setDate(d.getDate() - ((d.getDay() - WEEK_START + 7) % 7));
-    return Array.from({ length: 7 }, (_, i) => { const x = new Date(d); x.setDate(d.getDate() + i); return getFormattedDate(x); });
-  };
-  const entry = (h, k) => (H().log[k] || {})[h.id];
-  const isDone = (h, k) => {
-    const e = entry(h, k);
-    if (h.type === 'time') return !!(e && e.min > 0);
-    if (e === true) return true;
-    if (e === false) return false;
-    return h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true);
-  };
-  const setE = (id, k, v) => { (H().log[k] = H().log[k] || {})[id] = v; saveData(); render(); if(typeof renderToday === 'function') renderToday(); };
-  const find = id => H().list.find(h => h.id === id);
-
-  const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
-  const durMin = (a, b) => { const x = toMin(a), y = toMin(b); if (x == null || y == null) return 0; let d = y - x; if (d < 0) d += 1440; return d; };
-  const fmtDur = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
-  const fmt12 = t => { if (!t) return '--'; const p = t.split(':'), h = +p[0]; return `${h % 12 || 12}:${p[1]} ${h >= 12 ? 'م' : 'ص'}`; };
-  const minToTime = m => { m = Math.round(m) % 1440; return String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0'); };
-  const inCls = 'text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200';
-
-  function firstKey() {
-    const ks = Object.keys(H().log).concat(Object.keys(state.history || {})).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
-    return ks.length ? ks[0] : getTodayKey();
-  }
-  function streakOf(h) {
-    const tk = getTodayKey();
-    const d = keyToDate(firstKey()), end = keyToDate(tk);
-    let run = 0, best = 0;
-    for (; d <= end; d.setDate(d.getDate() + 1)) {
-      const k = getFormattedDate(d);
-      if (isFri(k)) continue;
-      if (isDone(h, k)) { run++; if (run > best) best = run; }
-      else if (k !== tk) run = 0;
-    }
-    return { cur: run, best };
-  }
-  let ST = {};
-
-  function badgeList() {
-    const out = [];
-    H().list.forEach(h => {
-      const st = ST[h.id] || streakOf(h);
-      const nm = BADGE_NAMES[h.id] || [h.name, '🏅'];
-      let shownLocked = false;
-      TIERS.forEach((t, i) => {
-        const un = st.best >= t;
-        if (un || !shownLocked) {
-          out.push({ key: `h${h.id}_${t}`, emoji: nm[1], title: nm[0] + ' ' + '⭐'.repeat(i + 1), desc: `${t} يوم متواصل — ${h.name}`, un, prog: `${Math.min(st.cur, t)}/${t}` });
-          if (!un) shownLocked = true;
-        }
-      });
-    });
-    return out;
-  }
-  function checkBadges(list) {
-    if (!H().badgesSeen) {
-      H().badgesSeen = {};
-      list.filter(b => b.un).forEach(b => { H().badgesSeen[b.key] = 1; });
-      saveData();
-      return;
-    }
-    const fresh = list.filter(b => b.un && !H().badgesSeen[b.key]);
-    fresh.forEach((b, i) => {
-      H().badgesSeen[b.key] = 1;
-      setTimeout(() => showToast(`🏅 وسام جديد: ${b.emoji} ${b.title}`), i * 3300);
-    });
-    if (fresh.length) saveData();
-  }
-  function renderBadges() {
-    const box = document.getElementById('habitsBadges');
-    if (!box) return;
-    const bl = badgeList();
-    checkBadges(bl);
-    box.innerHTML = `
-      <div class="flex justify-between items-center">
-        <h3 class="text-sm font-bold text-yellow-300">🏅 الإنجازات</h3>
-        <span class="text-[10px] text-gray-400">${bl.filter(b => b.un).length} مفتوحة</span>
-      </div>
-      <div class="grid grid-cols-2 gap-2">${bl.map(b => `
-        <div class="rounded-lg border p-2 text-center ${b.un ? 'border-yellow-500/60 bg-yellow-950/20' : 'border-gray-800 opacity-50'}">
-          <div class="text-2xl">${b.un ? b.emoji : '🔒'}</div>
-          <div class="text-[11px] font-bold ${b.un ? 'text-yellow-200' : 'text-gray-400'}">${esc(b.title)}</div>
-          <div class="text-[9px] text-gray-400">${esc(b.desc)}</div>
-          ${b.un ? '' : `<div class="text-[9px] text-amber-400">${b.prog}</div>`}
-        </div>`).join('')}</div>`;
-  }
-
-  let selDay = getTodayKey();
-  let hbTab = 'habits';
-  let viewY = new Date().getFullYear(), viewM = new Date().getMonth();
-
-  const section = document.createElement('section');
-  section.id = 'view-habits';
-  section.className = 'hidden space-y-3';
-  const tabCls = 'py-2 rounded-lg border text-[10px] font-bold transition bg-gray-900 border-gray-800 text-gray-400';
-  section.innerHTML = `
-    <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
-      <div><h2 class="text-sm font-bold text-amber-400">📊 التراكينج <span class="text-[9px] text-gray-500">v7</span></h2>
-      <p id="habitsDayLabel" class="text-[11px] text-gray-400"></p></div>
-      <button id="hbAddBtn" onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
-    </div>
-    <div class="grid grid-cols-4 gap-1">
-      <button id="htab-habits" onclick="hbTabSet('habits')" class="${tabCls}">✅ العادات</button>
-      <button id="htab-blocks" onclick="hbTabSet('blocks')" class="${tabCls}">⏱ بلوكينج</button>
-      <button id="htab-day" onclick="hbTabSet('day')" class="${tabCls}">😴 النوم</button>
-      <button id="htab-cals" onclick="hbTabSet('cals')" class="${tabCls}">🥗 السعرات</button>
-    </div>
-    <div id="habitsMonth" class="card-bg p-3 rounded-xl border border-gray-800"></div>
-    <div id="paneHabits" class="space-y-3">
-      <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
-      <div id="habitsList" class="space-y-2.5"></div>
-      <div id="habitsBadges" class="card-bg p-3 rounded-xl border border-yellow-500/40 space-y-2"></div>
-    </div>
-    <div id="paneBlocks" class="hidden space-y-3">
-      <div id="habitsBlocks" class="card-bg p-3 rounded-xl border border-teal-500/40 space-y-2"></div>
-    </div>
-    <div id="paneDay" class="hidden space-y-3">
-      <div id="habitsSleep" class="card-bg p-3 rounded-xl border border-sky-500/40 space-y-2"></div>
-    </div>
-    <div id="paneCals" class="hidden space-y-3">
-      <div id="habitsCals" class="card-bg p-3 rounded-xl border border-orange-500/40 space-y-3"></div>
-    </div>`;
-  document.querySelector('main').appendChild(section);
-
-  window.renderHabitsView = function () {
-    selDay = getTodayKey(); hbTab = 'habits';
-    viewY = new Date().getFullYear(); viewM = new Date().getMonth();
-    render();
-  };
-  window.setMainTab = n => { hbTab = n; render(); };
-
-  function setTabUI() {
-    [['habits', 'paneHabits'], ['blocks', 'paneBlocks'], ['day', 'paneDay'], ['cals', 'paneCals']].forEach(x => {
-      document.getElementById(x[1]).classList.toggle('hidden', x[0] !== hbTab);
-      document.getElementById('htab-' + x[0]).className = 'py-2 rounded-lg border text-[10px] font-bold transition ' +
-        (x[0] === hbTab ? 'bg-amber-950 border-amber-400 text-amber-300' : 'bg-gray-900 border-gray-800 text-gray-400');
-    });
-    document.getElementById('hbAddBtn').classList.toggle('hidden', hbTab !== 'habits');
-  }
-
-  function renderMonth(today) {
-    const list = H().list;
-    const first = new Date(viewY, viewM, 1, 12);
-    const dim = new Date(viewY, viewM + 1, 0).getDate();
-    const offset = (first.getDay() - WEEK_START + 7) % 7;
-    const title = first.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
-    const atNow = viewY === new Date().getFullYear() && viewM === new Date().getMonth();
-    let head = '';
-    for (let i = 0; i < 7; i++) head += `<span>${SHORT[(WEEK_START + i) % 7]}</span>`;
-    let cells = '';
-    for (let i = 0; i < offset; i++) cells += '<div></div>';
-    for (let day = 1; day <= dim; day++) {
-      const k = getFormattedDate(new Date(viewY, viewM, day, 12));
-      const fut = k > today, fri = isFri(k), sel = k === selDay;
-      const n = list.filter(h => isDone(h, k)).length;
-      const sub = fri ? '📝' : (fut ? '·' : n + '/' + list.length);
-      const cls = sel ? 'bg-amber-500 text-black border-amber-400 font-bold'
-        : (fri ? 'bg-indigo-950/50 border-indigo-500/50 text-indigo-300' : 'bg-gray-900 border-gray-800 text-gray-300');
-      cells += `<button ${fut ? 'disabled' : ''} onclick="hbDay('${k}')" class="py-1 rounded-lg border text-center transition ${cls} ${fut ? 'opacity-30' : ''} ${k === today ? 'ring-1 ring-amber-300' : ''}">
-        <div class="text-xs font-bold">${day}</div><div class="text-[9px] ${sel ? '' : 'text-amber-400'}">${sub}</div></button>`;
-    }
-    document.getElementById('habitsMonth').innerHTML = `
-      <div class="flex justify-between items-center mb-2">
-        <button onclick="hbMonth(-1)" class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300">▶ السابق</button>
-        <span class="text-xs font-bold text-amber-300">${title}</span>
-        <button onclick="hbMonth(1)" ${atNow ? 'disabled' : ''} class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300 ${atNow ? 'opacity-30' : ''}">التالي ◀</button>
-      </div>
-      <div class="grid grid-cols-7 gap-1 text-center text-[9px] text-gray-500 mb-1 font-semibold">${head}</div>
-      <div class="grid grid-cols-7 gap-1">${cells}</div>`;
-  }
-
-  function reviewHTML(wk, past) {
-    const list = H().list;
-    const rv = Object.assign({ won: '', change: '' }, H().reviews[wk[0]]);
-    const a = keyToDate(wk[0]), b = keyToDate(wk[6]);
-    const rows = list.map(h => {
-      const c = past.filter(k => isDone(h, k)).length;
-      const p = past.length ? Math.round(c / past.length * 100) : 0;
-      let extra = '';
-      if (h.type === 'time') {
-        let st = 0, me = 0;
-        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else st += x.min; } });
-        extra = `<div class="text-[10px] text-gray-400 mt-0.5">📚 مذاكرة ${fmt(st)} • 📖 حفظ ${fmt(me)}</div>`;
-      }
-      return `<div>
-        <div class="flex justify-between text-xs"><span class="text-gray-200">${esc(h.name)}</span><span class="text-amber-400 font-bold">${c}/${past.length} (${p}%)</span></div>
-        <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-1"><div class="bg-amber-400 h-1.5" style="width:${p}%"></div></div>${extra}</div>`;
-    }).join('');
-    const qs = [].concat((state.routines && state.routines.day1) || [], (state.routines && state.routines.day2) || []);
-    const wrows = qs.map(q => {
-      let t = 0, n = 0;
-      wk.forEach(k => { const r = state.questHistory && state.questHistory[k] ? state.questHistory[k][q.id] : 0; if (r > 0) { t += r; n++; } });
-      return n ? `<div class="flex justify-between text-xs"><span class="text-gray-300">${esc(q.name)}</span><span class="text-cyan-300">${(t / n).toFixed(1)} (في ${n} أيام)</span></div>` : '';
-    }).join('');
-    let wsec = 0;
-    wk.forEach(k => { wsec += (state.workoutTimes && state.workoutTimes[k]) || 0; });
-    return `<div class="card-bg p-3 rounded-xl border border-indigo-500/40 space-y-3">
-      <h3 class="text-sm font-bold text-indigo-300">📝 مراجعة الأسبوع (${a.getDate()}/${a.getMonth() + 1} – ${b.getDate()}/${b.getMonth() + 1})</h3>
-      <div class="space-y-2">${rows || '<p class="text-xs text-gray-500">مفيش عادات</p>'}</div>
-      ${wrows ? `<div class="pt-2 border-t border-gray-800 space-y-1"><p class="text-[11px] text-gray-400">📈 متوسط التمارين${wsec ? ` • إجمالي وقت التمرين: ${fmtDur(Math.round(wsec / 60))}` : ''}</p>${wrows}</div>` : ''}
-      <div class="pt-2 border-t border-gray-800 space-y-2">
-        <label class="text-[11px] text-gray-300">✅ إيه اللي نجح الأسبوع ده؟</label>
-        <textarea rows="3" onchange="hbReview('${wk[0]}','won',this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded p-2 text-gray-200">${esc(rv.won)}</textarea>
-        <label class="text-[11px] text-gray-300">🔧 إيه اللي هغيّره الأسبوع الجاي؟</label>
-        <textarea rows="3" onchange="hbReview('${wk[0]}','change',this.value)" class="w-full text-xs bg-gray-900 border border-gray-700 rounded p-2 text-gray-200">${esc(rv.change)}</textarea>
-      </div></div>`;
-  }
-
-  function render() {
-    const today = getTodayKey();
-    ST = {};
-    H().list.forEach(h => { ST[h.id] = streakOf(h); });
-    setTabUI();
-    renderMonth(today);
-    const sd = keyToDate(selDay), fri = isFri(selDay);
-    document.getElementById('habitsDayLabel').innerText = (hbTab === 'habits' && fri)
-      ? 'الجمعة: مراجعة الأسبوع (معفية من العادات)'
-      : (selDay === today ? 'اليوم' : 'يوم') + ': ' + DAYS[sd.getDay()] + ' ' + sd.getDate();
-    if (hbTab === 'habits') renderHabitsPane(today);
-    else if (hbTab === 'blocks') renderBlocks();
-    else if (hbTab === 'day') renderSleep();
-    else if (hbTab === 'cals') renderCalories();
-    if (typeof renderToday === 'function') renderToday();
-  }
-
-  function renderHabitsPane(today) {
-    const box = document.getElementById('habitsList');
-    const list = H().list;
-    const wk = weekKeysOf(selDay);
-    const trk = wk.filter(k => !isFri(k));
-    const past = trk.filter(k => k <= today);
-    const fri = isFri(selDay);
-
-    const wDone = list.reduce((s, h) => s + past.filter(k => isDone(h, k)).length, 0);
-    const wMax = Math.max(1, list.length * past.length);
-    const wPct = Math.round(wDone / wMax * 100);
-    let sum = '';
-    if (!fri) {
-      const dDone = list.filter(h => isDone(h, selDay)).length;
-      const dPct = list.length ? Math.round(dDone / list.length * 100) : 0;
-      sum += `<div class="flex justify-between text-xs"><span class="text-gray-300">اليوم المختار</span><span class="text-amber-400 font-bold">${dDone} / ${list.length} (${dPct}%)</span></div>
-        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-amber-400 h-2 transition-all" style="width:${dPct}%"></div></div>`;
-    }
-    sum += `<div class="flex justify-between text-xs pt-1"><span class="text-gray-300">إجمالي الأسبوع</span><span class="text-cyan-400 font-bold">${wDone} / ${wMax} (${wPct}%)</span></div>
-      <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-cyan-400 h-2 transition-all" style="width:${wPct}%"></div></div>`;
-    document.getElementById('habitsSummary').innerHTML = sum;
-
-    if (fri) { box.innerHTML = reviewHTML(wk, past); renderBadges(); return; }
-
-    box.innerHTML = '';
-    list.forEach((h, i) => {
-      const d = isDone(h, selDay);
-      const st = ST[h.id] || { cur: 0, best: 0 };
-      const wCount = past.filter(k => isDone(h, k)).length;
-      const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
-      let middle = '', extra = '';
-      if (h.type === 'time') {
-        const e = entry(h, selDay) || { min: 0, mode: 'study' };
-        middle = `<div class="flex items-center gap-2 mt-2">
-          <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
-          <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
-        let ss = 0, me = 0;
-        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else ss += x.min; } });
-        extra = ` • مذاكرة ${fmt(ss)} • حفظ ${fmt(me)}`;
-      }
-      const mark = h.type === 'time'
-        ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
-        : `<button onclick="hbToggle(${h.id}, event)" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
-      const card = document.createElement('div');
-      card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
-      card.innerHTML = `
-        <div class="flex justify-between items-center">
-          <div class="flex items-center gap-2.5">${mark}
-            <div>
-              <div class="text-xs font-bold text-gray-200">${esc(h.name)}</div>
-              <div class="text-[10px] text-orange-400">🔥 ${st.cur} يوم <span class="text-gray-500">• 🏆 أفضل ${st.best}</span></div>
-            </div>
-          </div>
-          <div class="flex items-center gap-1">
-            <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-            <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-            <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-            <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
-          </div>
-        </div>${middle}
-        <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
-          <div class="flex gap-1">${dots}</div>
-          <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
-        </div>`;
-      box.appendChild(card);
-    });
-    renderBadges();
-  }
-
-  function renderBlocks() {
-    const box = document.getElementById('habitsBlocks');
-    const tpl = H().blockTpl, txt = H().blockText[selDay] || {};
-    const rows = tpl.map((b, i) => `
-      <div class="bg-gray-900/60 border border-gray-800 rounded-lg p-2 space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-teal-200">${esc(b.label)}</span>
-          <div class="flex items-center gap-1">
-            <button onclick="tbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-            <button onclick="tbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-            <button onclick="tbRename(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-            <button onclick="tbDel(${b.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
-          </div>
-        </div>
-        <input type="text" value="${esc(txt[b.id] || '')}" placeholder="هتعمل إيه في البلوك ده؟" onchange="tbText(${b.id}, this.value)" class="w-full ${inCls}">
-      </div>`).join('');
-    box.innerHTML = `
-      <div class="flex justify-between items-center">
-        <h3 class="text-sm font-bold text-teal-300">⏱ تايم بلوكينج</h3>
-        <button onclick="tbAdd()" class="text-[10px] bg-teal-950 border border-teal-500 px-2 py-1 rounded text-teal-300 font-bold">+ بلوك جديد</button>
-      </div>
-      <p class="text-[10px] text-gray-400">البلوكات ثابتة لكل الأيام، واللي بتكتبه قدام كل بلوك بيتحفظ لليوم المختار بس.</p>
-      ${tpl.length ? `<div class="space-y-2">${rows}</div>` : '<p class="text-[11px] text-gray-500">مفيش بلوكات. ضيف أول بلوك.</p>'}`;
-  }
-
-  function renderSleep() {
-    const box = document.getElementById('habitsSleep');
-    const today = getTodayKey();
-    const sl = Object.assign({ bed: '', wake: '' }, H().sleep[selDay]);
-    const dur = sl.bed && sl.wake ? durMin(sl.bed, sl.wake) : 0;
-    let n = 0, sumD = 0, sumBed = 0, sumWake = 0;
-    weekKeysOf(selDay).filter(k => k <= today).forEach(k => {
-      const x = H().sleep[k];
-      if (x && x.bed && x.wake) {
-        n++; sumD += durMin(x.bed, x.wake);
-        let b = toMin(x.bed); if (b < 720) b += 1440;
-        sumBed += b; sumWake += toMin(x.wake);
-      }
-    });
-    box.innerHTML = `
-      <h3 class="text-sm font-bold text-sky-300">😴 النوم والاستيقاظ</h3>
-      <p class="text-[10px] text-gray-400">سجّل نمت إمتى امبارح وصحيت إمتى في اليوم المختار</p>
-      <div class="grid grid-cols-2 gap-2">
-        <div><label class="text-[11px] text-gray-300 block mb-1">🌙 وقت النوم</label><input type="time" value="${sl.bed}" onchange="slSet('bed',this.value)" class="w-full ${inCls}"></div>
-        <div><label class="text-[11px] text-gray-300 block mb-1">☀️ وقت الاستيقاظ</label><input type="time" value="${sl.wake}" onchange="slSet('wake',this.value)" class="w-full ${inCls}"></div>
-      </div>
-      ${dur ? `<p class="text-xs text-sky-200">مدة النوم: <strong>${fmtDur(dur)}</strong></p>` : ''}
-      <div class="pt-2 border-t border-gray-800 text-[11px] text-gray-300 space-y-0.5">
-        ${n ? `<div>📊 متوسط الأسبوع (${n} أيام): نوم <strong class="text-sky-300">${fmtDur(Math.round(sumD / n))}</strong></div>
-        <div>🌙 متوسط وقت النوم: <strong class="text-sky-300">${fmt12(minToTime(sumBed / n))}</strong> • ☀️ متوسط الاستيقاظ: <strong class="text-sky-300">${fmt12(minToTime(sumWake / n))}</strong></div>` : '<div class="text-gray-500">لسه مفيش أيام مسجلة الأسبوع ده</div>'}
-      </div>`;
-  }
-
-  function renderCalories() {
-    const box = document.getElementById('habitsCals');
-    const meals = H().calories[selDay] || [];
-    let totCal = 0, totPro = 0, totFat = 0, totCarb = 0;
-    meals.forEach(m => {
-      totCal += Number(m.cal) || 0;
-      totPro += Number(m.pro) || 0;
-      totFat += Number(m.fat) || 0;
-      totCarb += Number(m.carb) || 0;
-    });
-
-    const rows = meals.map((m, idx) => `
-      <div class="flex justify-between items-center bg-gray-900/70 border border-gray-800 rounded-lg p-2.5 text-xs">
-        <div>
-          <strong class="text-orange-300 block text-sm">${esc(m.name)}</strong>
-          <span class="text-[10px] text-gray-400">🔥 ${m.cal || 0} كالوري • بروتين: ${m.pro || 0}جم • دهون: ${m.fat || 0}جم • كارب: ${m.carb || 0}جم</span>
-        </div>
-        <button onclick="calDel(${idx})" class="text-red-400 hover:text-red-300 px-2 py-1 text-xs">✕</button>
-      </div>`).join('');
-
-    box.innerHTML = `
-      <div class="flex justify-between items-center">
-        <h3 class="text-sm font-bold text-orange-400">🥗 تراكينج السعرات والماكروز</h3>
-        <span class="text-[10px] text-gray-400">المجموع: <strong class="text-orange-300">${totCal} kcal</strong></span>
-      </div>
-      <div class="grid grid-cols-4 gap-1 text-center bg-black/40 p-2 rounded-xl border border-gray-800 text-[10px]">
-        <div><span class="text-gray-400 block">السعرات</span><strong class="text-orange-400 text-xs">${totCal}</strong></div>
-        <div><span class="text-gray-400 block">بروتين</span><strong class="text-cyan-400 text-xs">${totPro}ج</strong></div>
-        <div><span class="text-gray-400 block">دهون</span><strong class="text-yellow-400 text-xs">${totFat}ج</strong></div>
-        <div><span class="text-gray-400 block">كارب</span><strong class="text-emerald-400 text-xs">${totCarb}ج</strong></div>
-      </div>
-      <div class="space-y-2">${rows || '<p class="text-[11px] text-gray-500 text-center py-2">مفيش وجبات مسجلة اليوم.</p>'}</div>
-      <div class="pt-2 border-t border-gray-800 space-y-2">
-        <input type="text" id="mName" placeholder="اسم الوجبة (مثلاً: صدور فراخ ورز)..." class="w-full ${inCls}">
-        <div class="grid grid-cols-4 gap-1.5">
-          <input type="number" id="mCal" placeholder="كالوري" class="w-full text-center ${inCls}">
-          <input type="number" id="mPro" placeholder="بروتين" class="w-full text-center ${inCls}">
-          <input type="number" id="mFat" placeholder="دهون" class="w-full text-center ${inCls}">
-          <input type="number" id="mCarb" placeholder="كارب" class="w-full text-center ${inCls}">
-        </div>
-        <button onclick="calAdd()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold text-xs transition">+ إضافة الوجبة</button>
-      </div>`;
-  }
-
-  window.calAdd = () => {
-    const name = document.getElementById('mName').value.trim();
-    const cal = parseInt(document.getElementById('mCal').value, 10) || 0;
-    const pro = parseInt(document.getElementById('mPro').value, 10) || 0;
-    const fat = parseInt(document.getElementById('mFat').value, 10) || 0;
-    const carb = parseInt(document.getElementById('mCarb').value, 10) || 0;
-    if (!name) { alert('اكتب اسم الوجبة!'); return; }
-    H().calories[selDay] = H().calories[selDay] || [];
-    H().calories[selDay].push({ name, cal, pro, fat, carb });
-    saveData(); renderCalories();
-    if(typeof renderToday === 'function') renderToday();
-  };
-
-  window.calDel = idx => {
-    if (confirm('حذف هذه الوجبة؟')) {
-      H().calories[selDay].splice(idx, 1);
-      saveData(); renderCalories();
-      if(typeof renderToday === 'function') renderToday();
-    }
-  };
-
-  window.hbTabSet = n => { hbTab = n; render(); };
-  window.hbDay = k => { selDay = k; render(); };
-  window.hbMonth = dir => {
-    let y = viewY, m = viewM + dir;
-    if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
-    const now = new Date();
-    if (y > now.getFullYear() || (y === now.getFullYear() && m > now.getMonth())) return;
-    viewY = y; viewM = m; render();
-  };
-  window.hbReview = (wk, field, v) => {
-    H().reviews[wk] = Object.assign({ won: '', change: '' }, H().reviews[wk], { [field]: v });
-    saveData();
-  };
-  window.hbToggle = (id, e) => {
-    if (!isDone(find(id), selDay)) fx(e, '✅ تمام');
-    setE(id, selDay, !isDone(find(id), selDay));
-  };
-  window.hbMode = id => {
-    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
-    setE(id, selDay, { min: e.min, mode: e.mode === 'memo' ? 'study' : 'memo' });
-  };
-  window.hbMin = id => {
-    const e = entry(find(id), selDay) || { min: 0, mode: 'study' };
-    const v = prompt("عملت كام دقيقة؟", e.min || "");
-    if (v === null) return;
-    setE(id, selDay, { min: Math.max(0, parseInt(v, 10) || 0), mode: e.mode });
-  };
-  window.hbAdd = () => {
-    const n = prompt("اسم العادة:");
-    if (!n || !n.trim()) return;
-    const timed = confirm("العادة دي بالوقت؟\nموافق = بالوقت (دقايق)\nإلغاء = علامة صح");
-    H().list.push({ id: Date.now(), name: n.trim(), type: timed ? 'time' : 'check' });
-    saveData(); render();
-  };
-  window.hbEdit = id => { const h = find(id), n = prompt("تعديل اسم العادة:", h.name); if (n && n.trim()) { h.name = n.trim(); saveData(); render(); } };
-  window.hbDel = id => { if (confirm("تحذف العادة دي؟")) { H().list = H().list.filter(h => h.id !== id); saveData(); render(); } };
-  window.hbMove = (i, dir) => {
-    const l = H().list, t = i + dir;
-    if (t < 0 || t >= l.length) return;
-    [l[i], l[t]] = [l[t], l[i]];
-    saveData(); render();
-  };
-
-  window.tbText = (id, v) => {
-    H().blockText[selDay] = H().blockText[selDay] || {};
-    H().blockText[selDay][id] = v;
-    saveData();
-  };
-  window.tbAdd = () => {
-    const l = prompt("وقت البلوك (مثلاً: 3 – 6 م أو المغرب – العشاء):");
-    if (l && l.trim()) { H().blockTpl.push({ id: Date.now(), label: l.trim() }); saveData(); renderBlocks(); }
-  };
-  window.tbRename = id => {
-    const b = H().blockTpl.find(x => x.id === id);
-    const l = prompt("تعديل وقت البلوك:", b.label);
-    if (l && l.trim()) { b.label = l.trim(); saveData(); renderBlocks(); }
-  };
-  window.tbDel = id => {
-    if (confirm("تحذف البلوك ده؟")) { H().blockTpl = H().blockTpl.filter(b => b.id !== id); saveData(); renderBlocks(); }
-  };
-  window.tbMove = (i, dir) => {
-    const l = H().blockTpl, t = i + dir;
-    if (t < 0 || t >= l.length) return;
-    [l[i], l[t]] = [l[t], l[i]];
-    saveData(); renderBlocks();
-  };
-
-  window.slSet = (field, v) => {
-    H().sleep[selDay] = Object.assign({ bed: '', wake: '' }, H().sleep[selDay], { [field]: v });
-    saveData(); renderSleep();
-    if(typeof renderToday === 'function') renderToday();
-  };
-})();
-
-// ================= كارت النهارده في الرئيسية =================
-window.renderToday = function () {
-  const box = document.getElementById('today-card');
-  if (!box) return;
-  const k = getTodayKey(), now = new Date();
-  const bar = (p, c) => `<div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-2"><div class="${c} h-1.5" style="width:${Math.max(0, Math.min(100, p))}%"></div></div>`;
-  const tile = (label, value, pct, done, go, color) => `
-    <button onclick="${go}" class="rounded-xl border p-2.5 text-right transition ${done ? 'border-emerald-500/60 bg-emerald-950/20' : 'border-gray-800 bg-gray-900/40'}">
-      <div class="text-[10px] text-gray-400">${label}</div>
-      <div class="text-sm font-bold ${done ? 'text-emerald-300' : 'text-gray-100'} mt-0.5">${value}</div>
-      ${bar(pct, done ? 'bg-emerald-400' : color)}
-    </button>`;
-  
-  const list = (state.habits && state.habits.list) ? state.habits.list : [];
-  let habitsTile;
-  if (now.getDay() === 5) habitsTile = tile('✅ العادات', '📝 مراجعة الجمعة', 0, false, "showView('habits')", 'bg-amber-400');
-  else {
-    const n = list.filter(h => {
-      const e = (state.habits.log[k] || {})[h.id];
-      if (h.type === 'time') return !!(e && e.min > 0);
-      return e === true || (h.auto === 'workout' && (state.history[k] === 'completed' || state.history[k] === true));
-    }).length;
-    habitsTile = tile('✅ العادات', `${n} / ${list.length}`, list.length ? n / list.length * 100 : 0, list.length > 0 && n === list.length, "showView('habits')", 'bg-amber-400');
-  }
-
-  const completed = state.history[k] === 'completed' || state.history[k] === true;
-  const rest = state.history[k] === 'rest';
-  const qs = (state.routines && state.routines[state.activeRoutine]) || [];
-  const qd = qs.filter(q => q.current >= q.target).length;
-  let wv, wp = 0, wdone = false;
-  if (completed) { wv = '✅ خلصت'; wp = 100; wdone = true; }
-  else if (rest) { wv = '🌿 يوم راحة'; wp = 100; wdone = true; }
-  else if (state.penaltyActive) wv = '⚠️ عقوبة';
-  else { wv = `${qd} / ${qs.length} تمرين`; wp = qs.length ? qd / qs.length * 100 : 0; }
-  const wt = (state.workoutTimes && state.workoutTimes[k]) || 0;
-  if (wt) wv += ` • ⏱ ${Math.round(wt / 60)}د`;
-  const workoutTile = tile('🏋️ التمرين', wv, wp, wdone, "showView('workouts')", 'bg-cyan-400');
-
-  const az = state.azkar || [], rem = az.filter(z => z.current > 0).length;
-  const azTile = tile('📿 الأذكار', rem ? `باقي ${rem} من ${az.length}` : '✅ خلصتهم', az.length ? (az.length - rem) / az.length * 100 : 0, az.length > 0 && rem === 0, "showView('recovery');recTab('adhkar')", 'bg-emerald-400');
-
-  const du = state.duas || [], dn = du.filter(d => d.done).length;
-  const duTile = tile('🤲 الدعاء', `${dn} / ${du.length}`, du.length ? dn / du.length * 100 : 0, du.length > 0 && dn === du.length, "showView('recovery');recTab('duaa')", 'bg-blue-400');
-
-  const sl = state.habits && state.habits.sleep && state.habits.sleep[k];
-  const sleepOk = sl && sl.bed && sl.wake;
-  const durMinCalc = (a, b) => {
-    const toMin = t => { if (!t) return null; const p = t.split(':'); return (+p[0]) * 60 + (+p[1]); };
-    const x = toMin(a), y = toMin(b); if (x == null || y == null) return 0; let d = y - x; if (d < 0) d += 1440; return d;
-  };
-  const fmtDurCalc = m => { const h = Math.floor(m / 60), r = m % 60; return h ? (r ? `${h}س ${r}د` : `${h}س`) : `${r}د`; };
-  const sleepTile = tile('😴 النوم', sleepOk ? fmtDurCalc(durMinCalc(sl.bed, sl.wake)) : 'سجّل نومك', sleepOk ? 100 : 0, !!sleepOk, 'openDayTrackerFromHome()', 'bg-sky-400');
-
-  const meals = (state.habits && state.habits.calories && state.habits.calories[k]) || [];
-  const totCals = meals.reduce((s, m) => s + (Number(m.cal) || 0), 0);
-  const calsTile = tile('🥗 السعرات', `${totCals} kcal`, totCals ? 50 : 0, totCals > 0, "openDayTrackerFromHome()", 'bg-orange-400');
-
-  box.innerHTML = `
-    <div class="flex justify-between items-center">
-      <h3 class="text-sm font-bold text-cyan-300">📍 النهارده</h3>
-      <span class="text-[10px] text-gray-400">${DAYS[now.getDay()]} ${now.getDate()}</span>
-    </div>
-    <div class="grid grid-cols-2 gap-2">${habitsTile}${workoutTile}${azTile}${duTile}${sleepTile}${calsTile}</div>
-    <div class="text-[10px] text-gray-400 pt-1">🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak || 0}</strong> يوم</div>`;
-};
-window.renderToday();
-
-// ================= النسخ الاحتياطي على تليجرام =================
-let backupBusy = false;
-function renderBackupStatus() {
-  const el = document.getElementById('backup-status');
-  if (!el) return;
-  const b = state.lastBackup;
-  el.innerText = b ? `آخر نسخة: ${b.date}${b.auto ? ' (تلقائية)' : ''}` : 'لسه مفيش نسخة احتياطية';
-}
-
-async function backupToTelegram(manual, e) {
-  if (backupBusy) return false;
-  if (!(CONFIG.TELEGRAM_BOT_TOKEN && CONFIG.TELEGRAM_CHAT_ID)) {
-    if (manual) alert('اضغط ⚙️ إعداد تليجرام في ركن اليوميات الأول.');
-    return false;
-  }
-  backupBusy = true;
-  const el = document.getElementById('backup-status');
-  if (manual && el) el.innerText = '⏳ جاري الإرسال...';
-  try {
-    const today = getTodayKey();
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-    const fd = new FormData();
-    fd.append('chat_id', CONFIG.TELEGRAM_CHAT_ID);
-    fd.append('document', blob, `hunter_backup_${today}.json`);
-    fd.append('caption', `☁️ نسخة احتياطية Hunter • ${today}`);
-    const res = await fetch(`${TG_API()}/sendDocument`, { method: 'POST', body: fd });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.description);
-    state.lastBackup = { date: today, ts: Date.now(), auto: !manual };
-    saveData();
-    if (manual) fx(e, '☁️ اتبعتت');
-    return true;
-  } catch (err) {
-    if (manual) alert('تعذر إرسال النسخة: ' + (err.message || 'تأكد من الإنترنت'));
-    return false;
-  } finally {
-    backupBusy = false;
-    renderBackupStatus();
-  }
-}
-
-function autoBackupCheck() {
-  const today = getTodayKey();
-  const last = state.lastBackup ? state.lastBackup.date : null;
-  if (last === today) return;
-  const isFriday = new Date().getDay() === 5;
-  const daysSince = last ? Math.floor((new Date(today + 'T12:00:00') - new Date(last + 'T12:00:00')) / 86400000) : 999;
-  if (isFriday || daysSince >= 7) backupToTelegram(false);
-}
-
-renderBackupStatus();
-autoBackupCheck();
-document.addEventListener('visibilitychange', () => { if (!document.hidden) autoBackupCheck(); });
-</script>
-</body>
-</html>
