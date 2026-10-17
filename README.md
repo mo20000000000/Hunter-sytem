@@ -1589,16 +1589,26 @@ loadData();
     { id: 4, label: 'العصر – المغرب' }, { id: 5, label: 'العشاء – 12' }, { id: 6, label: '12 – 3' }
   ];
 
+  // بلوكات العادات
+  const HB = [
+    { id: 'prayer', name: '🕌 بلوك الصلاة' },
+    { id: 'taahud', name: '📖 بلوك التعاهد' },
+    { id: 'career', name: '💼 بلوك المهنة' },
+    { id: 'recovery', name: '🌱 بلوك التعافي' }
+  ];
+  const DEFAULT_BLOCK_MAP = { 1: 'prayer', 6: 'prayer', 3: 'taahud', 2: 'career', 4: 'recovery', 5: 'recovery' };
+  const blockOf = h => HB.some(b => b.id === h.block) ? h.block : 'career';
+
   let dirty = false;
   if (!state.habits) {
     state.habits = {
       list: [
-        { id: 1, name: "الفجر", type: "check" },
-        { id: 2, name: "المذاكرة / الحفظ", type: "time" },
-        { id: 3, name: "ورد المراجعة", type: "check" },
-        { id: 4, name: "التمرين", type: "check", auto: "workout" },
-        { id: 5, name: "التعافي (اليوميات والأذكار)", type: "check" },
-        { id: 6, name: "قيام الليل", type: "check" }
+        { id: 1, name: "الفجر", type: "check", block: "prayer" },
+        { id: 6, name: "قيام الليل", type: "check", block: "prayer" },
+        { id: 3, name: "ورد المراجعة", type: "check", block: "taahud" },
+        { id: 2, name: "المذاكرة / الحفظ", type: "time", block: "career" },
+        { id: 4, name: "التمرين", type: "check", auto: "workout", block: "recovery" },
+        { id: 5, name: "التعافي (اليوميات والأذكار)", type: "check", block: "recovery" }
       ],
       log: {}
     };
@@ -1609,6 +1619,10 @@ loadData();
   if (!state.habits.blockText) { state.habits.blockText = {}; dirty = true; }
   if (!state.habits.sleep) { state.habits.sleep = {}; dirty = true; }
   if (!state.habits.calories) { state.habits.calories = {}; dirty = true; }
+  // ترقية العادات القديمة: إسناد بلوك لكل عادة ليس لها بلوك
+  state.habits.list.forEach(h => {
+    if (!h.block) { h.block = DEFAULT_BLOCK_MAP[h.id] || 'career'; dirty = true; }
+  });
   if (dirty) saveData();
 
   const oldSec = document.getElementById('view-habits'); if (oldSec) oldSec.remove();
@@ -1720,7 +1734,6 @@ loadData();
     <div class="card-bg p-3 rounded-xl border border-amber-500/40 flex justify-between items-center">
       <div><h2 class="text-sm font-bold text-amber-400">📊 التراكينج <span class="text-[9px] text-gray-500">v7</span></h2>
       <p id="habitsDayLabel" class="text-[11px] text-gray-400"></p></div>
-      <button id="hbAddBtn" onclick="hbAdd()" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة جديدة</button>
     </div>
     <div class="grid grid-cols-4 gap-1">
       <button id="htab-habits" onclick="hbTabSet('habits')" class="${tabCls}">✅ العادات</button>
@@ -1731,7 +1744,7 @@ loadData();
     <div id="habitsMonth" class="card-bg p-3 rounded-xl border border-gray-800"></div>
     <div id="paneHabits" class="space-y-3">
       <div id="habitsSummary" class="card-bg p-3 rounded-xl border border-gray-800 space-y-2"></div>
-      <div id="habitsList" class="space-y-2.5"></div>
+      <div id="habitsList" class="space-y-4"></div>
       <div id="habitsBadges" class="card-bg p-3 rounded-xl border border-yellow-500/40 space-y-2"></div>
     </div>
     <div id="paneBlocks" class="hidden space-y-3">
@@ -1758,7 +1771,6 @@ loadData();
       document.getElementById('htab-' + x[0]).className = 'py-2 rounded-lg border text-[10px] font-bold transition ' +
         (x[0] === hbTab ? 'bg-amber-950 border-amber-400 text-amber-300' : 'bg-gray-900 border-gray-800 text-gray-400');
     });
-    document.getElementById('hbAddBtn').classList.toggle('hidden', hbTab !== 'habits');
   }
 
   function renderMonth(today) {
@@ -1846,6 +1858,48 @@ loadData();
     if (typeof renderToday === 'function') renderToday();
   }
 
+  function habitCard(h, today, trk, past) {
+    const d = isDone(h, selDay);
+    const st = ST[h.id] || { cur: 0, best: 0 };
+    const wCount = past.filter(k => isDone(h, k)).length;
+    const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
+    let middle = '', extra = '';
+    if (h.type === 'time') {
+      const e = entry(h, selDay) || { min: 0, mode: 'study' };
+      middle = `<div class="flex items-center gap-2 mt-2">
+        <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
+        <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
+      let ss = 0, me = 0;
+      past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else ss += x.min; } });
+      extra = ` • مذاكرة ${fmt(ss)} • حفظ ${fmt(me)}`;
+    }
+    const mark = h.type === 'time'
+      ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
+      : `<button onclick="hbToggle(${h.id}, event)" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
+    const card = document.createElement('div');
+    card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
+    card.innerHTML = `
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2.5">${mark}
+          <div>
+            <div class="text-xs font-bold text-gray-200">${esc(h.name)}</div>
+            <div class="text-[10px] text-orange-400">🔥 ${st.cur} يوم <span class="text-gray-500">• 🏆 أفضل ${st.best}</span></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button onclick="hbMove(${h.id},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
+          <button onclick="hbMove(${h.id},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
+          <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
+          <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
+        </div>
+      </div>${middle}
+      <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
+        <div class="flex gap-1">${dots}</div>
+        <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
+      </div>`;
+    return card;
+  }
+
   function renderHabitsPane(today) {
     const box = document.getElementById('habitsList');
     const list = H().list;
@@ -1871,46 +1925,22 @@ loadData();
     if (fri) { box.innerHTML = reviewHTML(wk, past); renderBadges(); return; }
 
     box.innerHTML = '';
-    list.forEach((h, i) => {
-      const d = isDone(h, selDay);
-      const st = ST[h.id] || { cur: 0, best: 0 };
-      const wCount = past.filter(k => isDone(h, k)).length;
-      const dots = trk.map(k => `<span class="w-3 h-3 rounded-sm ${isDone(h, k) ? 'bg-amber-400' : 'bg-gray-800'} ${k === selDay ? 'ring-1 ring-amber-300' : ''} ${k > today ? 'opacity-30' : ''}"></span>`).join('');
-      let middle = '', extra = '';
-      if (h.type === 'time') {
-        const e = entry(h, selDay) || { min: 0, mode: 'study' };
-        middle = `<div class="flex items-center gap-2 mt-2">
-          <button onclick="hbMode(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold bg-gray-900 border border-amber-500/50 text-amber-300">${e.mode === 'memo' ? '📖 الحفظ' : '📚 المذاكرة'} ⇄</button>
-          <button onclick="hbMin(${h.id})" class="px-2.5 py-1 rounded text-xs font-bold ${e.min > 0 ? 'bg-amber-500 text-black' : 'bg-gray-800 text-amber-300 border border-amber-500/40'}">⏱ ${e.min > 0 ? fmt(e.min) : 'سجّل الوقت'}</button></div>`;
-        let ss = 0, me = 0;
-        past.forEach(k => { const x = entry(h, k); if (x && x.min > 0) { if (x.mode === 'memo') me += x.min; else ss += x.min; } });
-        extra = ` • مذاكرة ${fmt(ss)} • حفظ ${fmt(me)}`;
-      }
-      const mark = h.type === 'time'
-        ? `<span class="w-7 h-7 rounded-full flex items-center justify-center text-sm ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-600'}">✔</span>`
-        : `<button onclick="hbToggle(${h.id}, event)" class="w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold transition ${d ? 'bg-amber-500 text-black' : 'bg-gray-800 text-gray-500 border border-gray-700'}">✔</button>`;
-      const card = document.createElement('div');
-      card.className = `card-bg p-3 rounded-xl border transition ${d ? 'border-amber-500/70 bg-amber-950/10' : 'border-gray-800'}`;
-      card.innerHTML = `
-        <div class="flex justify-between items-center">
-          <div class="flex items-center gap-2.5">${mark}
-            <div>
-              <div class="text-xs font-bold text-gray-200">${esc(h.name)}</div>
-              <div class="text-[10px] text-orange-400">🔥 ${st.cur} يوم <span class="text-gray-500">• 🏆 أفضل ${st.best}</span></div>
-            </div>
+    HB.forEach(b => {
+      const items = list.filter(h => blockOf(h) === b.id);
+      const done = items.filter(h => isDone(h, selDay)).length;
+      const wrap = document.createElement('div');
+      wrap.className = 'space-y-2';
+      wrap.innerHTML = `
+        <div class="flex justify-between items-center px-1 pt-1">
+          <div class="flex items-center gap-2">
+            <h3 class="text-xs font-bold text-amber-300">${esc(b.name)}</h3>
+            <span class="text-[10px] text-gray-400">${done}/${items.length}</span>
           </div>
-          <div class="flex items-center gap-1">
-            <button onclick="hbMove(${i},-1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▲</button>
-            <button onclick="hbMove(${i},1)" class="px-1.5 py-0.5 bg-gray-800 text-gray-300 rounded text-xs">▼</button>
-            <button onclick="hbEdit(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-cyan-400 rounded text-xs">✏️</button>
-            <button onclick="hbDel(${h.id})" class="px-1.5 py-0.5 bg-gray-800 text-red-400 rounded text-xs">✕</button>
-          </div>
-        </div>${middle}
-        <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-800/80">
-          <div class="flex gap-1">${dots}</div>
-          <span class="text-[10px] text-gray-400">الأسبوع: <strong class="text-amber-400">${wCount}/${trk.length}</strong>${extra}</span>
-        </div>`;
-      box.appendChild(card);
+          <button onclick="hbAdd('${b.id}')" class="text-[10px] bg-amber-950 border border-amber-500 px-2 py-1 rounded text-amber-300 font-bold">+ عادة</button>
+        </div>
+        ${items.length ? '' : '<p class="text-[11px] text-gray-500 px-1">مفيش عادات في البلوك ده. اضغط + عادة.</p>'}`;
+      items.forEach(h => wrap.appendChild(habitCard(h, today, trk, past)));
+      box.appendChild(wrap);
     });
     renderBadges();
   }
@@ -2071,19 +2101,25 @@ loadData();
     if (v === null) return;
     setE(id, selDay, { min: Math.max(0, parseInt(v, 10) || 0), mode: e.mode });
   };
-  window.hbAdd = () => {
+  window.hbAdd = blockId => {
+    const bid = HB.some(b => b.id === blockId) ? blockId : 'career';
     const n = prompt("اسم العادة:");
     if (!n || !n.trim()) return;
     const timed = confirm("العادة دي بالوقت؟\nموافق = بالوقت (دقايق)\nإلغاء = علامة صح");
-    H().list.push({ id: Date.now(), name: n.trim(), type: timed ? 'time' : 'check' });
+    H().list.push({ id: Date.now(), name: n.trim(), type: timed ? 'time' : 'check', block: bid });
     saveData(); render();
   };
   window.hbEdit = id => { const h = find(id), n = prompt("تعديل اسم العادة:", h.name); if (n && n.trim()) { h.name = n.trim(); saveData(); render(); } };
   window.hbDel = id => { if (confirm("تحذف العادة دي؟")) { H().list = H().list.filter(h => h.id !== id); saveData(); render(); } };
-  window.hbMove = (i, dir) => {
-    const l = H().list, t = i + dir;
-    if (t < 0 || t >= l.length) return;
-    [l[i], l[t]] = [l[t], l[i]];
+  window.hbMove = (id, dir) => {
+    const l = H().list;
+    const i = l.findIndex(h => h.id === id);
+    if (i < 0) return;
+    const blk = blockOf(l[i]);
+    let j = i + dir;
+    while (j >= 0 && j < l.length && blockOf(l[j]) !== blk) j += dir;
+    if (j < 0 || j >= l.length) return;
+    [l[i], l[j]] = [l[j], l[i]];
     saveData(); render();
   };
 
