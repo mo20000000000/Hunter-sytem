@@ -1351,6 +1351,7 @@ function removeTask(idx) {
   if (state.wheelPlans.length <= 2) { alert("يجب بقاء خيارين على الأقل في العجلة!"); return; }
   state.wheelPlans.splice(idx, 1); saveData(); renderTasks(); drawWheel();
 }
+(audioChunks, { type: mime });
 // ================= TELEGRAM =================
 let mediaRecorder = null;
 let audioChunks = [];
@@ -1477,11 +1478,7 @@ function importData(e) {
   reader.onload = ev => {
     try {
       state = Object.assign(state, JSON.parse(ev.target.result));
-      state.habits = state.habits || { list: [], log: {} };
-      ['reviews', 'blockText', 'sleep', 'calories'].forEach(f => { state.habits[f] = state.habits[f] || {}; });
-      state.habits.blockTpl = state.habits.blockTpl || [];
-      state.beliefs = state.beliefs || [];
-      saveData(); recalculateStreakAndLevel(); renderAll(); applyHomeCustom(); applyHomeOrder();
+      saveData();
       alert("✅ تم استيراد كل بياناتك بنجاح!");
       location.reload();
     } catch (err) { alert("خطأ في قراءة ملف النسخة الاحتياطية."); }
@@ -1599,6 +1596,14 @@ loadData();
   const DEFAULT_BLOCK_MAP = { 1: 'prayer', 6: 'prayer', 3: 'taahud', 2: 'career', 4: 'recovery', 5: 'recovery' };
   const blockOf = h => HB.some(b => b.id === h.block) ? h.block : 'career';
 
+  // لو التراكينج فاضي تمامًا (مثلاً بعد استيراد ملف فاضي) نرجّع الافتراضي
+  if (state.habits && Array.isArray(state.habits.list) && !state.habits.list.length
+      && !Object.keys(state.habits.log || {}).length
+      && !Object.keys(state.habits.sleep || {}).length
+      && !Object.keys(state.habits.calories || {}).length) {
+    state.habits = null;
+  }
+
   let dirty = false;
   if (!state.habits) {
     state.habits = {
@@ -1614,6 +1619,7 @@ loadData();
     };
     dirty = true;
   }
+  if (!state.habits.log) { state.habits.log = {}; dirty = true; }
   if (!state.habits.reviews) { state.habits.reviews = {}; dirty = true; }
   if (!state.habits.blockTpl) { state.habits.blockTpl = DEFAULT_BLOCKS.map(b => Object.assign({}, b)); dirty = true; }
   if (!state.habits.blockText) { state.habits.blockText = {}; dirty = true; }
@@ -2173,7 +2179,7 @@ window.renderToday = function () {
   if (now.getDay() === 5) habitsTile = tile('✅ العادات', '📝 مراجعة الجمعة', 0, false, "showView('habits')", 'bg-amber-400');
   else {
     const n = list.filter(h => {
-      const e = (state.habits.log[k] || {})[h.id];
+      const e = ((state.habits.log || {})[k] || {})[h.id];
       if (h.type === 'time') return !!(e && e.min > 0);
       if (e === true) return true;
       if (e === false) return false;
