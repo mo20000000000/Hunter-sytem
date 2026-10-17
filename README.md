@@ -1971,6 +1971,7 @@ loadData();
   function renderCalories() {
     const box = document.getElementById('habitsCals');
     const meals = H().calories[selDay] || [];
+    const goal = H().calGoal || 0;
     let totCal = 0, totPro = 0, totFat = 0, totCarb = 0;
     meals.forEach(m => {
       totCal += Number(m.cal) || 0;
@@ -1991,8 +1992,10 @@ loadData();
     box.innerHTML = `
       <div class="flex justify-between items-center">
         <h3 class="text-sm font-bold text-orange-400">🥗 تراكينج السعرات والماكروز</h3>
-        <span class="text-[10px] text-gray-400">المجموع: <strong class="text-orange-300">${totCal} kcal</strong></span>
+        <span class="text-[10px] text-gray-400">المجموع: <strong class="text-orange-300">${totCal}</strong> / <strong onclick="calGoal()" class="text-cyan-400 underline cursor-pointer">${goal || 'حدد الهدف'}</strong> kcal</span>
       </div>
+      ${goal ? `<div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="${totCal > goal ? 'bg-red-500' : 'bg-orange-400'} h-2 transition-all" style="width:${Math.min(100, Math.round(totCal / goal * 100))}%"></div></div>
+      <p class="text-[10px] ${totCal > goal ? 'text-red-400' : 'text-gray-400'}">${totCal > goal ? 'زيادة ' + (totCal - goal) : 'متبقي ' + (goal - totCal)} كالوري</p>` : ''}
       <div class="grid grid-cols-4 gap-1 text-center bg-black/40 p-2 rounded-xl border border-gray-800 text-[10px]">
         <div><span class="text-gray-400 block">السعرات</span><strong class="text-orange-400 text-xs">${totCal}</strong></div>
         <div><span class="text-gray-400 block">بروتين</span><strong class="text-cyan-400 text-xs">${totPro}ج</strong></div>
@@ -2011,6 +2014,14 @@ loadData();
         <button onclick="calAdd()" class="w-full py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-bold text-xs transition">+ إضافة الوجبة</button>
       </div>`;
   }
+
+  window.calGoal = () => {
+    const v = prompt("هدف السعرات اليومي (كالوري):", H().calGoal || "");
+    if (v === null) return;
+    H().calGoal = Math.max(0, parseInt(v, 10) || 0);
+    saveData(); renderCalories();
+    if (typeof renderToday === 'function') renderToday();
+  };
 
   window.calAdd = () => {
     const name = document.getElementById('mName').value.trim();
@@ -2165,7 +2176,8 @@ window.renderToday = function () {
 
   const meals = (state.habits && state.habits.calories && state.habits.calories[k]) || [];
   const totCals = meals.reduce((s, m) => s + (Number(m.cal) || 0), 0);
-  const calsTile = tile('🥗 السعرات', `${totCals} kcal`, totCals ? 50 : 0, totCals > 0, "openDayTrackerFromHome()", 'bg-orange-400');
+  const goal = (state.habits && state.habits.calGoal) || 0;
+  const calsTile = tile('🥗 السعرات', goal ? `${totCals} / ${goal}` : `${totCals} kcal`, goal ? totCals / goal * 100 : (totCals ? 50 : 0), goal ? (totCals >= goal * 0.9 && totCals <= goal * 1.1) : totCals > 0, "openDayTrackerFromHome()", 'bg-orange-400');
 
   box.innerHTML = `
     <div class="flex justify-between items-center">
