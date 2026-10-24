@@ -2283,6 +2283,193 @@ function autoBackupCheck() {
 renderBackupStatus();
 autoBackupCheck();
 document.addEventListener('visibilitychange', () => { if (!document.hidden) autoBackupCheck(); });
+  (function () {
+  const origToggle = window.toggleDayStatus;
+  let editKey = null, editRoutine = 'day1', editStatus = 'completed', editReps = {};
+
+  function modal() {
+    let m = document.getElementById('pastDayModal');
+    if (m) return m;
+    m = document.createElement('div');
+    m.id = 'pastDayModal';
+    m.style.cssText = 'position:fixed;inset:0;z-index:9998;display:none;background:rgba(0,0,0,.7);align-items:flex-end;justify-content:center';
+    m.innerHTML = '<div id="pastDayBox" class="w-full max-w-md card-bg border border-cyan-500/50 rounded-t-3xl p-4 space-y-3" style="max-height:85vh;overflow-y:auto"></div>';
+    m.addEventListener('click', e => { if (e.target === m) closePast(); });
+    document.body.appendChild(m);
+    return m;
+  }
+  function closePast() { modal().style.display = 'none'; }
+
+  function renderPast() {
+    const qs = state.routines[editRoutine] || [];
+    const d = new Date(editKey + 'T12:00:00');
+    const title = d.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+    const tab = (r, label) => `<button onclick="pdRoutine('${r}')" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${editRoutine === r ? 'border-cyan-400 bg-cyan-950 text-cyan-400' : 'border-gray-800 bg-gray-900 text-gray-400'}">${label}</button>`;
+    const sb = (v, label, on) => `<button onclick="pdStatus('${v}')" class="flex-1 py-2 rounded-xl text-xs font-bold border ${editStatus === v ? on : 'border-gray-800 bg-gray-900 text-gray-400'}">${label}</button>`;
+    const rows = qs.map(q => `
+      <div class="flex items-center justify-between gap-2 bg-gray-900/60 border border-gray-800 rounded-xl p-2.5">
+        <span class="text-xs text-gray-200 flex-1">${escH(q.name)} <span class="text-gray-500">/ ${q.target}</span></span>
+        <input type="number" inputmode="numeric" min="0" value="${editReps[q.id] || ''}" placeholder="0" oninput="pdReps(${q.id}, this.value)" class="w-20 text-center text-xs bg-gray-800 border border-gray-700 rounded-xl py-1 text-gray-100">
+      </div>`).join('');
+    document.getElementById('pastDayBox').innerHTML = `
+      <div class="flex justify-between items-center">
+        <h3 class="text-sm font-bold text-cyan-400">📅 ${title}</h3>
+        <button onclick="pdClose()" class="text-gray-400 text-sm px-2">✕</button>
+      </div>
+      <div class="flex gap-2">${tab('day1', '⚡ DAY 1')}${tab('day2', '🔥 DAY 2')}</div>
+      <div class="space-y-2">${rows || '<p class="text-xs text-gray-500">مفيش تمارين في الروتين ده.</p>'}</div>
+      <div class="flex gap-2">
+        ${sb('completed', '✅ مكتمل', 'border-cyan-400 bg-cyan-950 text-cyan-400')}
+        ${sb('rest', '🌿 راحة', 'border-green-500 bg-green-950 text-green-400')}
+        ${sb('none', '✖ مفيش', 'border-red-500 bg-red-950 text-red-400')}
+      </div>
+      <button onclick="pdSave()" class="w-full py-3 rounded-2xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs">💾 حفظ اليوم</button>`;
+  }
+
+  function openPast(k) {
+    editKey = k;
+    const saved = (state.questHistory && state.questHistory[k]) || {};
+    editReps = {};
+    const has = { day1: false, day2: false };
+    ['day1', 'day2'].forEach(r => (state.routines[r] || []).forEach(q => {
+      if (saved[q.id] > 0) { editReps[q.id] = saved[q.id]; has[r] = true; }
+    }));
+    editRoutine = (has.day2 && !has.day1) ? 'day2' : (has.day1 ? 'day1' : state.activeRoutine);
+    const st = state.history[k];
+    editStatus = !st ? 'completed' : (st === true ? 'completed' : st);
+    modal().style.display = 'flex';
+    renderPast();
+  }
+
+  window.pdClose = closePast;
+  window.pdRoutine = r => { editRoutine = r; renderPast(); };
+  window.pdStatus = v => { editStatus = v; renderPast(); };
+  window.pdReps = (id, v) => { editReps[id] = v; };
+  window.pdSave = () => {
+    const k = editKey;
+    if (!state.questHistory) state.questHistory = {};
+    const out = {};
+    Object.keys(editReps).forEach(id => {
+      const n = parseInt(editReps[id], 10) || 0;
+      if (n > 0) out[id] = n;
+    });
+    if (Object.keys(out).length) state.questHistory[k] = out; else delete state.questHistory[k];
+    if (editStatus === 'none') delete state.history[k]; else state.history[k] = editStatus;
+    recalculateStreakAndLevel(); saveData(); closePast(); renderWorkouts();
+    showToast('✅ تم حفظ اليوم');
+  };
+
+  window.toggleDayStatus = function (k) {
+    const today = getTodayKey();
+    if (k > today) return;
+    if (k === today) return origToggle(k);
+    openPast(k);
+  };
+})();
+  (function () {
+  if (!state.wolf) { state.wolf = { events: [] }; saveData(); }
+  if (!Array.isArray(state.wolf.events)) state.wolf.events = [];
+  const W = () => state.wolf;
+  const STAGES = [
+    { min: 0, name: 'جرو صغير' },
+    { min: 5, name: 'ذئب صغير' },
+    { min: 15, name: 'ذئب فتي' },
+    { min: 35, name: 'ذئب قوي' },
+    { min: 70, name: 'ذئب ألفا' }
+  ];
+
+  function power() {
+    let p = 0;
+    W().events.forEach(e => { p = Math.max(0, p + (e.type === 'win' ? 1 : -1)); });
+    return p;
+  }
+
+  const sec = document.createElement('section');
+  sec.id = 'view-wolf';
+  sec.className = 'hidden space-y-4';
+  document.querySelector('main').appendChild(sec);
+
+  function render() {
+    const p = power();
+    const st = STAGES.slice().reverse().find(s => p >= s.min);
+    const next = STAGES.find(s => s.min > p);
+    const pct = next ? Math.round((p - st.min) / (next.min - st.min) * 100) : 100;
+    const px = 44 + Math.min(p, 100);
+    const days = {};
+    let tw = 0, tl = 0;
+    W().events.forEach(e => {
+      const d = getFormattedDate(new Date(e.ts));
+      const x = days[d] = days[d] || { w: 0, l: 0 };
+      if (e.type === 'win') { x.w++; tw++; } else { x.l++; tl++; }
+    });
+    const td = days[getTodayKey()] || { w: 0, l: 0 };
+    const rows = Object.keys(days).sort().reverse().slice(0, 7).map(d =>
+      `<div class="flex justify-between text-xs"><span class="text-gray-400">${d.slice(5)}</span><span><strong class="text-emerald-400">${days[d].w}</strong> / <strong class="text-red-400">${days[d].l}</strong></span></div>`
+    ).join('');
+    sec.innerHTML = `
+      <div class="card-bg p-4 rounded-2xl border border-yellow-500/40">
+        <h2 class="text-sm font-bold text-yellow-300">🐺 الذئب</h2>
+        <p class="text-[11px] text-gray-400 mt-0.5">رفض الرغبة انتصار والذئب يكبر. الاستسلام هزيمة والذئب يصغر.</p>
+      </div>
+      <div class="card-bg p-5 rounded-2xl border border-gray-800 text-center space-y-2">
+        <div style="font-size:${px}px;line-height:1.1;filter:drop-shadow(0 0 10px rgba(250,204,21,.45))">🐺</div>
+        <div class="text-sm font-bold text-yellow-300">${st.name}</div>
+        <div class="text-[11px] text-gray-400">القوة: <strong class="text-yellow-300">${p}</strong>${next ? ` • باقي ${next.min - p} للمرحلة الجاية (${next.name})` : ' • وصلت لأعلى مرحلة'}</div>
+        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-yellow-400 h-2 transition-all" style="width:${pct}%"></div></div>
+      </div>
+      <div class="card-bg p-4 rounded-2xl border border-gray-800 space-y-3">
+        <div class="flex justify-between text-xs"><span class="text-gray-300">النهارده</span><span><strong class="text-emerald-400">${td.w}</strong> انتصار • <strong class="text-red-400">${td.l}</strong> هزيمة</span></div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="wolfAdd('win')" class="py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs">🛡️ رفضتها (انتصار)</button>
+          <button onclick="wolfAdd('loss')" class="py-3.5 rounded-2xl bg-red-900 hover:bg-red-800 text-white font-bold text-xs">💔 استسلمت (هزيمة)</button>
+        </div>
+        <button onclick="wolfUndo()" class="w-full py-2 rounded-xl text-[11px] bg-gray-900 border border-gray-700 text-gray-300">↩️ تراجع عن آخر تسجيل</button>
+      </div>
+      <div class="card-bg p-4 rounded-2xl border border-gray-800 space-y-2">
+        <div class="flex justify-between text-xs"><span class="text-gray-300">الإجمالي</span><span><strong class="text-emerald-400">${tw}</strong> انتصار • <strong class="text-red-400">${tl}</strong> هزيمة</span></div>
+        <div class="pt-2 border-t border-gray-800 space-y-1.5"><p class="text-[10px] text-gray-500">آخر 7 أيام (انتصار / هزيمة)</p>${rows || '<p class="text-[11px] text-gray-500">لسه مفيش تسجيلات.</p>'}</div>
+      </div>`;
+  }
+
+  window.wolfAdd = type => {
+    W().events.push({ ts: Date.now(), type });
+    saveData(); render();
+    if (navigator.vibrate) navigator.vibrate(type === 'win' ? 40 : [60, 40, 60]);
+    showToast(type === 'win' ? '🐺 انتصار! الذئب كبر' : '💔 الذئب صغر، كمّل من هنا');
+  };
+  window.wolfUndo = () => {
+    if (!W().events.length) return;
+    if (!confirm('تلغي آخر تسجيل؟')) return;
+    W().events.pop(); saveData(); render();
+  };
+
+  const origShow = window.showView;
+  window.showView = function (v) {
+    sec.classList.add('hidden');
+    origShow(v);
+    if (v === 'wolf') render();
+  };
+
+  const cont = document.getElementById('home-buttons-container');
+  const card = document.createElement('div');
+  card.setAttribute('data-home-key', 'wolf');
+  card.className = 'p-4 rounded-2xl card-bg border border-yellow-500/40 hover:border-yellow-400 flex items-center justify-between transition hover:scale-[1.01] relative cursor-pointer shadow';
+  card.onclick = () => { if (!isHomeEditing && !isHomeOrdering) showView('wolf'); };
+  card.innerHTML = `
+    <div class="flex items-center gap-3.5">
+      <span class="text-2xl p-2.5 rounded-xl bg-yellow-950/60 border border-yellow-500/50 hb-icon">🐺</span>
+      <div>
+        <h3 class="text-sm font-bold text-yellow-300 hb-title">الذئب</h3>
+        <p class="text-xs text-gray-400 hb-desc">سجّل الانتصارات والهزائم وشوف الذئب بيكبر</p>
+      </div>
+    </div>
+    <span class="text-yellow-300 text-sm arrow-icon">◀</span>`;
+  cont.appendChild(card);
+  if (!state.homeOrder) state.homeOrder = ['workouts', 'dayTracker', 'recoveryCounter', 'recovery', 'wheel'];
+  if (!state.homeOrder.includes('wolf')) { state.homeOrder.push('wolf'); saveData(); }
+  applyHomeOrder();
+  applyHomeCustom();
+})();
 </script>
 </body>
 </html>
