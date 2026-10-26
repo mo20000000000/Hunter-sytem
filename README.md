@@ -2470,6 +2470,29 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) auto
   applyHomeOrder();
   applyHomeCustom();
 })();
+ (function () {
+  const s = document.createElement('style');
+  s.textContent = `
+@media (min-width: 768px) {
+  html { font-size: 18px; }
+  body { max-width: 980px !important; }
+  #home-buttons-container { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  #home-buttons-container > * { margin: 0 !important; }
+  #quest-list { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; align-items: start; }
+  #quest-list > * { margin: 0 !important; }
+  #badges-content { grid-template-columns: repeat(3, 1fr); }
+  #today-card .grid { grid-template-columns: repeat(3, 1fr); }
+  [class*="text-[9px]"] { font-size: 12px !important; }
+  [class*="text-[10px]"] { font-size: 13px !important; }
+  [class*="text-[11px]"] { font-size: 14px !important; }
+  .wheel-container { width: 360px; height: 360px; }
+}
+@media (min-width: 1100px) {
+  html { font-size: 20px; }
+  body { max-width: 1100px !important; }
+}`;
+  document.head.appendChild(s);
+})(); 
 </script>
 </body>
 </html>
