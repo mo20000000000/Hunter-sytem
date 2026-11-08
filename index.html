@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Hunter Life System</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#08090d;color:#e2e8f0;font-family:ui-monospace,Menlo,Consolas,monospace}
+.cb{background:#12151f}
+.neon{border:1px solid #00e5ff;box-shadow:0 0 12px rgba(0,229,255,.2)}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,0) scale(.6)}20%{opacity:1;transform:translate(-50%,-10px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-60px)}}
+.fx{position:fixed;z-index:9999;pointer-events:none;font-weight:700;font-size:14px;color:#fde047;animation:pop .9s ease-out forwards}
+@media(min-width:768px){html{font-size:18px}body{max-width:980px!important}#hb,#quest-list{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;align-items:start}#hb>*,#quest-list>*{margin:0!important}[class*="text-[9px]"]{font-size:12px!important}[class*="text-[10px]"]{font-size:13px!important}[class*="text-[11px]"]{font-size:14px!important}}
+@media(min-width:1100px){html{font-size:20px}body{max-width:1100px!important}}
+</style></head>
+<body class="p-4 pb-24 min-h-screen flex flex-col items-center select-none text-right max-w-md mx-auto space-y-4">
+<header class="w-full flex justify-between items-center p-3.5 cb rounded-2xl neon">
+<div class="flex items-center gap-2.5 cursor-pointer" onclick="showView('home')"><span class="text-2xl">⚡</span><div><h1 class="text-xs font-bold text-cyan-400 font-mono">HUNTER LIFE SYSTEM</h1><p class="text-[10px] text-gray-400" id="top-name"></p></div></div>
+<button onclick="showView('home')" class="px-3 py-1.5 text-xs bg-gray-900 border border-cyan-500/50 rounded-xl text-cyan-400 font-bold">🏠 الرئيسية</button></header>
+<main class="w-full space-y-4">
+
+<section id="view-home" class="space-y-4">
+<div id="today-card" class="cb p-4 rounded-2xl border border-cyan-500/40 space-y-3"></div>
+<div id="hb" class="space-y-3">
+<div class="p-4 rounded-2xl cb border border-cyan-500/40 flex items-center justify-between cursor-pointer shadow" onclick="showView('workouts')"><div class="flex items-center gap-3.5"><span class="text-2xl p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-500/50">⚔️</span><div><h3 class="text-sm font-bold text-cyan-400">نظام تمارين Hunter</h3><p class="text-xs text-gray-400">Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي</p></div></div><span class="text-cyan-400 text-sm">◀</span></div>
+<div class="p-4 rounded-2xl cb border border-orange-500/40 flex items-center justify-between cursor-pointer shadow" onclick="showView('calories')"><div class="flex items-center gap-3.5"><span class="text-2xl p-2.5 rounded-xl bg-orange-950/60 border border-orange-500/50">🥗</span><div><h3 class="text-sm font-bold text-orange-400">تتبع السعرات</h3><p class="text-xs text-gray-400">السعرات والماكروز وهدف اليوم</p></div></div><span class="text-orange-400 text-sm">◀</span></div>
+<div class="p-4 rounded-2xl cb border border-purple-500/40 flex items-center justify-between cursor-pointer shadow" onclick="showView('akhlaq')"><div class="flex items-center gap-3.5"><span class="text-2xl p-2.5 rounded-xl bg-purple-950/60 border border-purple-500/50">🌟</span><div><h3 class="text-sm font-bold text-purple-300">الأخلاق</h3><p class="text-xs text-gray-400">اختار خُلق بتشتغل عليه وشوف بتعدّي مواقفه ولا لأ</p></div></div><span class="text-purple-300 text-sm">◀</span></div>
+</div>
+<div class="cb p-4 rounded-2xl border border-sky-500/40 space-y-3">
+<div><h3 class="text-sm font-bold text-sky-300">☁️ النسخ الاحتياطي</h3><p id="backup-status" class="text-[11px] text-gray-400"></p></div>
+<div class="flex flex-wrap gap-2">
+<button onclick="backupTG(true,event)" class="text-[11px] bg-sky-950 border border-sky-500 px-3 py-1.5 rounded-xl text-sky-300 font-bold">☁️ انسخ الآن</button>
+<button onclick="$('import-file').click()" class="text-[11px] bg-gray-900 border border-gray-700 px-3 py-1.5 rounded-xl text-gray-300">📂 استرجاع</button>
+<button onclick="exportData()" class="text-[11px] bg-gray-900 border border-gray-700 px-3 py-1.5 rounded-xl text-gray-300">💾 تصدير</button>
+<button onclick="setupTG()" class="text-[11px] bg-gray-900 border border-purple-500/50 px-3 py-1.5 rounded-xl text-purple-300">⚙️ تليجرام</button>
+</div></div>
+</section>
+
+<section id="view-workouts" class="hidden space-y-4">
+<div class="cb p-5 rounded-2xl neon space-y-3">
+<div class="flex items-center justify-between"><div><h2 id="hunter-name" class="text-lg font-bold text-cyan-400 cursor-pointer" onclick="editName()"></h2><p id="hunter-rank-level" class="text-xs text-gray-400 mt-1"></p></div>
+<div class="text-left"><span class="text-[10px] text-gray-400 block">TIME LEFT</span><span id="countdown" class="text-xs font-bold text-cyan-400 font-mono">00:00:00</span></div></div>
+<div class="pt-3 border-t border-gray-800 space-y-1.5"><div class="flex justify-between text-xs"><span class="text-gray-300">Streak: <strong id="streak-count" class="text-cyan-400">0</strong> Days</span><span id="weekly-status-text" class="text-gray-400"></span></div>
+<div class="w-full bg-gray-800 rounded-full h-2 overflow-hidden"><div id="streak-bar" class="bg-cyan-400 h-2 transition-all" style="width:0%"></div></div></div></div>
+
+<div class="cb p-4 rounded-2xl border border-orange-500/40 flex items-center justify-between">
+<div><div class="text-[10px] text-gray-400">⏱ وقت التمرين</div><div id="wt-display" class="text-2xl font-bold text-orange-400 font-mono">00:00:00</div><div id="wt-info" class="text-[10px] text-gray-400 mt-0.5"></div></div>
+<button id="wt-btn" onclick="toggleWT(event)" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow">▶ ابدأ التمرين</button></div>
+
+<div class="flex justify-between items-center text-xs px-1">
+<div class="flex gap-2"><button onclick="exportData()" class="px-2.5 py-1.5 bg-gray-900 border border-gray-700 rounded-xl">💾 Export</button><button onclick="$('import-file').click()" class="px-2.5 py-1.5 bg-gray-900 border border-gray-700 rounded-xl">📂 Import</button></div>
+<button id="rest-toggle-btn" onclick="toggleRest()" class="px-3 py-1.5 bg-gray-900 border border-green-700 text-green-400 rounded-xl font-semibold">🌿 Rest Day</button></div>
+
+<div class="cb p-4 rounded-2xl border border-gray-800 space-y-2">
+<div class="flex justify-between items-center px-1"><button onclick="wkMonth(-1)" class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300">▶</button>
+<div class="text-center"><span id="calendar-month-title" class="text-xs font-bold text-cyan-400 block"></span><span class="text-[10px] text-gray-400">اضغط على يوم لتعديله</span></div>
+<button id="wk-next" onclick="wkMonth(1)" class="text-[11px] px-2 py-1 bg-gray-900 border border-gray-700 rounded text-gray-300">◀</button></div>
+<div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-500 font-semibold mb-1"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+<div id="calendar-days" class="grid grid-cols-7 gap-1.5 text-center"></div></div>
+
+<div id="rest-day-banner" class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/50 hidden"><p class="text-xs text-emerald-300 font-bold">🌿 يوم استشفاء مفعل: أنت معفي اليوم من التمارين والعقوبات.</p></div>
+<div id="penalty-card" class="p-4 rounded-2xl bg-red-950/30 border border-red-500 hidden space-y-2.5">
+<div class="flex justify-between items-center"><h4 class="text-xs font-bold text-red-400">⚠️ PENALTY QUEST ACTIVE</h4><button onclick="editPenalty()" class="text-[10px] text-red-400 border border-red-500 px-2 py-0.5 rounded-lg">تعديل</button></div>
+<p id="penalty-task-text" class="text-xs text-gray-200"></p>
+<button onclick="penaltyDone()" class="w-full py-2 rounded-xl bg-red-600 font-bold text-xs">إتمام العقوبة وفتح النظام</button></div>
+
+<div class="flex justify-between items-center"><div class="flex gap-2"><button id="tab-day1" onclick="switchRoutine('day1')">⚡ DAY 1</button><button id="tab-day2" onclick="switchRoutine('day2')">🔥 DAY 2</button></div>
+<button onclick="addQuest()" class="text-xs border border-cyan-500 text-cyan-400 px-3 py-2 rounded-xl">+ إضافة تمرين</button></div>
+<div id="quest-list" class="space-y-3"></div>
+<button id="complete-day-btn" onclick="completeDay(event)" class="w-full py-3.5 rounded-2xl font-bold text-xs uppercase border border-cyan-500 text-cyan-400"></button>
+</section>
+
+<section id="view-calories" class="hidden space-y-4">
+<div class="cb p-4 rounded-2xl border border-orange-500/40 flex justify-between items-center">
+<button onclick="calShift(-1)" class="text-[11px] px-2.5 py-1.5 bg-gray-900 border border-gray-700 rounded-xl text-gray-300">▶ السابق</button>
+<div class="text-center"><h2 id="cal-day-title" class="text-sm font-bold text-orange-400"></h2><p id="cal-day-sub" class="text-[10px] text-gray-400"></p></div>
+<button id="cal-next" onclick="calShift(1)" class="text-[11px] px-2.5 py-1.5 bg-gray-900 border border-gray-700 rounded-xl text-gray-300">التالي ◀</button></div>
+<div id="cal-body" class="cb p-4 rounded-2xl border border-orange-500/40 space-y-3"></div>
+</section>
+<section id="view-akhlaq" class="hidden space-y-4">
+<div class="cb p-4 rounded-2xl border border-purple-500/40 flex justify-between items-center">
+<button onclick="akShift(-1)" class="text-[11px] px-2.5 py-1.5 bg-gray-900 border border-gray-700 rounded-xl text-gray-300">▶ السابق</button>
+<div class="text-center"><h2 id="ak-title" class="text-sm font-bold text-purple-300"></h2><p id="ak-sub" class="text-[10px] text-gray-400"></p></div>
+<button id="ak-next" onclick="akShift(1)" class="text-[11px] px-2.5 py-1.5 bg-gray-900 border border-gray-700 rounded-xl text-gray-300">التالي ◀</button></div>
+<div id="ak-body" class="cb p-4 rounded-2xl border border-purple-500/40 space-y-4"></div>
+</section>
+</main>
+
+<div id="pd" style="position:fixed;inset:0;z-index:9998;display:none;background:rgba(0,0,0,.7);align-items:flex-end;justify-content:center" onclick="if(event.target===this)pdClose()"><div id="pdbox" class="w-full max-w-md cb border border-cyan-500/50 rounded-t-3xl p-4 space-y-3" style="max-height:85vh;overflow-y:auto"></div></div>
+<input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+
+<script>
+const $=id=>document.getElementById(id);
+const K="hunter_ultimate_v7";
+const fd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const today=()=>fd(new Date());
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const RANKS=["E","D","C","B","A","S"];
+let calDay=today(),wY=new Date().getFullYear(),wM=new Date().getMonth(),busy=false;
+let state={name:"Mostafa Abdelrahman",level:1,streak:0,penaltyText:"1000 استغفار",penaltyActive:false,lastActiveDate:today(),activeRoutine:"day1",history:{},questHistory:{},
+routines:{day1:[{id:101,name:"Push-ups",current:0,target:100},{id:102,name:"Sit-ups",current:0,target:100},{id:103,name:"Squats",current:0,target:100}],
+day2:[{id:201,name:"Pull-ups",current:0,target:30},{id:202,name:"Plank (sec)",current:0,target:120},{id:203,name:"Lunges",current:0,target:60}]},
+habits:{calories:{},calGoal:0}};
+const save=()=>localStorage.setItem(K,JSON.stringify(state));
+function load(){
+ const s=localStorage.getItem(K)||localStorage.getItem("hunter_ultimate_v6");
+ if(s)try{state=Object.assign(state,JSON.parse(s))}catch(e){}
+ state.habits=state.habits||{};state.habits.calories=state.habits.calories||{};
+ state.history=state.history||{};state.questHistory=state.questHistory||{};
+ transition();recalc();renderAll();
+}
+function renderAll(){renderWorkouts();renderCal();renderToday()}
+function fx(e,t){if(navigator.vibrate)navigator.vibrate(30);const r=e&&e.target&&e.target.getBoundingClientRect?e.target.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0};const el=document.createElement('div');el.className='fx';el.textContent=t||'✨';el.style.left=(r.left+r.width/2)+'px';el.style.top=r.top+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),950)}
+function toast(m){const t=document.createElement('div');t.className='fixed bottom-5 left-1/2 -translate-x-1/2 bg-amber-500 text-black px-4 py-2 rounded-xl font-bold text-xs shadow-lg z-50';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
+function showView(v){['home','workouts','calories','akhlaq'].forEach(x=>$('view-'+x).classList.toggle('hidden',x!==v));if(v==='home')renderToday();if(v==='workouts')renderWorkouts();if(v==='calories'){calDay=today();renderCal()}if(v==='akhlaq'){akDay=today();renderAk()}}
+
+/* ===== الأيام والستريك ===== */
+const isDone=k=>{const s=state.history[k];return s==='completed'||s===true};
+const isRest=()=>state.history[today()]==='rest';
+function transition(){
+ const t=today();
+ if(!state.lastActiveDate){state.lastActiveDate=t;save();return false}
+ if(state.lastActiveDate===t)return false;
+ const d=new Date(state.lastActiveDate+'T12:00:00'),end=new Date(t+'T12:00:00');
+ for(;d<end;d.setDate(d.getDate()+1)){const s=state.history[fd(d)];if(!(s==='completed'||s==='rest'||s===true)){state.penaltyActive=true;state.streak=0;break}}
+ Object.values(state.routines).forEach(r=>r.forEach(q=>{q.current=0;q.sets=[]}));
+ state.lastActiveDate=t;save();return true;
+}
+function recalc(){
+ let n=0;const d=new Date();
+ if(state.history[fd(d)])n++;
+ d.setDate(d.getDate()-1);
+ while(state.history[fd(d)]){n++;d.setDate(d.getDate()-1)}
+ state.streak=n;state.level=1+Math.floor(n/7);
+}
+function toggleRest(){
+ const k=today();
+ if(state.history[k]==='rest'){delete state.history[k];delete state.questHistory[k];Object.values(state.routines).forEach(r=>r.forEach(q=>{q.current=0;q.sets=[]}))}
+ else{state.history[k]='rest';state.penaltyActive=false}
+ recalc();save();renderWorkouts();
+}
+function switchRoutine(r){state.activeRoutine=r;save();renderWorkouts()}
+
+/* ===== مؤقت التمرين ===== */
+const fmtHMS=s=>{s=Math.max(0,Math.floor(s));return[Math.floor(s/3600),Math.floor(s%3600/60),s%60].map(n=>String(n).padStart(2,'0')).join(':')};
+const elapsed=()=>state.workoutTimer?(Date.now()-state.workoutTimer.start)/1000:0;
+function toggleWT(e){if(state.workoutTimer)stopWT(e);else{state.workoutTimer={start:Date.now()};fx(e,'▶ يلا!');save();renderWT()}}
+function stopWT(e,silent){
+ if(!state.workoutTimer)return;
+ const sec=Math.round(elapsed()),k=today();
+ state.workoutTimes=state.workoutTimes||{};state.workoutTimes[k]=(state.workoutTimes[k]||0)+sec;
+ state.workoutTimer=null;if(!silent)fx(e,'⏱ '+fmtHMS(sec));
+ save();renderWT();
+}
+function renderWT(){
+ const times=state.workoutTimes||{},tot=times[today()]||0,run=!!state.workoutTimer;
+ $('wt-display').textContent=fmtHMS(run?elapsed():tot);
+ const v=[];for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);const x=times[fd(d)];if(x)v.push(x)}
+ const avg=v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length/60):0;
+ $('wt-info').textContent=`إجمالي اليوم: ${fmtHMS(tot)} • متوسط 7 أيام: ${avg} دقيقة`;
+ const b=$('wt-btn');
+ b.className=run?"px-4 py-2.5 rounded-xl text-xs font-bold bg-red-600 text-white animate-pulse":"px-4 py-2.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow";
+ b.textContent=run?"⏹ إنهاء التمرين":"▶ ابدأ التمرين";
+}
+
+/* ===== المجموعات (Sets) ===== */
+function prevSets(id){const t=today(),rec=state.lastSetsRecord||{};for(const k of Object.keys(rec).filter(k=>k<t).sort().reverse())if(rec[k][id])return rec[k][id];return(state.lastSets&&state.lastSets[id])||[]}
+function setsHTML(q,dis){
+ const ps=prevSets(q.id),cols="grid grid-cols-[28px_1fr_70px_36px_20px] gap-1.5 items-center";
+ const rows=(q.sets||[]).map((s,i)=>`<div class="${cols} text-xs"><span class="text-gray-400 text-center">${i+1}</span><span class="text-gray-500 text-center font-mono">${ps[i]!=null?ps[i]:'—'}</span><input type="number" inputmode="numeric" min="0" value="${s.reps}" ${dis} onchange="setReps(${q.id},${i},this.value)" class="w-full text-center bg-gray-800 border border-gray-700 rounded-xl py-1 text-gray-100 disabled:opacity-40"><button onclick="toggleSet(${q.id},${i},event)" ${dis} class="py-1 rounded-xl ${s.done?'bg-cyan-500 text-black font-bold':'bg-gray-800 text-gray-400 border border-gray-700'} disabled:opacity-40">✔</button><button onclick="delSet(${q.id},${i})" ${dis} class="text-gray-600 text-xs disabled:opacity-40">✕</button></div>`).join('');
+ return `<div class="mt-2.5 pt-2.5 border-t border-gray-800 space-y-2"><div class="${cols} text-[10px] text-gray-500 text-center"><span>SET</span><span>PREV</span><span>REPS</span><span>✔</span><span></span></div>${rows}<button onclick="addSet(${q.id})" ${dis} class="w-full text-xs text-cyan-400 py-1.5 rounded-xl bg-cyan-950/40 border border-cyan-500/30 disabled:opacity-40">+ ADD SET</button></div>`;
+}
+const findQuest=id=>state.routines[state.activeRoutine].find(x=>x.id===id);
+function addSet(id){const q=findQuest(id);if(!q)return;q.sets=q.sets||[];const p=prevSets(id),i=q.sets.length;q.sets.push({reps:p[i]!=null?p[i]:(i?q.sets[i-1].reps:10),done:false});save();renderWorkouts()}
+function setReps(id,i,v){const q=findQuest(id);if(!q||!q.sets||!q.sets[i])return;const s=q.sets[i],n=Math.max(0,parseInt(v,10)||0);if(s.done)q.current=Math.max(0,q.current+n-s.reps);s.reps=n;save();renderWorkouts()}
+function toggleSet(id,i,e){
+ if(state.penaltyActive||isRest())return;
+ const q=findQuest(id);if(!q||!q.sets||!q.sets[i])return;
+ const s=q.sets[i];s.done=!s.done;
+ if(s.done){fx(e,'💪 +'+s.reps);q.current+=s.reps}else q.current=Math.max(0,q.current-s.reps);
+ save();renderWorkouts();
+}
+function delSet(id,i){const q=findQuest(id);if(!q||!q.sets||!q.sets[i])return;if(q.sets[i].done)q.current=Math.max(0,q.current-q.sets[i].reps);q.sets.splice(i,1);save();renderWorkouts()}
+
+/* ===== شاشة التمارين ===== */
+function weekAvg(id){let t=0,n=0;const now=new Date();for(let i=0;i<7;i++){const d=new Date();d.setDate(now.getDate()-i);const r=(state.questHistory[fd(d)]||{})[id]||0;if(r>0){t+=r;n++}}return{avg:n?(t/n).toFixed(1):"0",days:n}}
+function renderWorkouts(){
+ $('hunter-name').textContent=state.name+" ✏";$('top-name').textContent=state.name;
+ $('hunter-rank-level').textContent=`${RANKS[Math.min(state.level-1,5)]}-RANK HUNTER | LEVEL ${state.level}`;
+ $('streak-count').textContent=state.streak;
+ $('streak-bar').style.width=Math.floor((state.streak%7)/7*100)+'%';
+ const rest=isRest(),k=today(),done=isDone(k);
+ $('weekly-status-text').innerHTML=rest?'<span class="text-green-400 font-bold">RECOVERY DAY 🌿</span>':`Day ${state.streak%7+1} of 7 (Level Progress)`;
+ $('rest-day-banner').classList.toggle('hidden',!rest);
+ const rb=$('rest-toggle-btn');
+ rb.className=rest?"px-3 py-1.5 bg-green-950 border border-green-400 text-green-300 rounded-xl font-semibold text-xs":"px-3 py-1.5 bg-gray-900 border border-green-700 text-green-400 rounded-xl font-semibold text-xs";
+ rb.textContent=rest?'🌿 Rest Active':'🌿 Rest Day';
+ const on="px-3.5 py-2 rounded-xl text-xs font-bold border border-cyan-400 bg-cyan-950 text-cyan-400",off="px-3.5 py-2 rounded-xl text-xs font-bold border border-gray-800 bg-gray-900 text-gray-400";
+ $('tab-day1').className=state.activeRoutine==='day1'?on:off;$('tab-day2').className=state.activeRoutine==='day1'?off:on;
+ $('penalty-task-text').textContent=state.penaltyText;
+ $('penalty-card').classList.toggle('hidden',!(state.penaltyActive&&!rest));
+ renderCalendar();renderWT();
+ const dis=state.penaltyActive||done||rest?'disabled':'';
+ const qs=state.routines[state.activeRoutine]||[];
+ $('quest-list').innerHTML=qs.map((q,i)=>{
+  const pct=Math.min(100,Math.floor(q.current/q.target*100)),w=weekAvg(q.id);
+  return `<div class="cb p-4 rounded-2xl border ${pct>=100?'border-cyan-500/70':'border-gray-800'}"><div class="flex justify-between items-center mb-1.5"><div class="flex items-center gap-2"><span class="font-bold text-xs text-gray-200">${esc(q.name)}</span><button onclick="editQuestName(${q.id})" class="text-[10px] text-gray-400">✏️</button></div><div class="flex items-center gap-1.5"><button onclick="moveQuest(${i},-1)" class="text-xs px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded-lg">▲</button><button onclick="moveQuest(${i},1)" class="text-xs px-1.5 py-0.5 bg-gray-800 text-gray-400 rounded-lg">▼</button><button onclick="delQuest(${q.id})" class="text-xs text-gray-500 px-1">✕</button></div></div><div class="flex justify-between items-center text-xs text-gray-400 mb-1.5"><span>Progress: ${q.current} / <strong onclick="editTarget(${q.id})" class="text-cyan-400 underline cursor-pointer">${q.target}</strong></span><span class="text-cyan-400 font-semibold">${pct}%</span></div><div class="text-[10px] text-cyan-300 font-mono mb-2">📈 متوسط أسبوعي: <strong>${w.avg}</strong> (في ${w.days} أيام)</div><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mb-2.5"><div class="bg-cyan-400 h-2 transition-all" style="width:${pct}%"></div></div><div class="flex justify-end gap-2 text-xs"><button onclick="updateQuest(${q.id},-1)" ${dis} class="px-3 py-1 bg-gray-800 rounded-xl text-gray-300 disabled:opacity-30">-1</button><button onclick="updateQuest(${q.id},1)" ${dis} class="px-3.5 py-1 bg-gray-800 rounded-xl text-cyan-400 disabled:opacity-30">+1</button></div>${setsHTML(q,dis)}</div>`;
+ }).join('');
+ const b=$('complete-day-btn'),base="w-full py-4 rounded-2xl font-bold text-xs uppercase border ";
+ if(rest){b.className=base+"border-green-500 bg-green-950/40 text-green-400 cursor-not-allowed";b.textContent="🌿 REST DAY ACTIVE (PROTECTED)"}
+ else if(done){b.className=base+"border-cyan-700 bg-cyan-950/40 text-cyan-400 cursor-not-allowed opacity-80";b.textContent="✅ TODAY ALREADY COMPLETED"}
+ else if(state.penaltyActive){b.className=base+"border-red-900 bg-red-950/30 text-red-400 cursor-not-allowed";b.textContent="LOCKED (PENALTY ACTIVE)"}
+ else{b.className=base+"border-cyan-400 bg-cyan-500/20 text-cyan-400 shadow cursor-pointer";b.textContent="COMPLETE DAY"}
+ renderToday();
+}
+
+/* ===== التقويم وتعديل الأيام الفايتة ===== */
+function renderCalendar(){
+ const first=new Date(wY,wM,1).getDay(),days=new Date(wY,wM+1,0).getDate(),t=today(),n=new Date();
+ $('calendar-month-title').textContent='📅 '+new Date(wY,wM,1).toLocaleString('en-US',{month:'short',year:'numeric'}).toUpperCase();
+ $('wk-next').style.opacity=(wY===n.getFullYear()&&wM===n.getMonth())?.3:1;
+ let h='<div></div>'.repeat(first);
+ for(let d=1;d<=days;d++){
+  const k=fd(new Date(wY,wM,d)),s=state.history[k];
+  let c="border-gray-800 bg-gray-900/40 text-gray-500",i="✖";
+  if(s==='rest'){c="border-green-600/70 bg-green-950/40 text-green-400";i="🌿"}
+  else if(s==='completed'||s===true){c="border-cyan-500 bg-cyan-950/50 text-cyan-400";i="✔"}
+  if(k===t)c+=" ring-1 ring-cyan-400";if(k>t)c+=" opacity-30";
+  h+=`<div onclick="dayClick('${k}')" class="p-2 rounded-xl cursor-pointer border flex flex-col items-center justify-center ${c}"><span class="text-[10px] font-bold">${d}</span><span class="text-[9px] mt-0.5">${i}</span></div>`;
+ }
+ $('calendar-days').innerHTML=h;
+}
+function wkMonth(dir){let y=wY,m=wM+dir;if(m<0){m=11;y--}else if(m>11){m=0;y++}const n=new Date();if(y>n.getFullYear()||(y===n.getFullYear()&&m>n.getMonth()))return;wY=y;wM=m;renderCalendar()}
+function dayClick(k){
+ const t=today();if(k>t)return;
+ if(k!==t)return pdOpen(k);
+ const s=state.history[k];
+ if(!s)state.history[k]='completed';else if(s==='completed'||s===true)state.history[k]='rest';else delete state.history[k];
+ recalc();save();renderWorkouts();
+}
+let pdKey,pdR,pdS,pdReps={};
+function pdOpen(k){
+ pdKey=k;const sv=state.questHistory[k]||{};pdReps={};let h1=0,h2=0;
+ ['day1','day2'].forEach(r=>state.routines[r].forEach(q=>{if(sv[q.id]>0){pdReps[q.id]=sv[q.id];if(r==='day1')h1=1;else h2=1}}));
+ pdR=(h2&&!h1)?'day2':(h1?'day1':state.activeRoutine);
+ const st=state.history[k];pdS=(!st||st===true)?'completed':st;
+ $('pd').style.display='flex';pdRender();
+}
+function pdClose(){$('pd').style.display='none'}
+function pdRender(){
+ const qs=state.routines[pdR]||[],d=new Date(pdKey+'T12:00:00');
+ const tab=(r,l)=>`<button onclick="pdR='${r}';pdRender()" class="px-3 py-1.5 rounded-xl text-xs font-bold border ${pdR===r?'border-cyan-400 bg-cyan-950 text-cyan-400':'border-gray-800 bg-gray-900 text-gray-400'}">${l}</button>`;
+ const sb=(v,l,c)=>`<button onclick="pdS='${v}';pdRender()" class="flex-1 py-2 rounded-xl text-xs font-bold border ${pdS===v?c:'border-gray-800 bg-gray-900 text-gray-400'}">${l}</button>`;
+ $('pdbox').innerHTML=`<div class="flex justify-between items-center"><h3 class="text-sm font-bold text-cyan-400">📅 ${d.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'})}</h3><button onclick="pdClose()" class="text-gray-400 text-sm px-2">✕</button></div>
+ <div class="flex gap-2">${tab('day1','⚡ DAY 1')}${tab('day2','🔥 DAY 2')}</div>
+ <div class="space-y-2">${qs.map(q=>`<div class="flex items-center justify-between gap-2 bg-gray-900/60 border border-gray-800 rounded-xl p-2.5"><span class="text-xs text-gray-200 flex-1">${esc(q.name)} <span class="text-gray-500">/ ${q.target}</span></span><input type="number" inputmode="numeric" min="0" value="${pdReps[q.id]||''}" placeholder="0" oninput="pdReps[${q.id}]=this.value" class="w-20 text-center text-xs bg-gray-800 border border-gray-700 rounded-xl py-1 text-gray-100"></div>`).join('')||'<p class="text-xs text-gray-500">مفيش تمارين في الروتين ده.</p>'}</div>
+ <div class="flex gap-2">${sb('completed','✅ مكتمل','border-cyan-400 bg-cyan-950 text-cyan-400')}${sb('rest','🌿 راحة','border-green-500 bg-green-950 text-green-400')}${sb('none','✖ مفيش','border-red-500 bg-red-950 text-red-400')}</div>
+ <button onclick="pdSave()" class="w-full py-3 rounded-2xl bg-cyan-600 text-white font-bold text-xs">💾 حفظ اليوم</button>`;
+}
+function pdSave(){
+ const out={};Object.keys(pdReps).forEach(id=>{const n=parseInt(pdReps[id],10)||0;if(n>0)out[id]=n});
+ if(Object.keys(out).length)state.questHistory[pdKey]=out;else delete state.questHistory[pdKey];
+ if(pdS==='none')delete state.history[pdKey];else state.history[pdKey]=pdS;
+ recalc();save();pdClose();renderWorkouts();toast('✅ تم حفظ اليوم');
+}
+
+/* ===== عمليات التمارين ===== */
+function updateQuest(id,a){if(state.penaltyActive||isRest())return;const q=findQuest(id);if(!q)return;q.current=Math.max(0,q.current+a);save();renderWorkouts()}
+function editTarget(id){const q=findQuest(id);if(!q)return;const t=prompt("Target:",q.target);if(t&&parseInt(t)>0){q.target=parseInt(t);save();renderWorkouts()}}
+function editQuestName(id){const q=findQuest(id);if(!q)return;const n=prompt("Quest Name:",q.name);if(n&&n.trim()){q.name=n.trim();save();renderWorkouts()}}
+function moveQuest(i,dir){const l=state.routines[state.activeRoutine],t=i+dir;if(t<0||t>=l.length)return;[l[i],l[t]]=[l[t],l[i]];save();renderWorkouts()}
+function addQuest(){const n=prompt(`Enter Quest Name for ${state.activeRoutine.toUpperCase()}:`);if(!n)return;const t=parseInt(prompt("Enter Target Count:","100"),10)||100;state.routines[state.activeRoutine].push({id:Date.now(),name:n.trim(),current:0,target:t,sets:[]});save();renderWorkouts()}
+function delQuest(id){if(confirm("Delete this quest?")){state.routines[state.activeRoutine]=state.routines[state.activeRoutine].filter(x=>x.id!==id);save();renderWorkouts()}}
+function completeDay(e){
+ const k=today();
+ if(isDone(k)){alert("You already completed your quests for today!");return}
+ if(isRest()){alert("Today is a Rest Day!");return}
+ if(state.penaltyActive)return;
+ if(state.routines[state.activeRoutine].some(q=>q.current<q.target)){alert("⚠️ لم تنهِ كل التمارين المطلوبة بعد!");return}
+ fx(e,'🎉 يوم مكتمل!');
+ if(state.workoutTimer)stopWT(null,true);
+ state.questHistory[k]={};state.lastSetsRecord=state.lastSetsRecord||{};state.lastSetsRecord[k]={};
+ state.routines[state.activeRoutine].forEach(q=>{state.questHistory[k][q.id]=q.current;const r=(q.sets||[]).map(s=>s.reps);if(r.length)state.lastSetsRecord[k][q.id]=r});
+ state.history[k]='completed';
+ const pl=state.level;recalc();save();renderWorkouts();
+ const wt=(state.workoutTimes&&state.workoutTimes[k])||0,tm=wt?`\n⏱ مدة التمرين: ${fmtHMS(wt)}`:'';
+ alert(state.level>pl?`🔥 [LEVEL UP] وصلت إلى LEVEL ${state.level}!${tm}`:`✅ تم تسجيل اليوم بنجاح! الستريك: ${state.streak} يوم.${tm}`);
+}
+function editPenalty(){const t=prompt("تعديل مهمة العقوبة:",state.penaltyText);if(t){state.penaltyText=t;save();renderWorkouts()}}
+function penaltyDone(){if(confirm("هل أتممت مهمة العقوبة؟")){state.penaltyActive=false;save();renderWorkouts()}}
+function editName(){const n=prompt("Enter Hunter Name:",state.name);if(n&&n.trim()){state.name=n.trim();save();renderWorkouts()}}
+
+/* ===== السعرات ===== */
+function renderCal(){
+ const t=today(),d=new Date(calDay+'T12:00:00'),meals=state.habits.calories[calDay]||[],goal=state.habits.calGoal||0;
+ const T=dayTotals(calDay),c=Math.round(T.c),p=Math.round(T.p*10)/10,f=Math.round(T.f*10)/10,cr=Math.round(T.cr*10)/10;
+ $('cal-day-title').textContent=d.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'});
+ $('cal-day-sub').textContent=calDay===t?'اليوم':calDay;
+ $('cal-next').style.opacity=calDay>=t?.3:1;
+ const inp="text-xs bg-gray-900 border border-gray-700 rounded px-2 py-1 text-gray-200";
+ const ports=state.habits.portions||[],pl=(state.habits.portionLog||{})[calDay]||{},pf=portForm?(portForm.i>=0?(ports[portForm.i]||{}):{}):null;
+ const sb="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 text-orange-300 font-bold text-lg";
+ const portsHTML=ports.map((x,i)=>{
+  const n=+pl[x.id]||0,tg=+x.target||0,ok=tg&&n>=tg;
+  const info=[x.cal?`🔥 ${x.cal}`:'',x.pro?`بروتين ${x.pro}`:'',x.fat?`دهون ${x.fat}`:'',x.carb?`كارب ${x.carb}`:''].filter(Boolean).join(' • ');
+  return `<div class="bg-gray-900/70 border ${ok?'border-emerald-500/60':'border-gray-800'} rounded-lg p-2.5 space-y-2"><div class="flex justify-between items-center"><div><strong class="text-orange-200 text-sm block">${esc(x.name)} <span class="${ok?'text-emerald-400':'text-gray-400'} text-xs">${n}${tg?' / '+tg:''}</span></strong>${info?`<span class="text-[10px] text-gray-400">للحصة: ${info}</span>`:''}</div><div class="flex gap-1.5"><button onclick="portEdit(${i})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-lg text-xs">✏️</button><button onclick="portDel(${i})" class="px-2 py-1 bg-gray-800 text-red-400 rounded-lg text-xs">✕</button></div></div><div class="flex items-center gap-2"><button onclick="portStep(${x.id},-1)" class="${sb}">−</button><input type="number" step="any" inputmode="decimal" value="${n}" onchange="portSet(${x.id},this.value)" class="flex-1 min-w-0 text-center ${inp} py-2 text-sm"><button onclick="portStep(${x.id},1)" class="${sb}">+</button><button onclick="portStep(${x.id},0.5)" class="${sb} text-sm">½</button></div>${tg?`<div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden"><div class="${ok?'bg-emerald-400':'bg-orange-400'} h-1.5 transition-all" style="width:${Math.min(100,Math.round(n/tg*100))}%"></div></div>`:''}</div>`;
+ }).join('')||'<p class="text-[11px] text-gray-500">مفيش حصص لسه. ضيف حصة زي "كارب" أو "بروتين".</p>';
+ const portFormHTML=pf?`<div class="bg-black/40 border border-orange-500/40 rounded-xl p-3 space-y-2"><input type="text" id="pfName" value="${esc(pf.name||'')}" placeholder="اسم الحصة (مثلاً: كارب)" class="w-full ${inp}"><div class="grid grid-cols-5 gap-1.5"><input type="number" step="any" inputmode="decimal" id="pfCal" value="${pf.cal||''}" placeholder="كالوري" class="w-full text-center ${inp}"><input type="number" step="any" inputmode="decimal" id="pfPro" value="${pf.pro||''}" placeholder="بروتين" class="w-full text-center ${inp}"><input type="number" step="any" inputmode="decimal" id="pfFat" value="${pf.fat||''}" placeholder="دهون" class="w-full text-center ${inp}"><input type="number" step="any" inputmode="decimal" id="pfCarb" value="${pf.carb||''}" placeholder="كارب" class="w-full text-center ${inp}"><input type="number" step="any" inputmode="decimal" id="pfTarget" value="${pf.target||''}" placeholder="هدف" class="w-full text-center ${inp}"></div><p class="text-[10px] text-gray-400">القيم لكل حصة واحدة (اختيارية)، والهدف عدد الحصص في اليوم.</p><div class="grid grid-cols-2 gap-2"><button onclick="portSave()" class="py-2 bg-orange-600 text-white rounded-xl font-bold text-xs">💾 حفظ الحصة</button><button onclick="portCancel()" class="py-2 bg-gray-900 border border-gray-700 text-gray-300 rounded-xl text-xs">إلغاء</button></div></div>`:`<button onclick="portNew()" class="w-full py-2 bg-gray-900 border border-orange-500/60 text-orange-300 rounded-xl font-bold text-xs">+ حصة جديدة</button>`;
+ $('cal-body').innerHTML=`<div class="flex justify-between items-center"><h3 class="text-sm font-bold text-orange-400">🥗 السعرات والماكروز</h3><span class="text-[10px] text-gray-400">المجموع: <strong class="text-orange-300">${c}</strong> / <strong onclick="calGoal()" class="text-cyan-400 underline cursor-pointer">${goal||'حدد الهدف'}</strong> kcal</span></div>
+ ${goal?`<div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="${c>goal?'bg-red-500':'bg-orange-400'} h-2 transition-all" style="width:${Math.min(100,Math.round(c/goal*100))}%"></div></div><p class="text-[10px] ${c>goal?'text-red-400':'text-gray-400'}">${c>goal?'زيادة '+(c-goal):'متبقي '+(goal-c)} كالوري</p>`:''}
+ <div class="grid grid-cols-4 gap-1 text-center bg-black/40 p-2 rounded-xl border border-gray-800 text-[10px]"><div><span class="text-gray-400 block">السعرات</span><strong class="text-orange-400 text-xs">${c}</strong></div><div><span class="text-gray-400 block">بروتين</span><strong class="text-cyan-400 text-xs">${p}ج</strong></div><div><span class="text-gray-400 block">دهون</span><strong class="text-yellow-400 text-xs">${f}ج</strong></div><div><span class="text-gray-400 block">كارب</span><strong class="text-emerald-400 text-xs">${cr}ج</strong></div></div>
+ <div class="pt-2 border-t border-gray-800 space-y-2"><div class="flex justify-between items-center"><h4 class="text-xs font-bold text-orange-300">🍽️ الحصص</h4><span class="text-[10px] text-gray-400">+ تزود حصة، واكتب أي رقم زي 3.5</span></div>${portsHTML}${portFormHTML}</div>
+ <div class="space-y-2">${meals.map((m,i)=>`<div class="flex justify-between items-center bg-gray-900/70 border border-gray-800 rounded-lg p-2.5 text-xs"><div><strong class="text-orange-300 block text-sm">${esc(m.name)}</strong><span class="text-[10px] text-gray-400">🔥 ${m.cal||0} كالوري • بروتين: ${m.pro||0}جم • دهون: ${m.fat||0}جم • كارب: ${m.carb||0}جم</span></div><button onclick="calDel(${i})" class="text-red-400 px-2 py-1 text-xs">✕</button></div>`).join('')||'<p class="text-[11px] text-gray-500 text-center py-2">مفيش وجبات مسجلة في اليوم ده.</p>'}</div>
+ <div class="pt-2 border-t border-gray-800 space-y-2"><div class="flex justify-between items-center"><h4 class="text-xs font-bold text-orange-300">⭐ وجباتي المحفوظة</h4><span class="text-[10px] text-gray-400">اضغط ➕ لإضافتها لليوم ده</span></div>${(state.habits.savedMeals||[]).map((m,i)=>`<div class="flex justify-between items-center bg-orange-950/20 border border-orange-500/30 rounded-lg p-2.5 text-xs"><div><strong class="text-orange-200 block text-sm">${esc(m.name)}</strong><span class="text-[10px] text-gray-400">🔥 ${m.cal||0} • بروتين: ${m.pro||0} • دهون: ${m.fat||0} • كارب: ${m.carb||0}</span></div><div class="flex items-center gap-1.5"><button onclick="calUse(${i})" class="px-2.5 py-1 bg-orange-600 text-white rounded-lg font-bold">➕</button><button onclick="calEditSaved(${i})" class="px-2 py-1 bg-gray-800 text-cyan-400 rounded-lg">✏️</button><button onclick="calDelSaved(${i})" class="px-2 py-1 bg-gray-800 text-red-400 rounded-lg">✕</button></div></div>`).join('')||'<p class="text-[11px] text-gray-500">مفيش وجبات محفوظة. اكتب وجبة تحت واضغط 💾 حفظ كوجبة.</p>'}</div>
+ <div class="pt-2 border-t border-gray-800 space-y-2"><input type="text" id="mName" placeholder="اسم الوجبة (مثلاً: صدور فراخ ورز)..." class="w-full ${inp}"><div class="grid grid-cols-4 gap-1.5"><input type="number" id="mCal" placeholder="كالوري" class="w-full text-center ${inp}"><input type="number" id="mPro" placeholder="بروتين" class="w-full text-center ${inp}"><input type="number" id="mFat" placeholder="دهون" class="w-full text-center ${inp}"><input type="number" id="mCarb" placeholder="كارب" class="w-full text-center ${inp}"></div><div class="grid grid-cols-2 gap-2"><button onclick="calAdd()" class="w-full py-2 bg-orange-600 text-white rounded-xl font-bold text-xs">+ أضف لليوم</button><button onclick="calSave()" class="w-full py-2 bg-gray-900 border border-orange-500 text-orange-300 rounded-xl font-bold text-xs">💾 حفظ كوجبة</button></div></div>`;
+ renderToday();
+}
+function calShift(dir){const d=new Date(calDay+'T12:00:00');d.setDate(d.getDate()+dir);const k=fd(d);if(k>today())return;calDay=k;renderCal()}
+function calGoal(){const v=prompt("هدف السعرات اليومي (كالوري):",state.habits.calGoal||"");if(v===null)return;state.habits.calGoal=Math.max(0,parseInt(v,10)||0);save();renderCal()}
+function calAdd(){
+ const name=$('mName').value.trim(),n=id=>parseInt($(id).value,10)||0;
+ if(!name){alert('اكتب اسم الوجبة!');return}
+ (state.habits.calories[calDay]=state.habits.calories[calDay]||[]).push({name,cal:n('mCal'),pro:n('mPro'),fat:n('mFat'),carb:n('mCarb')});
+ save();renderCal();
+}
+function calDel(i){if(confirm('حذف هذه الوجبة؟')){state.habits.calories[calDay].splice(i,1);save();renderCal()}}
+function calSave(){
+ const name=$('mName').value.trim(),n=id=>parseInt($(id).value,10)||0;
+ if(!name){alert('اكتب اسم الوجبة!');return}
+ (state.habits.savedMeals=state.habits.savedMeals||[]).push({id:Date.now(),name,cal:n('mCal'),pro:n('mPro'),fat:n('mFat'),carb:n('mCarb')});
+ save();renderCal();toast('⭐ اتحفظت في وجباتي');
+}
+function calUse(i){
+ const m=(state.habits.savedMeals||[])[i];if(!m)return;
+ (state.habits.calories[calDay]=state.habits.calories[calDay]||[]).push({name:m.name,cal:m.cal,pro:m.pro,fat:m.fat,carb:m.carb});
+ save();renderCal();toast('➕ اتضافت: '+m.name);
+}
+function calEditSaved(i){
+ const m=(state.habits.savedMeals||[])[i];if(!m)return;
+ const name=prompt("اسم الوجبة:",m.name);if(name===null||!name.trim())return;
+ const g=(l,v)=>{const x=prompt(l,v);return x===null?v:Math.max(0,parseInt(x,10)||0)};
+ m.name=name.trim();m.cal=g("الكالوري:",m.cal);m.pro=g("البروتين (جم):",m.pro);m.fat=g("الدهون (جم):",m.fat);m.carb=g("الكارب (جم):",m.carb);
+ save();renderCal();
+}
+function calDelSaved(i){if(confirm('حذف الوجبة من المحفوظات؟')){state.habits.savedMeals.splice(i,1);save();renderCal()}}
+
+/* ===== الحصص ===== */
+let portForm=null;
+function dayTotals(k){
+ const T={c:0,p:0,f:0,cr:0};
+ (state.habits.calories[k]||[]).forEach(m=>{T.c+=+m.cal||0;T.p+=+m.pro||0;T.f+=+m.fat||0;T.cr+=+m.carb||0});
+ const log=(state.habits.portionLog||{})[k]||{};
+ (state.habits.portions||[]).forEach(x=>{const n=+log[x.id]||0;T.c+=n*(+x.cal||0);T.p+=n*(+x.pro||0);T.f+=n*(+x.fat||0);T.cr+=n*(+x.carb||0)});
+ return T;
+}
+function portSet(id,v){
+ const n=Math.max(0,Math.round((parseFloat(String(v).replace(/[,٫]/g,'.'))||0)*100)/100);
+ const L=state.habits.portionLog=state.habits.portionLog||{};
+ (L[calDay]=L[calDay]||{})[id]=n;save();renderCal();
+}
+function portStep(id,d){const L=(state.habits.portionLog||{})[calDay]||{};portSet(id,(+L[id]||0)+d)}
+function portNew(){portForm={i:-1};renderCal()}
+function portEdit(i){portForm={i};renderCal()}
+function portCancel(){portForm=null;renderCal()}
+function portSave(){
+ const name=$('pfName').value.trim(),n=id=>Math.max(0,parseFloat($(id).value)||0);
+ if(!name){alert('اكتب اسم الحصة!');return}
+ const o={name,cal:n('pfCal'),pro:n('pfPro'),fat:n('pfFat'),carb:n('pfCarb'),target:n('pfTarget')};
+ const L=state.habits.portions=state.habits.portions||[];
+ if(portForm&&portForm.i>=0&&L[portForm.i])Object.assign(L[portForm.i],o);else L.push(Object.assign({id:Date.now()},o));
+ portForm=null;save();renderCal();
+}
+function portDel(i){if(confirm('حذف الحصة؟ سجلها في الأيام القديمة هيفضل محفوظ بس مش هيتحسب.')){state.habits.portions.splice(i,1);save();renderCal()}}
+
+/* ===== كارت النهارده ===== */
+function renderToday(){
+ const box=$('today-card');if(!box)return;
+ const k=today(),now=new Date(),D=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+ const bar=(p,c)=>`<div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mt-2"><div class="${c} h-1.5" style="width:${Math.max(0,Math.min(100,p))}%"></div></div>`;
+ const tile=(l,v,p,dn,go,c)=>`<button onclick="${go}" class="rounded-xl border p-2.5 text-right ${dn?'border-emerald-500/60 bg-emerald-950/20':'border-gray-800 bg-gray-900/40'}"><div class="text-[10px] text-gray-400">${l}</div><div class="text-sm font-bold ${dn?'text-emerald-300':'text-gray-100'} mt-0.5">${v}</div>${bar(p,dn?'bg-emerald-400':c)}</button>`;
+ const qs=state.routines[state.activeRoutine]||[],qd=qs.filter(q=>q.current>=q.target).length;
+ let wv,wp=0,wd=false;
+ if(isDone(k)){wv='✅ خلصت';wp=100;wd=true}else if(isRest()){wv='🌿 يوم راحة';wp=100;wd=true}else if(state.penaltyActive)wv='⚠️ عقوبة';else{wv=`${qd} / ${qs.length} تمرين`;wp=qs.length?qd/qs.length*100:0}
+ const wt=(state.workoutTimes&&state.workoutTimes[k])||0;if(wt)wv+=` • ⏱ ${Math.round(wt/60)}د`;
+ const tc=Math.round(dayTotals(k).c),g=state.habits.calGoal||0;
+ box.innerHTML=`<div class="flex justify-between items-center"><h3 class="text-sm font-bold text-cyan-300">📍 النهارده</h3><span class="text-[10px] text-gray-400">${D[now.getDay()]} ${now.getDate()}</span></div>
+ <div class="grid grid-cols-2 gap-2">${tile('🏋️ التمرين',wv,wp,wd,"showView('workouts')",'bg-cyan-400')}${tile('🥗 السعرات',g?`${tc} / ${g}`:`${tc} kcal`,g?tc/g*100:(tc?50:0),g?(tc>=g*.9&&tc<=g*1.1):tc>0,"showView('calories')",'bg-orange-400')}${akTile(tile)}</div>
+ <div class="text-[10px] text-gray-400 pt-1">🔥 ستريك التمرين: <strong class="text-orange-400">${state.streak||0}</strong> يوم</div>`;
+}
+
+/* ===== الأخلاق (التركيز على خُلق واحد) ===== */
+let akDay=today();
+function akEnsure(){
+ const mk=()=>{let n=1;const V=(name,icon,ts)=>({id:'v'+n++,name,icon,tests:ts.map(t=>({id:'t'+n++,t}))});
+  return{v2:1,goal:50,focus:null,log:{},virtues:[
+   V('الغضب','😡',['حد استفزني بكلمة','اتأخرت على حاجة وزعلت','حد خالفني في الرأي']),
+   V('الكذب','🤥',['موقف كنت هكذب فيه عشان أنجو','اتسألت سؤال محرج','حبيت أبالغ في كلامي']),
+   V('الغيبة','🗣️',['حد اتكلم عن غايب قدامي','اتضايقت من حد وحبيت أحكي عنه']),
+   V('التسويف','🐌',['مهمة لازم تتعمل دلوقتي','وقت الصلاة أو الورد جه','حسيت بكسل في نص شغل'])]}};
+ if(!state.akhlaq||(!state.akhlaq.v2&&!Object.keys(state.akhlaq.log||{}).length)){state.akhlaq=mk();save()}
+ const A=state.akhlaq;A.log=A.log||{};A.goal=A.goal||50;
+ if(!A.focus||!A.virtues.find(v=>v.id===A.focus))A.focus=A.virtues[0]?A.virtues[0].id:null;
+}
+const akLog=k=>state.akhlaq.log[k]||{};
+const akVir=()=>state.akhlaq.virtues.find(v=>v.id===state.akhlaq.focus);
+function akStat(v,k){const L=akLog(k);let p=0,f=0;v.tests.forEach(x=>{if(L[x.id]===1)p++;else if(L[x.id]===0)f++});const t=v.tests.length,need=Math.ceil(t*state.akhlaq.goal/100);return{p,f,t,need,ok:t>0&&p>=need}}
+function akTile(tile){akEnsure();const v=akVir();if(!v)return '';const s=akStat(v,today());return tile('🎯 '+esc(v.name),s.t?`${s.p} / ${s.t}`:'ضيف مواقف',s.t?s.p/s.t*100:0,s.ok,"showView('akhlaq')",'bg-purple-400')}
+function renderAk(){
+ akEnsure();
+ const A=state.akhlaq,t=today(),d=new Date(akDay+'T12:00:00'),v=akVir(),bt="px-2 py-1 bg-gray-800 rounded-lg text-xs";
+ $('ak-title').textContent=d.toLocaleDateString('ar-EG',{weekday:'long',day:'numeric',month:'long'});
+ $('ak-sub').textContent=akDay===t?'اليوم':akDay;$('ak-next').style.opacity=akDay>=t?.3:1;
+ const chips=A.virtues.map(x=>{const s=akStat(x,akDay);return `<button onclick="akPick('${x.id}')" class="px-3 py-2 rounded-xl border text-xs font-bold ${x.id===A.focus?'border-purple-400 bg-purple-950 text-purple-200':'border-gray-800 bg-gray-900 text-gray-300'}">${x.icon} ${esc(x.name)} <span class="text-[10px] text-gray-400">${s.p}/${s.t}</span></button>`}).join('');
+ let main='<p class="text-[11px] text-gray-500">ضيف أول خُلق تشتغل عليه.</p>';
+ if(v){
+  const s=akStat(v,akDay),L=akLog(akDay),ans=s.p+s.f,r=s.t?s.p/s.t:0;
+  const face=!ans?'🧑':r>=1?'🤩':s.ok?'😊':r>=.25?'😐':'😔',col=`hsl(${Math.round(120*r)},70%,50%)`;
+  const verdict=!s.t?'ضيف مواقف للخُلق ده':!ans?'لسه ما سجلتش النهارده':s.ok?`✅ عدّيت النص! (${s.p} من ${s.t} • المطلوب ${s.need})`:(s.p+(s.t-ans)>=s.need?`لسه في أمل: عدّيت ${s.p} والمطلوب ${s.need} (باقي ${s.t-ans} مواقف مسجلتهاش)`:`❌ ما وصلتش للنص (${s.p} من ${s.t} • المطلوب ${s.need})`);
+  let st=0;for(let i=0;i<400;i++){const dd=new Date();dd.setDate(dd.getDate()-i);if(akStat(v,fd(dd)).ok)st++;else if(i>0)break}
+  let wk='';for(let i=6;i>=0;i--){const dd=new Date();dd.setDate(dd.getDate()-i);const q=akStat(v,fd(dd)),has=q.p+q.f>0;wk+=`<div class="flex-1 text-center"><div class="h-12 flex items-end"><div class="w-full rounded-t ${!has?'bg-gray-700':q.ok?'bg-emerald-400/80':'bg-red-500/70'}" style="height:${q.t?Math.max(has?8:0,Math.round(q.p/q.t*100)):0}%"></div></div><div class="text-[9px] text-gray-500 mt-0.5">${dd.getDate()}</div></div>`}
+  const tests=v.tests.map(x=>{const c=L[x.id];return `<div class="bg-gray-900/70 border ${c===1?'border-emerald-500/60':c===0?'border-red-500/50':'border-gray-800'} rounded-lg p-2.5 space-y-2"><div class="text-xs text-gray-200">${esc(x.t)}</div><div class="flex items-center gap-1.5"><button onclick="akSet('${x.id}',1)" class="flex-1 py-1.5 rounded-lg text-xs font-bold ${c===1?'bg-emerald-600 text-white':'bg-gray-800 text-gray-300'}">✅ عدّيته</button><button onclick="akSet('${x.id}',0)" class="flex-1 py-1.5 rounded-lg text-xs font-bold ${c===0?'bg-red-700 text-white':'bg-gray-800 text-gray-300'}">❌ وقعت فيه</button><button onclick="akEditTest('${x.id}')" class="${bt} text-cyan-400">✏️</button><button onclick="akDelTest('${x.id}')" class="${bt} text-red-400">✕</button></div></div>`}).join('');
+  main=`<div class="text-center space-y-1.5"><div style="font-size:64px;line-height:1.1;filter:drop-shadow(0 0 14px ${col})">${face}</div><div class="text-sm font-bold text-purple-200">${v.icon} بشتغل على: ${esc(v.name)}</div><div class="text-xs ${s.ok?'text-emerald-400':'text-gray-300'}">${verdict}</div><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden relative"><div class="${s.ok?'bg-emerald-400':'bg-purple-400'} h-2 transition-all" style="width:${Math.round(r*100)}%"></div><div class="absolute top-0 bottom-0 w-0.5 bg-white/70" style="right:${A.goal}%"></div></div><div class="text-[10px] text-gray-400">الهدف: <strong onclick="akGoal()" class="text-cyan-400 underline cursor-pointer">${A.goal}%</strong> من المواقف • 🔥 ${st} يوم متتالي عدّيت فيهم الهدف</div></div>
+  <div class="space-y-2"><div class="flex justify-between items-center"><h3 class="text-sm font-bold text-purple-200">مواقف اختبار ${esc(v.name)}</h3><div class="flex gap-1.5"><button onclick="akEditVirtue()" class="${bt} text-cyan-400">✏️</button><button onclick="akDelVirtue()" class="${bt} text-red-400">🗑</button></div></div>${tests||'<p class="text-[11px] text-gray-500">مفيش مواقف للخُلق ده لسه. اكتب مواقف بتحصل فيها المشكلة.</p>'}<button onclick="akAddTest()" class="w-full py-2 bg-gray-900 border border-purple-500/60 text-purple-300 rounded-xl font-bold text-xs">+ موقف جديد</button></div>
+  <div class="pt-2 border-t border-gray-800"><p class="text-[10px] text-gray-400 mb-1">آخر 7 أيام (أخضر = عدّيت الهدف، أحمر = لأ)</p><div class="flex gap-1.5 items-end">${wk}</div></div>`;
+ }
+ $('ak-body').innerHTML=`<div class="flex flex-wrap gap-2">${chips}<button onclick="akAddVirtue()" class="px-3 py-2 rounded-xl border border-dashed border-purple-500/60 text-xs text-purple-300">+ خُلق</button></div>${main}`;
+ renderToday();
+}
+function akPick(id){state.akhlaq.focus=id;save();renderAk()}
+function akGoal(){const x=prompt("نسبة المواقف اللي لازم تعدّيها عشان اليوم يتحسب ناجح (1 إلى 100):",state.akhlaq.goal);if(x===null)return;state.akhlaq.goal=Math.min(100,Math.max(1,parseInt(x,10)||50));save();renderAk()}
+function akShift(dir){const d=new Date(akDay+'T12:00:00');d.setDate(d.getDate()+dir);const k=fd(d);if(k>today())return;akDay=k;renderAk()}
+function akSet(id,val){const L=state.akhlaq.log[akDay]=state.akhlaq.log[akDay]||{};if(L[id]===val)delete L[id];else L[id]=val;save();renderAk()}
+function akAddVirtue(){const n=prompt("اسم الخُلق اللي عايز تشتغل عليه:");if(!n||!n.trim())return;const ic=prompt("أيقونة (إيموجي):","⭐")||'⭐';const v={id:'v'+Date.now(),name:n.trim(),icon:ic.trim(),tests:[]};state.akhlaq.virtues.push(v);state.akhlaq.focus=v.id;save();renderAk()}
+function akEditVirtue(){const v=akVir();if(!v)return;const n=prompt("اسم الخُلق:",v.name);if(n===null||!n.trim())return;const ic=prompt("الأيقونة:",v.icon);v.name=n.trim();if(ic&&ic.trim())v.icon=ic.trim();save();renderAk()}
+function akDelVirtue(){const v=akVir();if(!v||!confirm(`حذف خُلق "${v.name}" بكل مواقفه؟`))return;state.akhlaq.virtues=state.akhlaq.virtues.filter(x=>x!==v);state.akhlaq.focus=null;save();renderAk()}
+function akAddTest(){const v=akVir();if(!v)return;const t=prompt("اكتب الموقف اللي بيحصل فيه الخُلق ده:");if(!t||!t.trim())return;v.tests.push({id:'t'+Date.now(),t:t.trim()});save();renderAk()}
+function akEditTest(id){const v=akVir(),x=v&&v.tests.find(y=>y.id===id);if(!x)return;const t=prompt("تعديل الموقف:",x.t);if(t&&t.trim()){x.t=t.trim();save();renderAk()}}
+function akDelTest(id){const v=akVir();if(!v||!confirm('حذف الموقف؟'))return;v.tests=v.tests.filter(y=>y.id!==id);save();renderAk()}
+
+/* ===== النسخ الاحتياطي ===== */
+const tgTok=()=>localStorage.getItem("tg_token")||"",tgChat=()=>localStorage.getItem("tg_chat")||"";
+function setupTG(){const t=prompt("Bot Token:",tgTok());if(t===null)return;const c=prompt("Chat ID:",tgChat());if(c===null)return;localStorage.setItem("tg_token",t.trim());localStorage.setItem("tg_chat",c.trim());alert("✅ تم الحفظ على جهازك")}
+function renderBackupStatus(){const b=state.lastBackup;$('backup-status').textContent=b?`آخر نسخة: ${b.date}${b.auto?' (تلقائية)':''}`:'لسه مفيش نسخة احتياطية'}
+async function backupTG(manual,e){
+ if(busy)return false;
+ if(!(tgTok()&&tgChat())){if(manual)alert('اضغط ⚙️ تليجرام الأول وحط التوكن والـ chat id.');return false}
+ busy=true;if(manual)$('backup-status').textContent='⏳ جاري الإرسال...';
+ try{
+  const t=today(),f=new FormData();
+  f.append('chat_id',tgChat());f.append('document',new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),`hunter_backup_${t}.json`);f.append('caption',`☁️ نسخة احتياطية Hunter • ${t}`);
+  const r=await fetch(`https://api.telegram.org/bot${tgTok()}/sendDocument`,{method:'POST',body:f}),d=await r.json();
+  if(!d.ok)throw new Error(d.description);
+  state.lastBackup={date:t,ts:Date.now(),auto:!manual};save();if(manual)fx(e,'☁️ اتبعتت');return true;
+ }catch(err){if(manual)alert('تعذر إرسال النسخة: '+(err.message||'تأكد من الإنترنت'));return false}
+ finally{busy=false;renderBackupStatus()}
+}
+function autoBackup(){
+ const t=today(),last=state.lastBackup?state.lastBackup.date:null;
+ if(last===t)return;
+ const since=last?Math.floor((new Date(t+'T12:00:00')-new Date(last+'T12:00:00'))/86400000):999;
+ if(new Date().getDay()===5||since>=7)backupTG(false);
+}
+function exportData(){const a=document.createElement('a');a.href="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(state,null,2));a.download=`hunter_ultimate_backup_${today()}.json`;a.click()}
+function importData(e){
+ const file=e.target.files[0];if(!file)return;
+ const rd=new FileReader();
+ rd.onload=ev=>{
+  try{
+   const data=JSON.parse(ev.target.result);
+   if(!data||typeof data!=='object'||!data.history){alert("الملف ده مش نسخة Hunter صالحة.");return}
+   if(!confirm("الاسترجاع هيستبدل بياناتك الحالية. تكمل؟"))return;
+   localStorage.setItem(K+"_before_import",JSON.stringify(state));
+   data.lastActiveDate=today();data.workoutTimer=null;
+   state=Object.assign(state,data);save();alert("✅ تم استيراد بياناتك.");location.reload();
+  }catch(err){alert("خطأ في قراءة ملف النسخة الاحتياطية.")}
+ };
+ rd.readAsText(file);e.target.value="";
+}
+
+/* ===== المؤقت والتشغيل ===== */
+function updateTimer(){
+ const now=new Date(),mid=new Date(now);mid.setHours(24,0,0,0);const diff=mid-now;
+ if(transition()){recalc();renderAll()}
+ if(state.workoutTimer)$('wt-display').textContent=fmtHMS(elapsed());
+ const p=n=>String(Math.floor(n)).padStart(2,'0');
+ $('countdown').textContent=`${p(diff/3600000%24)}:${p(diff/60000%60)}:${p(diff/1000%60)}`;
+}
+load();
+setInterval(updateTimer,1000);updateTimer();
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+renderBackupStatus();autoBackup();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoBackup()});
+</script>
+</body></html>
