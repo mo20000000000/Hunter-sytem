@@ -176,7 +176,7 @@ function load(){
 function renderAll(){renderHome();renderWorkouts();renderCal();renderToday()}
 function fx(e,t){if(navigator.vibrate)navigator.vibrate(30);const r=e&&e.target&&e.target.getBoundingClientRect?e.target.getBoundingClientRect():{left:innerWidth/2,top:innerHeight/2,width:0};const el=document.createElement('div');el.className='fx';el.textContent=t||'✨';el.style.left=(r.left+r.width/2)+'px';el.style.top=r.top+'px';document.body.appendChild(el);setTimeout(()=>el.remove(),950)}
 function toast(m){const t=document.createElement('div');t.className='fixed bottom-5 left-1/2 -translate-x-1/2 bg-amber-500 text-black px-4 py-2 rounded-xl font-bold text-xs shadow-lg z-50';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
-function showView(v){if(v!=='settings')jInl=false;const JV=['habits','plan','jour','rec','notes','weekly'],isJ=JV.includes(v);['home','workouts','calories','settings'].forEach(x=>$('view-'+x).classList.toggle('hidden',x!==v));$('view-j').classList.toggle('hidden',!isJ);if(v==='home'){renderHome();renderToday()}if(v==='workouts')renderWorkouts();if(v==='calories'){calDay=today();renderCal()}if(isJ){jTab=v;jOff=0;renderJ()}}
+function showView(v){if(v!=='settings')jInl=false;const JV=['habits','plan','jour','rec','notes','weekly','khushu'],isJ=JV.includes(v);['home','workouts','calories','settings'].forEach(x=>$('view-'+x).classList.toggle('hidden',x!==v));$('view-j').classList.toggle('hidden',!isJ);if(v==='home'){renderHome();renderToday()}if(v==='workouts')renderWorkouts();if(v==='calories'){calDay=today();renderCal()}if(isJ){jTab=v;jOff=0;renderJ()}}
 
 /* ===== الأيام والستريك ===== */
 const isDone=k=>{const s=state.history[k];return s==='completed'||s===true};
@@ -496,9 +496,9 @@ const APPDEF='بَوۡصَلَة';
 const HFONTS=[['Amiri','أميري (نسخ كلاسيكي)'],['Reem Kufi','ريم كوفي (حديث)'],['Cairo','القاهرة'],['Tajawal','تجوال'],['Aref Ruqaa','عارف رقعة (رقعة)']],HSIZES=[['26','صغير'],['32','متوسط'],['40','كبير']];
 const SLG='قَالَ كَلَّا ۖ إِنَّ مَعِيَ رَبِّي سَيَهْدِينِ',SLG2='قُلْ أَذَٰلِكَ خَيْرٌ أَمْ جَنَّةُ الْخُلْدِ الَّتِي وُعِدَ الْمُتَّقُونَ';
 const MS=[[1,'أول يوم'],[3,'٣ أيام'],[7,'أسبوع'],[14,'أسبوعين'],[30,'شهر'],[60,'شهرين'],[90,'٣ شهور'],[180,'٦ شهور'],[365,'سنة']];
-const JNAMES={w:'نظام التمارين',c:'تتبع السعرات',h:'العادات',p:'الجدول',j:'اليوميات',r:'التعافي',n:'الملاحظات'};
-const HC={w:['⚔️','cyan'],c:['🥗','orange'],h:['✅','violet'],p:['🕒','teal'],j:['📓','pink'],r:['🌱','emerald'],n:['📝','yellow']};
-const GO={w:'workouts',c:'calories',h:'habits',p:'plan',j:'jour',r:'rec',n:'notes',},JK={habits:'h',plan:'p',jour:'j',rec:'r',notes:'n',weekly:'h'};
+const JNAMES={w:'نظام التمارين',c:'تتبع السعرات',h:'العادات',p:'الجدول',j:'اليوميات',r:'التعافي',n:'الملاحظات',k:'تحسين الصلاة'};
+const HC={w:['⚔️','cyan'],c:['🥗','orange'],h:['✅','violet'],p:['🕒','teal'],j:['📓','pink'],r:['🌱','emerald'],n:['📝','yellow'],k:['🕌','sky']};
+const GO={w:'workouts',c:'calories',h:'habits',p:'plan',j:'jour',r:'rec',n:'notes',k:'khushu'},JK={habits:'h',plan:'p',jour:'j',rec:'r',notes:'n',weekly:'h',khushu:'k'};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const nA=x=>(+x).toLocaleString('ar-EG');
 const jD=i=>{const d=new Date();d.setDate(d.getDate()-i);return d};
@@ -524,7 +524,7 @@ function jEnsure(){
  const J=state.j=state.j||{};let fresh=false;
  if(!J.groups){fresh=true;J.filter='all';J.groups=[{id:'g1',name:'الصحة',color:JC[1]},{id:'g2',name:'التعلّم',color:JC[0]}];J.habits=[{id:uid(),name:'شرب الماء',g:'g1',days:{}},{id:uid(),name:'قراءة ١٠ صفحات',g:'g2',days:{}}]}
  J.blocks=J.blocks||[];J.names=Object.assign({},JNAMES,J.names);if(J.names.w==='نظام تمارين Hunter')J.names.w=JNAMES.w;
- J.order=(J.order||['w','c','h','p','j','r']).filter(k=>k!=='a'&&k!=='v');if(J.names){delete J.names.a;delete J.names.v}J.focus=J.focus||[];J.notes=J.notes||[];J.wr=J.wr||{};Object.keys(JNAMES).forEach(k=>{if(!J.order.includes(k))J.order.push(k)});
+ J.order=(J.order||['w','c','h','p','j','r']).filter(k=>k!=='a'&&k!=='v');if(J.names){delete J.names.a;delete J.names.v}J.focus=J.focus||[];J.notes=J.notes||[];J.wr=J.wr||{};J.pr=J.pr||{};J.pr.ed=J.pr.ed||{};J.pr.d=J.pr.d||{};J.pr.w=J.pr.w||{};J.pr.foc=J.pr.foc||'';Object.keys(JNAMES).forEach(k=>{if(!J.order.includes(k))J.order.push(k)});
  J.rec=J.rec||{start:null,log:{},got:[],rw:{}};
  J.user=J.user||'مصطفى';J.app=J.app||APPDEF;J.hf=J.hf||'Amiri';J.hs=J.hs||32;if(J.slogan===undefined)J.slogan=SLG;if(J.slogan2===undefined)J.slogan2=SLG2;
  if(!J.az){fresh=true;J.az={items:[['سبحان الله وبحمده',100],['أستغفر الله وأتوب إليه',100],['لا حول ولا قوة إلا بالله',33],['لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير',10],['اللهم صلِّ وسلِّم على نبينا محمد',10]].map(x=>({id:uid(),t:x[0],n:x[1]})),c:{}}}
@@ -567,7 +567,7 @@ function jForm(o){
 /* --- التنقل والرئيسية --- */
 function renderJ(){
  jEnsure();$('j-title').textContent=state.j.names[JK[jTab]]||'';$('j-titlebar').classList.add('hidden');
- ({habits:renderHabits,plan:renderPlan,rec:renderRecCorner,jour:renderJour,notes:renderNotes,weekly:renderWeekly})[jTab]();
+ ({habits:renderHabits,plan:renderPlan,rec:renderRecCorner,jour:renderJour,notes:renderNotes,weekly:renderWeekly,khushu:renderKhushu})[jTab]();
  renderToday();
 }
 function renderHome(){
@@ -576,7 +576,7 @@ function renderHome(){
  {const sl=[[J.slogan,SLG,'الشعراء ٦٢'],[J.slogan2,SLG2,'الفرقان ١٥']].filter(x=>x[0]).map(x=>`<div class="text-cyan-300" style="font-family:Amiri,serif;font-size:22px;line-height:2">${esc(x[0])}${x[0]===x[1]?`<div class="text-[11px] text-gray-500" style="font-family:inherit;line-height:1.6">${x[2]}</div>`:''}</div>`);
  $('greet').innerHTML=sl.length?`<div class="cb p-4 rounded-2xl border border-gray-800 text-center">${sl.join('<div style="height:1px;margin:8px 28px;background:linear-gradient(90deg,transparent,#374151,transparent)"></div>')}</div>`:''}
  const due=J.habits.filter(h=>jSched(h,d)),dn=due.filter(h=>h.days[t]).length,st=recStats(),mn=d.getHours()*60+d.getMinutes(),cur=J.blocks.find(b=>inBlock(b,mn));
- const SUB={w:'Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي',c:'السعرات والماكروز وهدف اليوم والحصص',h:due.length?`${nA(dn)} من ${nA(due.length)} اليوم`:'لا عادات اليوم',p:cur?cur.name:(J.blocks.length?`${nA(J.blocks.length)} فترة`:'ضيف فترات'),j:(st?`${nA(st.cnt)} يوم تعافي. `:'ابدأ العدّاد. ')+'العدّاد وخطة الهروب واليوميات',r:'الأذكار والدعاء والمعتقدات',n:'اكتب أي فكرة أو ملاحظة بسرعة'};
+ const SUB={w:'Day 1 / Day 2، الرتب، السجل الشهري والمتوسط الأسبوعي',c:'السعرات والماكروز وهدف اليوم والحصص',h:due.length?`${nA(dn)} من ${nA(due.length)} اليوم`:'لا عادات اليوم',p:cur?cur.name:(J.blocks.length?`${nA(J.blocks.length)} فترة`:'ضيف فترات'),j:(st?`${nA(st.cnt)} يوم تعافي. `:'ابدأ العدّاد. ')+'العدّاد وخطة الهروب واليوميات',r:'الأذكار والدعاء والمعتقدات',n:'اكتب أي فكرة أو ملاحظة بسرعة',k:'خطوات الصلاة والخشوع خطوة خطوة'};
  $('hb').innerHTML=weekBanner()+J.order.filter(k=>HC[k]).map(k=>{const ic=HC[k][0],c=HC[k][1];return `<div class="p-4 rounded-2xl cb border border-${c}-500/40 flex items-center justify-between cursor-pointer shadow" onclick="showView('${GO[k]}')"><div class="flex items-center gap-3.5"><span class="text-2xl p-2.5 rounded-xl bg-${c}-950/60 border border-${c}-500/50">${ic}</span><div><h3 class="text-sm font-bold text-${c}-400">${esc(J.names[k])}</h3><p class="text-xs text-gray-400">${esc(SUB[k])}</p></div></div><span class="text-${c}-400 text-sm">◀</span></div>`}).join('')+`<div class="p-4 rounded-2xl cb border border-gray-700 flex items-center justify-between cursor-pointer shadow" onclick="jSettings()"><div class="flex items-center gap-3.5"><span class="text-2xl p-2.5 rounded-xl bg-gray-900 border border-gray-700">⚙️</span><div><h3 class="text-sm font-bold text-gray-200">الإعدادات</h3><p class="text-xs text-gray-400">الاسم والشعار والأقسام والترتيب وتيليجرام</p></div></div><span class="text-gray-400 text-sm">◀</span></div>`;
 }
 /* ===== تخصيص كارت النهارده ===== */
@@ -758,18 +758,63 @@ function renderWeekly(){
  if(cd.length)ex+=`<div class="text-xs text-gray-300">🥗 متوسط السعرات: ${nA(Math.round(cd.reduce((a,b)=>a+b,0)/cd.length))} kcal (على ${nA(cd.length)} يوم)</div>`;
  const card=(ic,ti,tx,c)=>tx?`<div class="cb p-3.5 rounded-2xl border border-${c}-500/40"><div class="text-xs font-bold text-${c}-300 mb-1">${ic} ${ti}</div><div class="text-xs text-gray-200" style="white-space:pre-wrap">${esc(tx)}</div></div>`:'';
  const has=r.h||r.s||r.n,mo=['😞','😕','😐','🙂','😄'];
+ const kf=(J.pr.w[fd(ws)]||[]).map(id=>KH.find(x=>x.id===id)).filter(Boolean),kc=keys.reduce((a,k)=>a+Object.values(J.pr.d[k]||{}).filter(Boolean).length,0);
+ const kcard=kf.length?`<div class="cb p-3.5 rounded-2xl border border-sky-500/40 space-y-1"><div class="text-xs font-bold text-sky-300">🕌 تركيزك في الصلاة</div><div class="text-xs text-gray-200">${kf.map(x=>esc(x.t)).join(' + ')}</div><div class="text-xs text-gray-400">طبّقته في ${nA(kc)} صلاة من ${nA(35)}</div></div>`:'';
  $('j-body').innerHTML=jhTabs('w')+`<div class="flex items-center gap-2"><button onclick="jwNav(-1)" class="flex-1 py-2 rounded-xl border border-gray-700 text-gray-300 text-[11px]">الأسبوع اللي قبله</button><button onclick="jwNav(1)" ${cur?'disabled':''} class="flex-1 py-2 rounded-xl border border-gray-700 text-gray-300 text-[11px] disabled:opacity-30">الأسبوع اللي بعده</button></div>
 <div class="cb p-4 rounded-2xl border border-violet-500/40 text-center space-y-1"><div class="text-[11px] text-gray-400">${cur?'الأسبوع ده':'أسبوع'}: ${dl(ws)} إلى ${dl(we)}</div><div class="text-4xl font-bold text-violet-300">${nA(pct)}٪</div><div class="text-sm text-gray-200">${vd}</div><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-violet-400 h-2" style="width:${pct}%"></div></div>${cur?'<div class="text-[10px] text-gray-500">الأسبوع لسه شغال، الأرقام بتتحدث</div>':''}</div>
 ${it.length?`<div class="cb p-3.5 rounded-2xl border border-emerald-500/40"><div class="text-xs font-bold text-emerald-300 mb-1">✅ اللي عملته (${nA(ok.length)})</div>${ok.length?ok.map(i=>row(i,1)).join(''):'<div class="text-[11px] text-gray-500">لسه ولا عنصر وصل لهدفه</div>'}</div>
 <div class="cb p-3.5 rounded-2xl border border-red-500/40"><div class="text-xs font-bold text-red-300 mb-1">❌ اللي معملتوش (${nA(no.length)})</div>${no.length?no.map(i=>row(i,0)).join(''):'<div class="text-[11px] text-gray-500">كله اتعمل، برافو ✅</div>'}</div>`:''}
 ${it.length>1?`<div class="cb p-3.5 rounded-2xl border border-gray-800 space-y-1"><div class="text-xs text-gray-300">⭐ أحسن حاجة: <b class="text-emerald-300">${esc(best.name)}</b> (${nA(best.cnt)}/${nA(best.need)})</div><div class="text-xs text-gray-300">⚠️ أضعف حاجة: <b class="text-red-300">${esc(worst.name)}</b> (${nA(worst.cnt)}/${nA(worst.need)})</div>${ex}</div>`:ex?`<div class="cb p-3.5 rounded-2xl border border-gray-800 space-y-1">${ex}</div>`:''}
-<div class="cb p-3.5 rounded-2xl border border-gray-800"><div class="text-xs text-gray-400 mb-2 text-center">حالتك العامة في الأسبوع ده</div><div class="flex justify-around">${mo.map((e,i)=>`<button onclick="jwMood(${i+1})" class="text-2xl w-11 h-11 rounded-full border ${r.m===i+1?'border-violet-400 bg-violet-900/50':'border-transparent opacity-60'}">${e}</button>`).join('')}</div></div>
+${kcard}<div class="cb p-3.5 rounded-2xl border border-gray-800"><div class="text-xs text-gray-400 mb-2 text-center">حالتك العامة في الأسبوع ده</div><div class="flex justify-around">${mo.map((e,i)=>`<button onclick="jwMood(${i+1})" class="text-2xl w-11 h-11 rounded-full border ${r.m===i+1?'border-violet-400 bg-violet-900/50':'border-transparent opacity-60'}">${e}</button>`).join('')}</div></div>
 ${card('😊','المبسوط منه',r.h,'emerald')}${card('😕','اللي مش مبسوط منه',r.s,'red')}${card('🎯','هعمل إيه الأسبوع الجاي',r.n,'sky')}
 <button onclick="jwForm()" class="w-full py-3 rounded-2xl bg-violet-600 text-white font-bold text-xs">${has?'✏️ تعديل مراجعتي':'✍️ اكتب مراجعتي'}</button>`}
 function jwForm(){
  const J=state.j,k=jwKey(),r=J.wr[k]||{};
  jForm({title:'مراجعة الأسبوع',fields:[{id:'h',label:'😊 إيه المبسوط منه؟',type:'area',rows:4,value:r.h||''},{id:'s',label:'😕 إيه اللي مش مبسوط منه؟',type:'area',rows:4,value:r.s||''},{id:'n',label:'🎯 هعمل إيه مختلف الأسبوع الجاي؟',type:'area',rows:4,value:r.n||''}],
  ok:v=>{J.wr[k]=Object.assign(J.wr[k]||{},{h:v.h,s:v.s,n:v.n});save();renderJ();renderHome()}});
+}
+
+/* ===== تحسين الصلاة ===== */
+const KG=['قبل الصلاة','في الصلاة','بعد الصلاة'];
+const KH=[
+{id:'k1',g:0,t:'وأنت رايح للوضوء',f:'• انوِ إنك بتتطهّر عشان تقابل ربنا\n• افتكر إن الذنوب بتنزل مع الماء وأنت بتتوضأ\n• هدّي نفسك وسيب الموبايل والكلام',d:'بِسْمِ اللَّهِ'},
+{id:'k2',g:0,t:'إسباغ الوضوء',f:'• إسباغ الوضوء: إنك تتمّه وتوصّل الماء لكل موضع\n• وأنت بتغسل كل عضو افتكر إن الذنوب بتتطهر منه\n• بسم الله، الكفين، المضمضة والاستنشاق، الوجه، اليدين للمرفقين، مسح الرأس والأذنين، الرجلين للكعبين\n• من غير إسراف، وببطء',d:''},
+{id:'k3',g:0,t:'الشهادتان بعد الوضوء',f:'• قول الشهادتين بتركيز بعد ما تخلّص وضوءك\n• ورد إن اللي يقولهم بعد الوضوء تتفتح له أبواب الجنة الثمانية',d:'أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ\nاللَّهُمَّ اجْعَلْنِي مِنَ التَّوَّابِينَ وَاجْعَلْنِي مِنَ الْمُتَطَهِّرِينَ'},
+{id:'k17',g:0,t:'دعاء الخروج من المنزل',f:'• قوله أول ما تخطي برا الباب\n• ورد إنه بيتقال لك: هُديت وكُفيت ووُقيت\n• اتوكل على الله واترك الانشغال بالدنيا',d:'بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ\nاللَّهُمَّ إِنِّي أَعُوذُ بِكَ أَنْ أَضِلَّ أَوْ أُضَلَّ، أَوْ أَزِلَّ أَوْ أُزَلَّ، أَوْ أَظْلِمَ أَوْ أُظْلَمَ، أَوْ أَجْهَلَ أَوْ يُجْهَلَ عَلَيَّ'},
+{id:'k18',g:0,t:'دعاء الأنوار',f:'• كان النبي ﷺ يقوله وهو خارج للصلاة\n• اطلب النور في كل اتجاه وفي كل حواسك، وافهم معنى كل جملة\n• قوله بتمهّل وأنت ماشي',d:'اللَّهُمَّ اجْعَلْ فِي قَلْبِي نُورًا، وَفِي لِسَانِي نُورًا، وَفِي سَمْعِي نُورًا، وَفِي بَصَرِي نُورًا، وَمِنْ فَوْقِي نُورًا، وَمِنْ تَحْتِي نُورًا، وَعَنْ يَمِينِي نُورًا، وَعَنْ شِمَالِي نُورًا، وَمِنْ أَمَامِي نُورًا، وَمِنْ خَلْفِي نُورًا، وَاجْعَلْ لِي نُورًا، وَاجْعَلْنِي نُورًا'},
+{id:'k4',g:0,t:'وأنت ماشي للمسجد',f:'• امشِ بسكينة من غير جري\n• كل خطوة بترفع درجة وتمحو خطيئة\n• فكّر في اللي هتقوله لربنا في الصلاة\n• اذكر الله أو ادعي في طريقك بدل الموبايل',d:''},
+{id:'k5',g:0,t:'دعاء دخول المسجد',f:'• ادخل برجلك اليمين\n• حس إنك داخل بيت الله وضيف عنده\n• اطلب المغفرة وفتح أبواب الرحمة بقلبك',d:'بِسْمِ اللَّهِ، وَالصَّلَاةُ وَالسَّلَامُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ اغْفِرْ لِي ذُنُوبِي وَافْتَحْ لِي أَبْوَابَ رَحْمَتِكَ'},
+{id:'k19',g:0,t:'صلاة النافلة',f:'• صلّي ركعتين تحية المسجد، أو السنة الراتبة قبل الفرض\n• اعتبرها تسخين لقلبك قبل الفريضة\n• خفّفها لكن اطمئن فيها وركّز',d:''},
+{id:'k6',g:1,t:'استحضار معنى «الله أكبر»',f:'• استحضر إنك واقف بين إيدين الله\n• «الله أكبر»: أكبر من أي شاغل في دماغك وأكبر من الدنيا كلها\n• ارفع إيديك وكأنك بترمي الدنيا ورا ضهرك\n• انوِ الصلاة، وخلّي نظرك في مكان سجودك',d:'اللَّهُ أَكْبَرُ'},
+{id:'k7',g:1,t:'دعاء الاستفتاح',f:'• ده أول كلامك مع ربنا، قوله بتمهّل وبمعناه\n• اختار صيغة واحدة وافهم معناها كويس',d:'سُبْحَانَكَ اللَّهُمَّ وَبِحَمْدِكَ، وَتَبَارَكَ اسْمُكَ، وَتَعَالَى جَدُّكَ، وَلَا إِلَهَ غَيْرُكَ'},
+{id:'k8',g:1,t:'الفاتحة',f:'• في حديث قدسي إن ربنا بيرد عليك على كل آية من الفاتحة\n• وقّف بين الآيات وأنت متخيّل الرد\n• «إياك نعبد وإياك نستعين» جدّدها وأنت صادق\n• «اهدنا الصراط المستقيم» ادعيها من قلبك',d:'الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ، الرَّحْمَٰنِ الرَّحِيمِ، مَالِكِ يَوْمِ الدِّينِ، إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ، اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ'},
+{id:'k9',g:1,t:'القراءة بعد الفاتحة',f:'• اقرأ بتدبّر وافهم معنى اللي بتقوله\n• عند آية الرحمة اسأل، وعند آية العذاب اتعوّذ\n• نوّع السور عشان ما تقراش بالعادة',d:''},
+{id:'k10',g:1,t:'الركوع',f:'• اطمئن لحد ما كل مفصل يستقر\n• استشعر عظمة ربنا وأنت منحني\n• كرر التسبيح بحضور مش بسرعة',d:'سُبْحَانَ رَبِّيَ الْعَظِيمِ (٣ مرات)'},
+{id:'k11',g:1,t:'الرفع من الركوع',f:'• قف معتدل واطمئن قبل ما تنزل للسجود\n• احمد ربنا وأنت حاسس بنعمته',d:'سَمِعَ اللَّهُ لِمَنْ حَمِدَهُ\nرَبَّنَا وَلَكَ الْحَمْدُ، حَمْدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ'},
+{id:'k12',g:1,t:'السجود',f:'• أقرب ما يكون العبد من ربه وهو ساجد، فأكثر الدعاء\n• ادعي بحاجاتك الدنيوية والأخروية بكلامك\n• سيب نفسك وحس بالخضوع لله',d:'سُبْحَانَ رَبِّيَ الْأَعْلَى (٣ مرات)'},
+{id:'k13',g:1,t:'الجلوس بين السجدتين',f:'• اجلس مطمئن من غير استعجال\n• اطلب المغفرة وأنت حاسس بالحاجة ليها',d:'رَبِّ اغْفِرْ لِي، رَبِّ اغْفِرْ لِي'},
+{id:'k14',g:1,t:'التشهد',f:'• اقرأه بتأنٍّ، ده سلام على النبي وعلى عباد الله الصالحين\n• بعده الصلاة الإبراهيمية\n• قبل السلام اطلب اللي نفسك فيه من ربنا',d:'التَّحِيَّاتُ لِلَّهِ وَالصَّلَوَاتُ وَالطَّيِّبَاتُ، السَّلَامُ عَلَيْكَ أَيُّهَا النَّبِيُّ وَرَحْمَةُ اللَّهِ وَبَرَكَاتُهُ، السَّلَامُ عَلَيْنَا وَعَلَى عِبَادِ اللَّهِ الصَّالِحِينَ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا اللَّهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ'},
+{id:'k15',g:1,t:'ختام الصلاة (التسليم)',f:'• سلّم يمين وشمال بهدوء\n• ما تقومش مستعجل، خلّي لحظة الختام تاخد حقها',d:'السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ'},
+{id:'k16',g:2,t:'بعد الصلاة',f:'• ما تقومش بسرعة، خليك دقايق مع ربنا\n• اذكر الله وادعي ولو دقيقتين',d:'أَسْتَغْفِرُ اللَّهَ (٣ مرات)\nاللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ\nسُبْحَانَ اللَّهِ ٣٣، الْحَمْدُ لِلَّهِ ٣٣، اللَّهُ أَكْبَرُ ٣٣\nثم آية الكرسي'}];
+let khOpen='';
+const khv=id=>{const s=KH.find(x=>x.id===id),e=state.j.pr.ed[id]||{};return{s,f:e.f||s.f,d:e.d||s.d,n:e.n||''}};
+function khT(id){khOpen=khOpen===id?'':id;renderJ()}
+function khFocs(){const P=state.j.pr,k=fd(wsOf(0));if(P.foc){if(!P.w[k])P.w[k]=[P.foc];P.foc=''}return P.w[k]||[]}
+function khFoc(id){const P=state.j.pr,k=fd(wsOf(0)),a=khFocs().slice(),i=a.indexOf(id);if(i>=0)a.splice(i,1);else{if(a.length>=2)a.shift();a.push(id)}P.w[k]=a;save();renderJ()}
+function khCopy(){const P=state.j.pr;P.w[fd(wsOf(0))]=(P.w[fd(wsOf(-1))]||[]).slice();save();renderJ()}
+function khDay(k){const P=state.j.pr,t=fd(new Date()),d=P.d[t]||(P.d[t]={});d[k]=!d[k];save();renderJ()}
+function renderKhushu(){
+ const J=state.j,P=J.pr,t=fd(new Date()),dy=P.d[t]||{},fl=khFocs().map(id=>KH.find(x=>x.id===id)).filter(Boolean),pv=(P.w[fd(wsOf(-1))]||[]).map(id=>KH.find(x=>x.id===id)).filter(Boolean);
+ const wk=[...Array(7)].map((_,i)=>fd(jD(i))).reduce((a,k)=>a+Object.values(P.d[k]||{}).filter(Boolean).length,0);
+ const chips=PR.filter(x=>x[0]!=='sunrise').map(x=>`<button onclick="khDay('${x[0]}')" class="flex-1 py-2 rounded-xl border text-[11px] ${dy[x[0]]?'bg-sky-600 border-sky-400 text-white':'border-gray-700 text-gray-300'}">${dy[x[0]]?'✅ ':''}${x[1]}</button>`).join('');
+ const top=fl.length?`<div class="cb p-3.5 rounded-2xl border border-sky-400 space-y-2"><div class="text-[11px] text-sky-300">⭐ تركيز الأسبوع ده</div>${fl.map(x=>`<div><div class="text-sm font-bold text-gray-100">${esc(x.t)}</div><div class="text-xs text-gray-300" style="white-space:pre-wrap;line-height:1.9">${esc(khv(x.id).f)}</div></div>`).join('<div class="h-px bg-gray-800"></div>')}<div class="text-[11px] text-gray-400 pt-1">علّم الصلاة اللي طبّقت فيها تركيزك النهارده:</div><div class="flex gap-1.5">${chips}</div><div class="text-[10px] text-gray-500 text-center">آخر ٧ أيام: ${nA(wk)} صلاة</div></div>`:`<div class="cb p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs text-gray-300 leading-6"><div>أسبوع جديد: اختار حاجة أو حاجتين بس تركّز عليهم الأسبوع ده بالنجمة ⭐.</div>${pv.length?`<button onclick="khCopy()" class="w-full py-2 rounded-xl border border-sky-500/60 text-sky-300 text-[11px]">كمّل نفس تركيز الأسبوع اللي فات: ${pv.map(x=>esc(x.t)).join(' + ')}</button>`:'<div class="text-gray-500">تلميح للبداية: إسباغ الوضوء أو استحضار «الله أكبر».</div>'}</div>`;
+ const card=s=>{const v=khv(s.id),o=khOpen===s.id,i=KH.indexOf(s);
+  return `<div class="cb rounded-2xl border ${fl.some(x=>x.id===s.id)?'border-sky-400':'border-gray-800'}"><div class="flex items-center gap-2 p-3 cursor-pointer" onclick="khT('${s.id}')"><span class="w-6 h-6 rounded-full bg-sky-900 text-sky-200 text-[11px] flex items-center justify-center shrink-0">${nA(i+1)}</span><b class="flex-1 text-sm text-gray-100">${esc(s.t)}</b><button onclick="event.stopPropagation();khFoc('${s.id}')" class="text-base ${fl.some(x=>x.id===s.id)?'':'opacity-40'}">⭐</button><span class="text-gray-500 text-xs">${o?'▲':'▼'}</span></div>${o?`<div class="px-3 pb-3 space-y-3"><div><div class="text-[11px] text-sky-300 mb-1">🧠 فكّر في إيه</div><div class="text-xs text-gray-200" style="white-space:pre-wrap;line-height:1.9">${esc(v.f)}</div></div>${v.d?`<div><div class="text-[11px] text-sky-300 mb-1">🗣 الذكر / الدعاء</div><div class="text-cyan-200" style="font-family:Amiri,serif;font-size:18px;line-height:2;white-space:pre-wrap">${esc(v.d)}</div></div>`:''}${v.n?`<div><div class="text-[11px] text-amber-300 mb-1">📝 ملاحظتي</div><div class="text-xs text-gray-200" style="white-space:pre-wrap;line-height:1.9">${esc(v.n)}</div></div>`:''}<button onclick="khForm('${s.id}')" class="text-[11px] text-gray-400 underline">✏️ تعديل أو إضافة ملاحظة</button></div>`:''}</div>`};
+ $('j-body').innerHTML=top+KG.map((g,gi)=>`<div class="text-xs font-bold text-sky-300 pt-1">${g}</div>`+KH.filter(x=>x.g===gi).map(card).join('')).join('')}
+function khForm(id){
+ const J=state.j,v=khv(id),s=v.s;
+ jForm({title:s.t,fields:[{id:'f',label:'🧠 فكّر في إيه (امسحها عشان ترجع للأصلي)',type:'area',rows:6,value:v.f},{id:'d',label:'🗣 الذكر / الدعاء (امسحه عشان يرجع للأصلي)',type:'area',rows:5,value:v.d},{id:'n',label:'📝 ملاحظتي (اختياري)',type:'area',rows:3,value:v.n}],
+ ok:x=>{J.pr.ed[id]={f:x.f===s.f?'':x.f,d:x.d===s.d?'':x.d,n:x.n};save();renderJ()}});
 }
 
 /* --- التعافي: الأذكار والدعاء والمعتقدات --- */
@@ -974,9 +1019,9 @@ function importData(e){
    for(const id in (j.media||{}))await mPut(id,d2b(j.media[id].d));
    if(mine){
     jEnsure();const J=state.j,o=data.order||[];
-    ['groups','habits','focus','blocks','pt','ptc','ptd','rec','az','du','duc','tOn','lvlOn','lvlMin','tOrd','lOrd','tNm','lNm','jr','esc','bl','filter','user','app','hf','hs','slogan','slogan2','notes','wr'].forEach(k=>{if(data[k]!==undefined)J[k]=data[k]});
+    ['groups','habits','focus','blocks','pt','ptc','ptd','rec','az','du','duc','tOn','lvlOn','lvlMin','tOrd','lOrd','tNm','lNm','jr','esc','bl','filter','user','app','hf','hs','slogan','slogan2','notes','wr','pr'].forEach(k=>{if(data[k]!==undefined)J[k]=data[k]});
     if(data.names)['h','p','r','j'].forEach(k=>{if(data.names[k])J.names[k]=data.names[k]});
-    J.order=['w','c'].concat(o.filter(k=>'hpjrn'.includes(k)));
+    J.order=['w','c'].concat(o.filter(k=>'hpjrnk'.includes(k)));
     if(data.tg){if(data.tg.token&&!tgTok())localStorage.setItem('tg_token',data.tg.token);if(data.tg.chat&&!tgChat())localStorage.setItem('tg_chat',data.tg.chat);J.tgAuto=!!data.tg.auto}
    }else{data.lastActiveDate=today();data.workoutTimer=null;state=Object.assign(state,data)}
    save();alert("✅ تم استيراد بياناتك.");location.reload();
