@@ -92,7 +92,7 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 /* ===== نظام الليفل الأسبوعي (1-100) ===== */
 const RANK_TABLE=[["E",1,"#9ca3af"],["D",15,"#4ade80"],["C",30,"#38bdf8"],["B",45,"#a78bfa"],["A",60,"#fb923c"],["S",75,"#f87171"],["S+",85,"#f472b6"],["SS",95,"#facc15"]];
 const MAXLVL=100,WEEK_START=6; /* 6 = السبت بداية الأسبوع (0 أحد ... 6 سبت) */
-const minDays=()=>{const v=Math.round(+(state.j&&state.j.lvlMin));return v>=1&&v<=7?v:5};
+const minDays=ws=>{const J=state.j||{},h=J.lvlMinH,k=fd(ws||wkStart(new Date()));let v;if(Array.isArray(h)&&h.length){v=h[0].v;h.forEach(e=>{if(e.from<=k)v=e.v})}else v=Math.round(+J.lvlMin);return v>=1&&v<=7?v:5};
 const rankOf=l=>{let r=RANK_TABLE[0];RANK_TABLE.forEach(x=>{if(l>=x[1])r=x});return r};
 const wkStart=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);x.setDate(x.getDate()-((x.getDay()-WEEK_START+7)%7));return x};
 /* العناصر اللي ممكن تدخل في حساب الليفل */
@@ -114,7 +114,7 @@ function dayDone(id,k){
 }
 function weekItems(ws,isCur){
  const days=[];for(let i=0;i<7;i++){const d=new Date(ws);d.setDate(ws.getDate()+i);days.push(d)}
- const keys=days.map(fd),end=keys[6],items=[],J=state.j||{},MD=minDays();
+ const keys=days.map(fd),end=keys[6],items=[],J=state.j||{},MD=minDays(ws);
  lvlList().forEach(it=>{
   if(!lvlOn(it))return;
   if(it.h||it.f){
@@ -574,7 +574,7 @@ function todayChecklistHTML(items){
 function lvlChecklistHTML(items){
  return `<div class="fl mt-3">🏆 العناصر اللي بتدخل في حساب الليفل (علّم اللي يتحسب، غيّر الاسم، ورتّبهم بالأسهم)</div><div class="text-[11px] text-gray-500">تغيير القايمة بيعيد حساب الليفل من تاريخك القديم. الترتيب بس مبيأثرش على الحساب.</div><div id="ldl">${items.map(it=>rowHTML(it,lvlOn(it))).join('')}</div>`;
 }
-function lvlSave(items,min){const J=state.j,R=readRows('#ldl');R.forEach(r=>{J.lvlOn[r.id]=r.on});J.lOrd=R.map(r=>r.id);saveNames(R,'lNm');const m=Math.round(+min);if(m>=1&&m<=7)J.lvlMin=m;lvlInfo()}
+function lvlSave(items,min){const J=state.j,R=readRows('#ldl');R.forEach(r=>{J.lvlOn[r.id]=r.on});J.lOrd=R.map(r=>r.id);saveNames(R,'lNm');const m=Math.round(+min);if(m>=1&&m<=7){const old=minDays(),ck=fd(wkStart(new Date()));if(!J.lvlMinH||!J.lvlMinH.length)J.lvlMinH=[{from:'0000-00-00',v:old}];if(m!==old){J.lvlMinH=J.lvlMinH.filter(e=>e.from<ck);J.lvlMinH.push({from:ck,v:m})}J.lvlMin=m}lvlInfo()}
 function todaySave(items){const J=state.j,R=readRows('#tdl');R.forEach(r=>{J.tOn[r.id]=r.on});J.tOrd=R.map(r=>r.id);saveNames(R,'tNm')}
 function jTile(tile,lbl){jEnsure();const d=new Date(),t=fd(d),du=state.j.habits.filter(h=>jSched(h,d)),dn=du.filter(h=>h.days[t]).length;return tile(lbl||('✅ '+esc(state.j.names.h)),du.length?`${dn} / ${du.length}`:'لا عادات اليوم',du.length?dn/du.length*100:0,du.length>0&&dn===du.length,"showView('habits')",'bg-violet-400')}
 function jSettings(){
@@ -697,7 +697,7 @@ let jwOff=0;
 const wsOf=o=>{const d=wkStart(new Date());d.setDate(d.getDate()+o*7);return d};
 const jwKey=()=>fd(wsOf(jwOff));
 function weekAll(ws,cur){
- const days=[...Array(7)].map((_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d}),keys=days.map(fd),end=keys[6],J=state.j,MD=minDays(),out=[];
+ const days=[...Array(7)].map((_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d}),keys=days.map(fd),end=keys[6],J=state.j,MD=minDays(ws),out=[];
  lvlList().forEach(it=>{
   if(it.h||it.f){const o=it.h||it.f,dd=o.days||{},first=firstKey(dd);if(!cur&&(!first||first>end))return;
    const need=it.h?Math.min(MD,days.filter(d=>jSched(o,d)).length):MD;if(!need)return;
@@ -1005,7 +1005,7 @@ function importData(e){
    for(const id in (j.media||{}))await mPut(id,d2b(j.media[id].d));
    if(mine){
     jEnsure();const J=state.j,o=data.order||[];
-    ['groups','habits','focus','blocks','pt','ptc','ptd','rec','az','du','duc','tOn','lvlOn','lvlMin','tOrd','lOrd','tNm','lNm','jr','esc','bl','filter','user','app','hf','hs','slogan','slogan2','notes','wr','pr'].forEach(k=>{if(data[k]!==undefined)J[k]=data[k]});
+    ['groups','habits','focus','blocks','pt','ptc','ptd','rec','az','du','duc','tOn','lvlOn','lvlMin','lvlMinH','tOrd','lOrd','tNm','lNm','jr','esc','bl','filter','user','app','hf','hs','slogan','slogan2','notes','wr','pr'].forEach(k=>{if(data[k]!==undefined)J[k]=data[k]});
     if(data.names)['h','p','r','j'].forEach(k=>{if(data.names[k])J.names[k]=data.names[k]});
     J.order=['w','c'].concat(o.filter(k=>'hpjrnk'.includes(k)));
     if(data.tg){if(data.tg.token&&!tgTok())localStorage.setItem('tg_token',data.tg.token);if(data.tg.chat&&!tgChat())localStorage.setItem('tg_chat',data.tg.chat);J.tgAuto=!!data.tg.auto}
