@@ -148,8 +148,8 @@ function lvlInfo(){
 }
 function lvlCardHTML(){
  const L=lvlInfo(),nx=L.level>=MAXLVL?'MAX':`الليفل ${L.level+1}`;
- const rows=L.items.map(i=>`<div class="flex items-center justify-between text-[11px] py-0.5"><span class="${i.ok?'text-emerald-300':i.lost?'text-red-400':'text-gray-300'} truncate">${esc(i.name)}</span><span class="font-mono ${i.ok?'text-emerald-300':i.lost?'text-red-400':'text-gray-400'}">${i.cnt}/${i.need}</span></div>`).join('');
- return `<div class="rounded-xl border border-gray-800 bg-gray-900/40 p-3 space-y-2"><div class="flex justify-between items-center"><div><div class="text-[10px] text-gray-400">🏆 مستواك</div><div class="text-sm font-bold" style="color:${L.color}">${L.rank}-RANK • LEVEL ${L.level} / ${MAXLVL}</div></div><div class="text-left text-[10px] text-gray-400">${L.ok?'<span class="text-emerald-300 font-bold">الأسبوع مكتمل ✅</span>':L.lost?'<span class="text-red-400">الأسبوع ده مش هيزوّد ليفل</span>':`باقي ${L.left} يوم`}<div>للوصول لـ ${nx}</div></div></div><div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden"><div class="h-1.5 transition-all" style="width:${L.pct}%;background:${L.ok?'#34d399':L.color}"></div></div><div class="text-[10px] text-gray-500">لازم ${minDays()} أيام على الأقل لكل عنصر من اللي تحت خلال الأسبوع (من السبت للجمعة)</div><div>${rows}</div></div>`;
+ const stat=L.ok?'<span class="text-emerald-300 font-bold">الأسبوع مكتمل ✅</span>':L.lost?'<span class="text-red-400">الأسبوع ده مش هيزوّد ليفل</span>':`باقي ${L.left} يوم`;
+ return `<div class="rounded-xl border border-gray-800 bg-gray-900/40 p-3 space-y-2"><div class="flex justify-between items-center"><div><div class="text-[10px] text-gray-400">🏆 الرنك</div><div class="text-xl font-bold" style="color:${L.color}">${L.rank}-RANK</div></div><div class="text-left"><div class="text-[10px] text-gray-400">الليفل</div><div class="text-xl font-bold" style="color:${L.color}">${L.level}<span class="text-xs text-gray-500"> / ${MAXLVL}</span></div></div></div><div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden"><div class="h-1.5 transition-all" style="width:${L.pct}%;background:${L.ok?'#34d399':L.color}"></div></div><div class="text-[10px] text-gray-400 text-center">${stat} • للوصول لـ ${nx}</div></div>`;
 }
 let calDay=today(),wY=new Date().getFullYear(),wM=new Date().getMonth(),busy=false;
 let state={name:"Mostafa Abdelrahman",level:1,streak:0,lastActiveDate:today(),activeRoutine:"day1",history:{},questHistory:{},
@@ -430,8 +430,8 @@ function renderToday(){
   else if(builders[it.id])tiles.push(builders[it.id](esc(it.label)));
  });
  box.innerHTML=`<div class="flex justify-between items-center"><h3 class="text-sm font-bold text-cyan-300">📍 النهارده</h3><span class="text-[10px] text-gray-400 text-left leading-5">${dateHG(now)}</span></div>
- <div class="grid grid-cols-2 gap-2">${tiles.join('')}</div>
  ${lvlCardHTML()}
+ <div class="grid grid-cols-2 gap-2">${tiles.join('')}</div>
  `;
 }
 
