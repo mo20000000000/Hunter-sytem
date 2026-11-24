@@ -645,8 +645,54 @@ function jGroupForm(gid){
 /* --- الجدول --- */
 function renderPlan(){
  const J=state.j,bl=J.blocks.slice().sort((a,b)=>toMin(bt(a).s)-toMin(bt(b).s)),nw=new Date(),m=nw.getHours()*60+nw.getMinutes(),cur=bl.find(b=>inBlock(b,m));
- $('j-body').innerHTML=`<div class="text-[11px] text-gray-400">${cur?`الآن: <b class="text-gray-100">${esc(cur.name)}</b> حتى ${bLbl(cur).e}`:(bl.length?'مفيش فترة شغالة الآن':'')}</div>`+(bl.length?bl.map(b=>{const g=J.groups.find(x=>x.id===b.g),c=g?g.color:'#6b7886';return `<div class="flex items-center gap-3 cb p-3 rounded-2xl border border-gray-800" style="border-inline-start:5px solid ${c};${b===cur?`box-shadow:0 0 0 1.5px ${c}`:''}"><div class="text-xs font-bold text-gray-100" style="width:84px;flex:none">${bLbl(b).s}<br><small class="text-gray-400 font-normal">${bLbl(b).e}</small></div><div class="flex-1 min-w-0"><b class="text-sm text-gray-100 break-words">${esc(b.name)}</b>${g?`<small class="text-[11px] text-gray-400 block">${esc(g.name)}</small>`:''}</div><button onclick="jBlockForm('${b.id}')" class="text-[11px] text-cyan-400">تعديل</button></div>`}).join(''):'<div class="text-center text-xs text-gray-500 py-8">ضيف أول فترة، مثلاً: من ٨ لـ ١٠ مذاكرة، أو من الظهر للعصر.</div>')+`<div class="flex gap-2"><button onclick="jBlockForm()" class="flex-1 py-3 rounded-2xl bg-cyan-600 text-white font-bold text-xs">+ فترة جديدة</button><button onclick="jPrayerForm()" class="px-4 py-3 rounded-2xl border border-teal-500 text-teal-300 font-bold text-xs">🕌 المواقيت</button></div>`;
+ $('j-body').innerHTML=slHtml()+`<div class="text-[11px] text-gray-400">${cur?`الآن: <b class="text-gray-100">${esc(cur.name)}</b> حتى ${bLbl(cur).e}`:(bl.length?'مفيش فترة شغالة الآن':'')}</div>`+(bl.length?bl.map(b=>{const g=J.groups.find(x=>x.id===b.g),c=g?g.color:'#6b7886';return `<div class="flex items-center gap-3 cb p-3 rounded-2xl border border-gray-800" style="border-inline-start:5px solid ${c};${b===cur?`box-shadow:0 0 0 1.5px ${c}`:''}"><div class="text-xs font-bold text-gray-100" style="width:84px;flex:none">${bLbl(b).s}<br><small class="text-gray-400 font-normal">${bLbl(b).e}</small></div><div class="flex-1 min-w-0"><b class="text-sm text-gray-100 break-words">${esc(b.name)}</b>${g?`<small class="text-[11px] text-gray-400 block">${esc(g.name)}</small>`:''}</div><button onclick="jBlockForm('${b.id}')" class="text-[11px] text-cyan-400">تعديل</button></div>`}).join(''):'<div class="text-center text-xs text-gray-500 py-8">ضيف أول فترة، مثلاً: من ٨ لـ ١٠ مذاكرة، أو من الظهر للعصر.</div>')+`<div class="flex gap-2"><button onclick="jBlockForm()" class="flex-1 py-3 rounded-2xl bg-cyan-600 text-white font-bold text-xs">+ فترة جديدة</button><button onclick="jPrayerForm()" class="px-4 py-3 rounded-2xl border border-teal-500 text-teal-300 font-bold text-xs">🕌 المواقيت</button></div>`;
  if(J.ptc&&J.ptd!==today()){J.ptd=today();prFetch(J.ptc[0],J.ptc[1]).then(t=>{J.pt=t;save();if(jTab==='plan')renderJ()}).catch(()=>{})}
+}
+/* --- تراكينج النوم: ميعاد ثابت بتغيّره وقت ما تحب --- */
+function slFor(k){const h=(state.j.sleep&&state.j.sleep.h)||[];let c=null;h.forEach(e=>{if(e.from<=k)c=e});return c}
+function slCur(){return slFor(fd(new Date()))}
+function slTomKey(){const d=new Date();d.setDate(d.getDate()+1);return fd(d)}
+function slTom(){const o=state.j.sleep&&state.j.sleep.o;return o?o[slTomKey()]||null:null}
+function slDur(e){let d=toMin(e.wake)-toMin(e.bed);if(d<=0)d+=1440;return d}
+function slMinTxt(d){const h=Math.floor(d/60),m=d%60;return (h?`${nA(h)} ساعة`:'')+(h&&m?' و':'')+(m?`${nA(m)} دقيقة`:'')}
+function slDurTxt(e){return slMinTxt(slDur(e))}
+function slHtml(){
+ const h=(state.j.sleep&&state.j.sleep.h)||[],c=slCur(),t=fd(new Date());
+ const hist=h.slice().reverse().slice(0,5).map(e=>`<div class="flex justify-between text-[11px] ${e===c?'text-indigo-300':'text-gray-500'}"><span>${e.from>t?'من ':''}${esc(e.from)}${e.from>t?' (لسه جاي)':''}</span><span>${fmtT(e.bed)} ← ${fmtT(e.wake)}</span></div>`).join('');
+ if(!c)return `<div class="cb p-4 rounded-2xl border border-indigo-500/40 space-y-2"><div class="text-sm font-bold text-indigo-300">🌙 تراكينج النوم</div><div class="text-[11px] text-gray-400">حدد ميعاد نومك وصحيانك مرة واحدة، وغيّره وقت ما حياتك تتغير.</div>${hist}<button onclick="jSleepForm()" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">حدد ميعاد النوم</button></div>`;
+ return `<div class="cb p-4 rounded-2xl border border-indigo-500/40 space-y-2.5"><div class="flex justify-between items-center"><div class="text-sm font-bold text-indigo-300">🌙 تراكينج النوم</div><button onclick="jSleepForm()" class="text-[11px] text-cyan-400">تغيير</button></div><div class="grid grid-cols-3 gap-2 text-center"><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">النوم</div><div class="text-sm font-bold text-gray-100">${fmtT(c.bed)}</div></div><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">الصحيان</div><div class="text-sm font-bold text-gray-100">${fmtT(c.wake)}</div></div><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">المدة</div><div class="text-sm font-bold text-indigo-300">${slDurTxt(c)}</div></div></div>${slTomHtml()}${h.length>1?`<div class="pt-1 border-t border-gray-800 space-y-0.5">${hist}</div>`:''}</div>`;
+}
+function slTomHtml(){
+ const o=slTom(),b=slFor(slTomKey());
+ if(!o)return `<button onclick="jSleepTomForm()" class="w-full py-2 rounded-xl border border-indigo-500/60 text-indigo-300 font-bold text-xs">⏰ ظبّط ميعاد بكره</button>`;
+ const df=b?slDur(o)-slDur(b):0,dt=df===0?'نفس مدة المعتاد':`${df<0?'أقل':'أكتر'} من المعتاد بـ ${slMinTxt(Math.abs(df))}`;
+ return `<div class="rounded-xl border border-indigo-500/50 bg-indigo-950/30 p-2.5 space-y-1"><div class="flex justify-between items-center"><div class="text-[11px] font-bold text-indigo-300">⏰ بكره</div><button onclick="jSleepTomForm()" class="text-[11px] text-cyan-400">تعديل</button></div><div class="flex justify-between text-sm font-bold text-gray-100"><span>نوم ${fmtT(o.bed)}</span><span>صحيان ${fmtT(o.wake)}</span></div><div class="text-[11px] text-gray-400">${slDurTxt(o)} • ${dt}</div></div>`;
+}
+function jSleepTomForm(){
+ const J=state.j;J.sleep=J.sleep||{h:[]};J.sleep.o=J.sleep.o||{};
+ const k=slTomKey(),o=J.sleep.o[k],b=slFor(k);
+ jForm({title:'ميعاد نوم بكره',fields:[
+  {id:'bed',label:'هنام امتى بكره؟',type:'time',value:o?o.bed:(b?b.bed:'23:00')},
+  {id:'wake',label:'هصحى امتى؟',type:'time',value:o?o.wake:(b?b.wake:'06:00')}],
+  html:`<div class="text-[11px] text-gray-500">${b?`المعتاد: نوم ${fmtT(b.bed)} وصحيان ${fmtT(b.wake)} (${slDurTxt(b)}). `:''}التعديل ده ليوم بكره بس، وبعدها بيرجع الميعاد المعتاد.</div>`,
+  ok:v=>{const m=$('jmsg');
+   if(!v.bed||!v.wake){m.textContent='اكتب الميعادين';return false}
+   if(v.bed===v.wake){m.textContent='ميعاد النوم والصحيان لازم يختلفوا';return false}
+   const t=fd(new Date());Object.keys(J.sleep.o).forEach(x=>{if(x<t)delete J.sleep.o[x]});
+   J.sleep.o[k]={bed:v.bed,wake:v.wake};save();renderJ()},
+  del:o?()=>{delete J.sleep.o[k];save();renderJ()}:null});
+}
+function jSleepForm(){
+ const J=state.j,c=slCur();J.sleep=J.sleep||{h:[]};
+ jForm({title:'ميعاد النوم والصحيان',fields:[
+  {id:'bed',label:'ميعاد النوم',type:'time',value:c?c.bed:'23:00'},
+  {id:'wake',label:'ميعاد الصحيان',type:'time',value:c?c.wake:'06:00'},
+  {id:'from',label:'يبدأ من يوم',type:'date',value:fd(new Date())}],
+  html:'<div class="text-[11px] text-gray-500">الميعاد ده بيفضل ثابت لحد ما تغيّره. التغييرات القديمة بتتحفظ في السجل.</div>',
+  ok:v=>{const m=$('jmsg');
+   if(!v.bed||!v.wake||!v.from){m.textContent='اكمل البيانات';return false}
+   if(v.bed===v.wake){m.textContent='ميعاد النوم والصحيان لازم يختلفوا';return false}
+   J.sleep.h=J.sleep.h.filter(e=>e.from!==v.from);J.sleep.h.push({from:v.from,bed:v.bed,wake:v.wake});J.sleep.h.sort((a,b)=>a.from<b.from?-1:1);save();renderJ()}});
 }
 function jBlockForm(bid){
  const J=state.j,b=J.blocks.find(x=>x.id===bid),po=PR.map(x=>[x[0],x[1]]);
@@ -1005,7 +1051,7 @@ function importData(e){
    for(const id in (j.media||{}))await mPut(id,d2b(j.media[id].d));
    if(mine){
     jEnsure();const J=state.j,o=data.order||[];
-    ['groups','habits','focus','blocks','pt','ptc','ptd','rec','az','du','duc','tOn','lvlOn','lvlMin','lvlMinH','tOrd','lOrd','tNm','lNm','jr','esc','bl','filter','user','app','hf','hs','slogan','slogan2','notes','wr','pr'].forEach(k=>{if(data[k]!==undefined)J[k]=data[k]});
+    ['groups','habits','focus','blocks','pt','ptc','ptd','rec','sleep','az','du','duc','tOn','lvlOn','lvlMin','lvlMinH','tOrd','lOrd','tNm','lNm','jr','esc','bl','filter','user','app','hf','hs','slogan','slogan2','notes','wr','pr'].forEach(k=>{if(data[k]!==undefined)J[k]=data[k]});
     if(data.names)['h','p','r','j'].forEach(k=>{if(data.names[k])J.names[k]=data.names[k]});
     J.order=['w','c'].concat(o.filter(k=>'hpjrnk'.includes(k)));
     if(data.tg){if(data.tg.token&&!tgTok())localStorage.setItem('tg_token',data.tg.token);if(data.tg.chat&&!tgChat())localStorage.setItem('tg_chat',data.tg.chat);J.tgAuto=!!data.tg.auto}
