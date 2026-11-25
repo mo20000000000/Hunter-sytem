@@ -92,7 +92,9 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 /* ===== نظام الليفل الأسبوعي (1-100) ===== */
 const RANK_TABLE=[["E",1,"#9ca3af"],["D",15,"#4ade80"],["C",30,"#38bdf8"],["B",45,"#a78bfa"],["A",60,"#fb923c"],["S",75,"#f87171"],["S+",85,"#f472b6"],["SS",95,"#facc15"]];
 const MAXLVL=100,WEEK_START=6; /* 6 = السبت بداية الأسبوع (0 أحد ... 6 سبت) */
-const minDays=ws=>{const J=state.j||{},h=J.lvlMinH,k=fd(ws||wkStart(new Date()));let v;if(Array.isArray(h)&&h.length){v=h[0].v;h.forEach(e=>{if(e.from<=k)v=e.v})}else v=Math.round(+J.lvlMin);return v>=1&&v<=7?v:5};
+const lvlEnt=ws=>{const h=(state.j||{}).lvlMinH,k=fd(ws||wkStart(new Date()));if(!Array.isArray(h)||!h.length)return null;let e=h[0];h.forEach(x=>{if(x.from<=k)e=x});return e};
+const minDays=ws=>{const e=lvlEnt(ws),v=e?e.v:Math.round(+(state.j||{}).lvlMin);return v>=1&&v<=7?v:5};
+const itemMin=(id,ws)=>{const e=lvlEnt(ws),n=e&&e.o&&e.o[id];return n>=1&&n<=7?n:minDays(ws)};
 const rankOf=l=>{let r=RANK_TABLE[0];RANK_TABLE.forEach(x=>{if(l>=x[1])r=x});return r};
 const wkStart=d=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate(),12);x.setDate(x.getDate()-((x.getDay()-WEEK_START+7)%7));return x};
 /* العناصر اللي ممكن تدخل في حساب الليفل */
@@ -120,13 +122,13 @@ function weekItems(ws,isCur){
   if(it.h||it.f){
    const o=it.h||it.f,dd=o.days||{},first=firstKey(dd);
    if(!isCur&&(!first||first>end))return;
-   const need=it.h?Math.min(MD,days.filter(d=>jSched(o,d)).length):MD;if(!need)return;
+   const need=it.h?Math.min(itemMin(it.id,ws),days.filter(d=>jSched(o,d)).length):itemMin(it.id,ws);if(!need)return;
    items.push({name:it.label,icon:'',cnt:keys.filter(k=>dd[k]).length,need});
   }else{
    let first=null;
    if(it.id==='w')first=firstKey(state.history);else if(it.id==='az')first=firstKey(J.az&&J.az.c);else if(it.id==='du')first=firstKey(J.duc);else first=firstKey(state.habits.calories);
    if(!isCur&&(!first||first>end))return;
-   items.push({name:it.label,icon:'',cnt:keys.filter(k=>dayDone(it.id,k)).length,need:MD});
+   items.push({name:it.label,icon:'',cnt:keys.filter(k=>dayDone(it.id,k)).length,need:itemMin(it.id,ws)});
   }
  });
  return items;
@@ -553,8 +555,8 @@ function renderHome(){
 const TODAY_BASE=[['w','🏋️ التمرين'],['c','🥗 السعرات'],['hs','✅ ملخص العادات'],['az','📿 الأذكار'],['du','🤲 الأدعية']];
 const sortBy=(list,ord)=>{if(!ord||!ord.length)return list;const ix=id=>{const i=ord.indexOf(id);return i<0?1e6:i};return list.map((x,i)=>[x,i]).sort((a,b)=>ix(a[0].id)-ix(b[0].id)||a[1]-b[1]).map(x=>x[0])};
 function mvRow(b,d){const r=b.closest('[data-row]'),p=r.parentNode;if(d<0&&r.previousElementSibling)p.insertBefore(r,r.previousElementSibling);else if(d>0&&r.nextElementSibling)p.insertBefore(r.nextElementSibling,r)}
-const rowHTML=(it,on)=>`<div data-row="1" data-id="${esc(it.id)}" data-def="${esc(it.defLabel||it.label)}" class="flex items-center gap-1.5 py-1"><input type="checkbox" ${on?'checked':''} style="width:auto;margin:0"><input type="text" class="fi" value="${esc(it.label)}" style="margin:0;flex:1;min-width:0;padding:5px 8px"><button type="button" onclick="mvRow(this,-1)" class="px-2.5 py-1 bg-gray-800 rounded-lg text-xs">↑</button><button type="button" onclick="mvRow(this,1)" class="px-2.5 py-1 bg-gray-800 rounded-lg text-xs">↓</button></div>`;
-const readRows=sel=>[...document.querySelectorAll(sel+' [data-row]')].map(r=>({id:r.dataset.id,on:r.querySelector('input[type=checkbox]').checked,name:r.querySelector('input[type=text]').value.trim(),def:r.dataset.def}));
+const rowHTML=(it,on,ex)=>`<div data-row="1" data-id="${esc(it.id)}" data-def="${esc(it.defLabel||it.label)}" class="flex items-center gap-1.5 py-1"><input type="checkbox" ${on?'checked':''} style="width:auto;margin:0"><input type="text" class="fi" value="${esc(it.label)}" style="margin:0;flex:1;min-width:0;padding:5px 8px">${ex||''}<button type="button" onclick="mvRow(this,-1)" class="px-2.5 py-1 bg-gray-800 rounded-lg text-xs">↑</button><button type="button" onclick="mvRow(this,1)" class="px-2.5 py-1 bg-gray-800 rounded-lg text-xs">↓</button></div>`;
+const readRows=sel=>[...document.querySelectorAll(sel+' [data-row]')].map(r=>({id:r.dataset.id,on:r.querySelector('input[type=checkbox]').checked,name:r.querySelector('input[type=text]').value.trim(),def:r.dataset.def,min:(r.querySelector('input[data-min]')||{}).value}));
 const lblApply=(list,nm)=>{list.forEach(it=>{it.defLabel=it.label;if(nm&&nm[it.id])it.label=nm[it.id]});return list};
 const saveNames=(R,key)=>{const J=state.j;J[key]=J[key]||{};R.forEach(r=>{if(r.name&&r.name!==r.def)J[key][r.id]=r.name;else delete J[key][r.id]})};
 function todayItems(){
@@ -572,15 +574,15 @@ function todayChecklistHTML(items){
  return `<div class="fl mt-3">عناصر كارت «النهارده» في الرئيسية (علّم اللي يظهر، غيّر الاسم، ورتّبهم بالأسهم)</div><div id="tdl">${items.map(it=>rowHTML(it,todayOn(it))).join('')}</div>`;
 }
 function lvlChecklistHTML(items){
- return `<div class="fl mt-3">🏆 العناصر اللي بتدخل في حساب الليفل (علّم اللي يتحسب، غيّر الاسم، ورتّبهم بالأسهم)</div><div class="text-[11px] text-gray-500">تغيير القايمة بيعيد حساب الليفل من تاريخك القديم. الترتيب بس مبيأثرش على الحساب.</div><div id="ldl">${items.map(it=>rowHTML(it,lvlOn(it))).join('')}</div>`;
+ return `<div class="fl mt-3">🏆 العناصر اللي بتدخل في حساب الليفل (علّم اللي يتحسب، غيّر الاسم، ورتّبهم بالأسهم)</div><div class="text-[11px] text-gray-500">الرقم الصغير قدام كل عنصر هو أقل عدد أيام للعنصر ده لوحده (فاضي = الرقم العام اللي تحت). تغيير القايمة بيعيد حساب الليفل من تاريخك القديم. الترتيب بس مبيأثرش على الحساب.</div><div id="ldl">${items.map(it=>rowHTML(it,lvlOn(it),`<input type="number" data-min="1" inputmode="numeric" min="1" max="7" placeholder="${minDays()}" value="${(lvlEnt()&&lvlEnt().o&&lvlEnt().o[it.id])||''}" class="fi" style="width:46px;margin:0;padding:5px 2px;text-align:center">`)).join('')}</div>`;
 }
-function lvlSave(items,min){const J=state.j,R=readRows('#ldl');R.forEach(r=>{J.lvlOn[r.id]=r.on});J.lOrd=R.map(r=>r.id);saveNames(R,'lNm');const m=Math.round(+min);if(m>=1&&m<=7){const old=minDays(),ck=fd(wkStart(new Date()));if(!J.lvlMinH||!J.lvlMinH.length)J.lvlMinH=[{from:'0000-00-00',v:old}];if(m!==old){J.lvlMinH=J.lvlMinH.filter(e=>e.from<ck);J.lvlMinH.push({from:ck,v:m})}J.lvlMin=m}lvlInfo()}
+function lvlSave(items,min){const J=state.j,R=readRows('#ldl');R.forEach(r=>{J.lvlOn[r.id]=r.on});J.lOrd=R.map(r=>r.id);saveNames(R,'lNm');const m=Math.round(+min),o={};R.forEach(r=>{const n=Math.round(+r.min);if(r.min!==''&&r.min!==undefined&&n>=1&&n<=7)o[r.id]=n});if(m>=1&&m<=7){const old=minDays(),oo=(lvlEnt()&&lvlEnt().o)||{},sg=x=>Object.keys(x).sort().map(k=>k+':'+x[k]).join(','),ck=fd(wkStart(new Date()));if(!J.lvlMinH||!J.lvlMinH.length)J.lvlMinH=[{from:'0000-00-00',v:old}];if(m!==old||sg(o)!==sg(oo)){J.lvlMinH=J.lvlMinH.filter(e=>e.from<ck);J.lvlMinH.push({from:ck,v:m,o})}J.lvlMin=m}lvlInfo()}
 function todaySave(items){const J=state.j,R=readRows('#tdl');R.forEach(r=>{J.tOn[r.id]=r.on});J.tOrd=R.map(r=>r.id);saveNames(R,'tNm')}
 function jTile(tile,lbl){jEnsure();const d=new Date(),t=fd(d),du=state.j.habits.filter(h=>jSched(h,d)),dn=du.filter(h=>h.days[t]).length;return tile(lbl||('✅ '+esc(state.j.names.h)),du.length?`${dn} / ${du.length}`:'لا عادات اليوم',du.length?dn/du.length*100:0,du.length>0&&dn===du.length,"showView('habits')",'bg-violet-400')}
 function jSettings(){
  jEnsure();const J=state.j,ord=J.order.slice(),nm={},tItems=todayItems(),lItems=lvlList();
  const drawOrd=()=>{$('ord').innerHTML=ord.map((k,i)=>`<div class="flex items-center gap-2 my-1"><span class="flex-1 text-xs text-gray-200">${esc(($('f_n'+k)&&$('f_n'+k).value.trim())||J.names[k])}</span><button type="button" data-o="${i}" ${i?'':'disabled'} class="px-2.5 py-1 bg-gray-800 rounded-lg text-xs disabled:opacity-35">↑</button><button type="button" data-o="${i}" data-d="1" ${i<ord.length-1?'':'disabled'} class="px-2.5 py-1 bg-gray-800 rounded-lg text-xs disabled:opacity-35">↓</button></div>`).join('')};
- jForm({inline:true,title:'⚙️ الإعدادات',fields:[{id:'app',label:'اسم التطبيق (اللي فوق في الهيدر)',type:'text',value:J.app},{id:'user',label:'اسمك (بيظهر تحت اسم التطبيق)',type:'text',value:J.user},{id:'hf',label:'خط الهيدر (اسم التطبيق واسمك)',type:'sel',value:J.hf,opts:HFONTS},{id:'hs',label:'حجم الهيدر (اسمك بيتظبط تلقائي بنسبة الحجم)',type:'sel',value:String(J.hs),opts:HSIZES},{id:'lmin',label:'أقل عدد أيام في الأسبوع لكل عنصر في الليفل (١ إلى ٧)',type:'num',value:minDays()},{id:'slogan',label:'الآية / الكلام الأول (فاضي = بدون)',type:'area',rows:2,value:J.slogan||''},{id:'slogan2',label:'الآية / الكلام التاني (فاضي = بدون)',type:'area',rows:2,value:J.slogan2||''}].concat(Object.keys(JNAMES).map(k=>({id:'n'+k,label:'اسم قسم: '+JNAMES[k],type:'text',value:J.names[k]}))),
+ jForm({inline:true,title:'⚙️ الإعدادات',fields:[{id:'app',label:'اسم التطبيق (اللي فوق في الهيدر)',type:'text',value:J.app},{id:'user',label:'اسمك (بيظهر تحت اسم التطبيق)',type:'text',value:J.user},{id:'hf',label:'خط الهيدر (اسم التطبيق واسمك)',type:'sel',value:J.hf,opts:HFONTS},{id:'hs',label:'حجم الهيدر (اسمك بيتظبط تلقائي بنسبة الحجم)',type:'sel',value:String(J.hs),opts:HSIZES},{id:'lmin',label:'أقل عدد أيام في الأسبوع لكل عنصر في الليفل (١ إلى ٧). العنصر اللي ليه رقم لوحده فوق بياخد رقمه',type:'num',value:minDays()},{id:'slogan',label:'الآية / الكلام الأول (فاضي = بدون)',type:'area',rows:2,value:J.slogan||''},{id:'slogan2',label:'الآية / الكلام التاني (فاضي = بدون)',type:'area',rows:2,value:J.slogan2||''}].concat(Object.keys(JNAMES).map(k=>({id:'n'+k,label:'اسم قسم: '+JNAMES[k],type:'text',value:J.names[k]}))),
  html:`<div class="fl">ترتيب الأقسام في الرئيسية (الأول في الأعلى)</div><div id="ord"></div>${todayChecklistHTML(tItems)}${lvlChecklistHTML(lItems)}<div class="fl mt-3">نسخة احتياطية وتيليجرام</div>`,
  extra:[{id:'tg',label:'تيليجرام',fn:()=>{jClose();jTgForm()}},{id:'exp',label:'تصدير',fn:()=>exportData()},{id:'imp',label:'استيراد',fn:()=>$('import-file').click()}],
  init(){drawOrd();$('ord').onclick=e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.o,j=b.dataset.d?i+1:i-1;[ord[i],ord[j]]=[ord[j],ord[i]];drawOrd()};Object.keys(JNAMES).forEach(k=>{$('f_n'+k).oninput=drawOrd})},
@@ -746,11 +748,11 @@ function weekAll(ws,cur){
  const days=[...Array(7)].map((_,i)=>{const d=new Date(ws);d.setDate(ws.getDate()+i);return d}),keys=days.map(fd),end=keys[6],J=state.j,MD=minDays(ws),out=[];
  lvlList().forEach(it=>{
   if(it.h||it.f){const o=it.h||it.f,dd=o.days||{},first=firstKey(dd);if(!cur&&(!first||first>end))return;
-   const need=it.h?Math.min(MD,days.filter(d=>jSched(o,d)).length):MD;if(!need)return;
+   const need=it.h?Math.min(itemMin(it.id,ws),days.filter(d=>jSched(o,d)).length):itemMin(it.id,ws);if(!need)return;
    out.push({name:it.label,cnt:keys.filter(k=>dd[k]).length,need,on:lvlOn(it)})}
   else{let first=null;if(it.id==='w')first=firstKey(state.history);else if(it.id==='az')first=firstKey(J.az&&J.az.c);else if(it.id==='du')first=firstKey(J.duc);else first=firstKey(state.habits.calories);
    if(!cur&&(!first||first>end))return;
-   out.push({name:it.label,cnt:keys.filter(k=>dayDone(it.id,k)).length,need:MD,on:lvlOn(it)})}});
+   out.push({name:it.label,cnt:keys.filter(k=>dayDone(it.id,k)).length,need:itemMin(it.id,ws),on:lvlOn(it)})}});
  return out.filter(i=>i.on||i.cnt>0)}
 function jhTabs(a){const b=(k,l,go)=>`<button onclick="showView('${go}')" class="flex-1 py-2 rounded-xl text-xs font-bold ${a===k?'bg-violet-600 text-white':'text-gray-300'}">${l}</button>`;return `<div class="flex gap-1 p-1 rounded-2xl cb border border-violet-500/40">${b('h','✅ العادات','habits')}${b('w','📊 المراجعة الأسبوعية','weekly')}</div>`}
 function weekBanner(){
