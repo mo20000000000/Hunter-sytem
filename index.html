@@ -651,39 +651,80 @@ function renderPlan(){
  if(J.ptc&&J.ptd!==today()){J.ptd=today();prFetch(J.ptc[0],J.ptc[1]).then(t=>{J.pt=t;save();if(jTab==='plan')renderJ()}).catch(()=>{})}
 }
 /* --- تراكينج النوم: ميعاد ثابت بتغيّره وقت ما تحب --- */
-function slFor(k){const h=(state.j.sleep&&state.j.sleep.h)||[];let c=null;h.forEach(e=>{if(e.from<=k)c=e});return c}
+function slFor(k){const S=state.j.sleep||{},p=S.plan&&S.plan[k];if(p)return p;const h=S.h||[];let c=null;h.forEach(e=>{if(e.from<=k)c=e});return c}
 function slCur(){return slFor(fd(new Date()))}
-function slTomKey(){const d=new Date();d.setDate(d.getDate()+1);return fd(d)}
-function slTom(){const o=state.j.sleep&&state.j.sleep.o;return o?o[slTomKey()]||null:null}
 function slDur(e){let d=toMin(e.wake)-toMin(e.bed);if(d<=0)d+=1440;return d}
 function slMinTxt(d){const h=Math.floor(d/60),m=d%60;return (h?`${nA(h)} ساعة`:'')+(h&&m?' و':'')+(m?`${nA(m)} دقيقة`:'')}
 function slDurTxt(e){return slMinTxt(slDur(e))}
 function slHtml(){
  const h=(state.j.sleep&&state.j.sleep.h)||[],c=slCur(),t=fd(new Date());
- const hist=h.slice().reverse().slice(0,5).map(e=>`<div class="flex justify-between text-[11px] ${e===c?'text-indigo-300':'text-gray-500'}"><span>${e.from>t?'من ':''}${esc(e.from)}${e.from>t?' (لسه جاي)':''}</span><span>${fmtT(e.bed)} ← ${fmtT(e.wake)}</span></div>`).join('');
+ const hist=h.slice().reverse().slice(0,5).map(e=>`<div class="flex justify-between text-[11px] ${e===c?'text-indigo-300':'text-gray-500'}"><span>${slDL(e.from)}${e.from>t?' (لسه جاي)':''}</span><span>نوم ${fmtT(e.bed)} • صحيان ${fmtT(e.wake)}</span></div>`).join('');
  if(!c)return `<div class="cb p-4 rounded-2xl border border-indigo-500/40 space-y-2"><div class="text-sm font-bold text-indigo-300">🌙 تراكينج النوم</div><div class="text-[11px] text-gray-400">حدد ميعاد نومك وصحيانك مرة واحدة، وغيّره وقت ما حياتك تتغير.</div>${hist}<button onclick="jSleepForm()" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-xs">حدد ميعاد النوم</button></div>`;
- return `<div class="cb p-4 rounded-2xl border border-indigo-500/40 space-y-2.5"><div class="flex justify-between items-center"><div class="text-sm font-bold text-indigo-300">🌙 تراكينج النوم</div><button onclick="jSleepForm()" class="text-[11px] text-cyan-400">تغيير</button></div><div class="grid grid-cols-3 gap-2 text-center"><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">النوم</div><div class="text-sm font-bold text-gray-100">${fmtT(c.bed)}</div></div><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">الصحيان</div><div class="text-sm font-bold text-gray-100">${fmtT(c.wake)}</div></div><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">المدة</div><div class="text-sm font-bold text-indigo-300">${slDurTxt(c)}</div></div></div>${slTomHtml()}${h.length>1?`<div class="pt-1 border-t border-gray-800 space-y-0.5">${hist}</div>`:''}</div>`;
+ return `<div class="cb p-4 rounded-2xl border border-indigo-500/40 space-y-2.5"><div class="flex justify-between items-center"><div class="text-sm font-bold text-indigo-300">🌙 تراكينج النوم</div><button onclick="jSleepForm()" class="text-[11px] text-cyan-400">تغيير</button></div><div class="grid grid-cols-3 gap-2 text-center"><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">النوم</div><div class="text-sm font-bold text-gray-100">${fmtT(c.bed)}</div></div><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">الصحيان</div><div class="text-sm font-bold text-gray-100">${fmtT(c.wake)}</div></div><div class="rounded-xl border border-gray-800 bg-gray-900/40 p-2"><div class="text-[10px] text-gray-400">المدة</div><div class="text-sm font-bold text-indigo-300">${slDurTxt(c)}</div></div></div>${slGoalHtml()}${h.length>1?`<div class="pt-1 border-t border-gray-800 space-y-0.5">${hist}</div>`:''}</div>`;
 }
-function slTomHtml(){
- const o=slTom(),b=slFor(slTomKey());
- if(!o)return `<button onclick="jSleepTomForm()" class="w-full py-2 rounded-xl border border-indigo-500/60 text-indigo-300 font-bold text-xs">⏰ ظبّط ميعاد بكره</button>`;
- const df=b?slDur(o)-slDur(b):0,dt=df===0?'نفس مدة المعتاد':`${df<0?'أقل':'أكتر'} من المعتاد بـ ${slMinTxt(Math.abs(df))}`;
- return `<div class="rounded-xl border border-indigo-500/50 bg-indigo-950/30 p-2.5 space-y-1"><div class="flex justify-between items-center"><div class="text-[11px] font-bold text-indigo-300">⏰ بكره</div><button onclick="jSleepTomForm()" class="text-[11px] text-cyan-400">تعديل</button></div><div class="flex justify-between text-sm font-bold text-gray-100"><span>نوم ${fmtT(o.bed)}</span><span>صحيان ${fmtT(o.wake)}</span></div><div class="text-[11px] text-gray-400">${slDurTxt(o)} • ${dt}</div></div>`;
+/* --- هدف الصحيان: جدول تدريجي لحد ميعاد معين في عدد أيام --- */
+function slAddD(i){const d=new Date();d.setDate(d.getDate()+i);return fd(d)}
+function slM2T(m){m=((Math.round(m)%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function slGoalOn(){const g=state.j.sleep&&state.j.sleep.goal;return g&&g.end>=fd(new Date())?g:null}
+function slDL(k){const d=new Date(k+'T12:00:00');return d.toLocaleDateString('ar-EG',{weekday:'short',day:'numeric',month:'numeric'})}
+function slTableHtml(rows){
+ const g='display:grid;grid-template-columns:1.3fr 1fr 1fr;align-items:center;text-align:center';
+ return `<div class="rounded-xl border border-gray-800 overflow-hidden"><div style="${g}" class="bg-gray-900/70 text-[10px] text-gray-400 py-1.5"><div>اليوم</div><div>🌙 النوم</div><div>☀️ الصحيان</div></div>${rows.map(r=>`<div style="${g}" class="py-1.5 border-t border-gray-800 ${r.hl?'bg-emerald-900/30':''}"><div class="text-[11px] ${r.hl?'text-emerald-300 font-bold':'text-gray-300'} leading-4">${r.lb}</div><div class="text-[12px] font-bold text-indigo-300">${fmtT(r.bed)}</div><div class="text-[12px] font-bold text-amber-300">${fmtT(r.wake)}</div></div>`).join('')}</div>`;
 }
-function jSleepTomForm(){
- const J=state.j;J.sleep=J.sleep||{h:[]};J.sleep.o=J.sleep.o||{};
- const k=slTomKey(),o=J.sleep.o[k],b=slFor(k);
- jForm({title:'ميعاد نوم بكره',fields:[
-  {id:'bed',label:'هنام امتى بكره؟',type:'time',value:o?o.bed:(b?b.bed:'23:00')},
-  {id:'wake',label:'هصحى امتى؟',type:'time',value:o?o.wake:(b?b.wake:'06:00')}],
-  html:`<div class="text-[11px] text-gray-500">${b?`المعتاد: نوم ${fmtT(b.bed)} وصحيان ${fmtT(b.wake)} (${slDurTxt(b)}). `:''}التعديل ده ليوم بكره بس، وبعدها بيرجع الميعاد المعتاد.</div>`,
-  ok:v=>{const m=$('jmsg');
-   if(!v.bed||!v.wake){m.textContent='اكتب الميعادين';return false}
-   if(v.bed===v.wake){m.textContent='ميعاد النوم والصحيان لازم يختلفوا';return false}
-   const t=fd(new Date());Object.keys(J.sleep.o).forEach(x=>{if(x<t)delete J.sleep.o[x]});
-   J.sleep.o[k]={bed:v.bed,wake:v.wake};save();renderJ()},
-  del:o?()=>{delete J.sleep.o[k];save();renderJ()}:null});
+function slGoalHtml(){
+ const g=slGoalOn();
+ if(!g)return `<button onclick="jSleepGoalForm()" class="w-full py-2 rounded-xl border border-emerald-500/60 text-emerald-300 font-bold text-xs">🎯 هدف: أصحى الساعة كذا تدريجيًا</button>`;
+ const t=fd(new Date()),P=(state.j.sleep||{}).plan||{},keys=Object.keys(P).sort(),left=keys.filter(k=>k>t).length+(keys.includes(t)?0:0),cur=slFor(t),tk=slAddD(1),tm=slFor(tk);
+ const dates=[t].concat(keys.filter(k=>k>t));
+ const rows=dates.map(k=>{const p=slFor(k)||cur;return{lb:k===t?'النهارده':`${slDL(k)}${k===g.end?' 🎯':''}`,bed:p.bed,wake:p.wake,hl:k===t}});
+ const sum=left>0?`<div>📌 <b>النهارده</b> تنام الساعة <b class="text-indigo-300">${fmtT(cur.bed)}</b> وتصحى <b class="text-amber-300">${fmtT(cur.wake)}</b></div><div>➡️ <b>بكره</b> تنام <b class="text-indigo-300">${fmtT(tm.bed)}</b> وتصحى <b class="text-amber-300">${fmtT(tm.wake)}</b></div><div>🎯 <b>الهدف</b> (${slDL(g.end)}): نوم <b class="text-indigo-300">${fmtT(g.bed)}</b> وصحيان <b class="text-amber-300">${fmtT(g.wake)}</b> • باقي ${nA(left)} ${left===1?'يوم':'أيام'}</div>`:`<div>🎯 النهارده يوم الهدف: تنام <b class="text-indigo-300">${fmtT(cur.bed)}</b> وتصحى <b class="text-amber-300">${fmtT(cur.wake)}</b> ✅</div>`;
+ return `<div class="rounded-xl border border-emerald-500/50 bg-emerald-950/20 p-3 space-y-2"><div class="flex justify-between items-center"><div class="text-xs font-bold text-emerald-300">🎯 جدول الوصول للهدف</div><button onclick="jSleepGoalForm()" class="text-[11px] text-cyan-400">تعديل</button></div>${slTableHtml(rows)}<div class="rounded-xl bg-gray-900/60 border border-gray-800 p-2.5 text-[12px] text-gray-200 space-y-1 leading-5">${sum}</div></div>`;
 }
+function slBuild(cb,cw,tb,tw,n){
+ const bb=toMin(cb),bw=toMin(cw),circ=x=>{x=((x%1440)+1440)%1440;return x>720?x-1440:x},dw=circ(tw-bw),db=circ(tb-bb),out=[];
+ for(let i=1;i<=n;i++)out.push(i===n?{bed:slM2T(tb),wake:slM2T(tw)}:{bed:slM2T(Math.round((bb+db*i/n)/5)*5),wake:slM2T(Math.round((bw+dw*i/n)/5)*5)});
+ return{out,dw,db};
+}
+function slGoalVals(){
+ const g=id=>($('f_'+id)||{}).value||'',cb=g('cb'),cw=g('cw'),tw=g('wake'),tbv=g('bed'),n=Math.round(+g('days'));
+ if(!cb||!cw||!tw||!(n>=1&&n<=30))return null;
+ const dur=(toMin(cw)-toMin(cb)+1440)%1440||1440,tb=tbv?toMin(tbv):toMin(tw)-dur;
+ return{cb,cw,tw:toMin(tw),tb,n};
+}
+function slPrev(){
+ const el=$('sl-prev');if(!el)return;const v=slGoalVals();
+ if(!v){el.innerHTML='<div class="text-[11px] text-gray-500">املا الخانات وهيظهر الجدول هنا.</div>';return}
+ const r=slBuild(v.cb,v.cw,v.tb,v.tw,v.n),ab=Math.abs(r.dw),dir=r.dw<0?'أبكر':'أتأخر',tx=r.dw===0?'ميعاد الصحيان زي ما هو':`الصحيان هيبقى ${dir} بـ ${slMinTxt(ab)} على ${nA(v.n)} ${v.n===1?'يوم':'أيام'} (حوالي ${nA(Math.round(ab/v.n))} دقيقة كل يوم)`;
+ const rows=[{lb:'دلوقتي',bed:v.cb,wake:v.cw,hl:true}].concat(r.out.map((p,i)=>({lb:`${slDL(slAddD(i+1))}${i===v.n-1?' 🎯':''}`,bed:p.bed,wake:p.wake})));
+ el.innerHTML=`<div class="text-[11px] text-emerald-300 mb-1.5">${tx}</div>${slTableHtml(rows)}`;
+}
+function jSleepGoalForm(){
+ const J=state.j;J.sleep=J.sleep||{h:[]};
+ const g=slGoalOn(),b=slFor(fd(new Date()))||{bed:'23:00',wake:'06:00'};
+ jForm({title:'هدف الصحيان',fields:[
+  {id:'cb',label:'بتنام حاليًا امتى؟',type:'time',value:b.bed},
+  {id:'cw',label:'وبتصحى حاليًا امتى؟',type:'time',value:b.wake},
+  {id:'wake',label:'عايز تصحى الساعة كام (الهدف)؟',type:'time',value:g?g.wake:''},
+  {id:'bed',label:'ميعاد النوم المطلوب (سيبه فاضي = نفس عدد ساعات نومك الحالي)',type:'time',value:g?g.bed:''},
+  {id:'days',label:'في خلال كام يوم؟ (١ إلى ٣٠)',type:'num',value:g?g.days:6}],
+  html:'<div class="text-[11px] text-gray-500 mb-2">بنبدأ من ميعادك الحالي ونقرّب كل يوم شوية لحد الهدف. أول يوم بكره، وآخر يوم بيبقى الميعاد الجديد بالظبط وبعدها بيفضل ثابت.</div><div class="fl">الجدول المتوقع</div><div id="sl-prev"></div>',
+  ok:v=>{const m=$('jmsg'),x=slGoalVals();
+   if(!x){m.textContent='اكمل كل الخانات (الأيام من ١ إلى ٣٠)';return false}
+   if(((x.tw-x.tb+1440)%1440)===0){m.textContent='ميعاد النوم والصحيان لازم يختلفوا';return false}
+   if(x.cb===x.cw){m.textContent='ميعاد نومك وصحيانك الحاليين لازم يختلفوا';return false}
+   slGoalClear();
+   const S=J.sleep,t=fd(new Date()),cur=slFor(t);
+   if(!cur||cur.bed!==x.cb||cur.wake!==x.cw){S.h=(S.h||[]).filter(e=>e.from!==t);S.h.push({from:t,bed:x.cb,wake:x.cw})}
+   const r=slBuild(x.cb,x.cw,x.tb,x.tw,x.n);S.plan={};S.base={bed:x.cb,wake:x.cw};
+   r.out.forEach((p,i)=>{S.plan[slAddD(i+1)]=p});
+   const end=slAddD(x.n),last=r.out[r.out.length-1];S.goal={wake:last.wake,bed:last.bed,days:x.n,end};
+   S.h=(S.h||[]).filter(e=>e.from!==end);S.h.push({from:end,bed:last.bed,wake:last.wake,g:1});S.h.sort((a,b)=>a.from<b.from?-1:1);
+   save();renderJ()},
+  del:g?()=>{slGoalClear();save();renderJ()}:null});
+ ['cb','cw','wake','bed','days'].forEach(id=>{const e=$('f_'+id);if(e){e.addEventListener('input',slPrev);e.addEventListener('change',slPrev)}});
+ slPrev();
+}
+function slGoalClear(){const S=state.j.sleep;if(!S)return;S.plan={};S.h=(S.h||[]).filter(e=>!e.g);delete S.goal;delete S.base}
 function jSleepForm(){
  const J=state.j,c=slCur();J.sleep=J.sleep||{h:[]};
  jForm({title:'ميعاد النوم والصحيان',fields:[
@@ -1081,7 +1122,7 @@ renderBackupStatus();autoBackup();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoBackup()});
 
 /* --- تحديث تلقائي: لو فيه نسخة أحدث على السيرفر يتحمّل لوحده (البيانات محفوظة ومش بتتأثر) --- */
-const APP_BUILD='2026-11-25-1';
+const APP_BUILD='2026-11-25-4';
 (function(){
  let busy=false;
  async function chkUpdate(){
